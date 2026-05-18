@@ -1,7 +1,7 @@
 import { type NextRequest, NextResponse } from "next/server";
 
 // Rotas que exigem sessão ativa
-const PROTEGIDAS = ["/dashboard", "/agenda", "/criar", "/sala", "/avaliar", "/confirmacao"];
+const PROTEGIDAS = ["/dashboard", "/agenda", "/sala", "/avaliar", "/confirmacao"];
 
 export function proxy(request: NextRequest) {
   const pathname = request.nextUrl.pathname;

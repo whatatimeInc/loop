@@ -18,6 +18,7 @@ export interface Expert {
   rating: number;
   sessoes: number;
   scarcity?: string;
+  doacao?: boolean;
   social: {
     instagram?: string;
     linkedin?: string;
@@ -72,6 +73,7 @@ export const experts: Expert[] = [
     duracoes: [30, 60],
     rating: 4.5,
     sessoes: 213,
+    doacao: true,
     social: {},
   },
   {

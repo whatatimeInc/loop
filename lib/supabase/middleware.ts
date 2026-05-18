@@ -25,7 +25,7 @@ export async function updateSession(request: NextRequest) {
   const { data: { user } } = await supabase.auth.getUser();
 
   // Rotas protegidas: redireciona para login se não autenticado
-  const protegidas = ["/dashboard", "/agenda", "/criar", "/sala", "/avaliar", "/confirmacao"];
+  const protegidas = ["/dashboard", "/agenda", "/sala", "/avaliar", "/confirmacao"];
   const pathname = request.nextUrl.pathname;
   const eProtegida = protegidas.some((p) => pathname.startsWith(p));
 

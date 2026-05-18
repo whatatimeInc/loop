@@ -98,17 +98,16 @@ export function IconCategoriaCarreira({ className = "" }: { className?: string }
 
 export function IconCategoriaSaude({ className = "" }: { className?: string }) {
   return (
-    <svg className={className} viewBox="0 0 42.8 43.5" fill="none" xmlns="http://www.w3.org/2000/svg">
-      <line x1="21.3" y1="0"    x2="21.3" y2="12"   stroke="currentColor" strokeWidth={2} strokeMiterlimit={10} />
-      <line x1="8.6"  y1="4.2"  x2="15.6" y2="13.9" stroke="currentColor" strokeWidth={2} strokeMiterlimit={10} />
-      <line x1=".7"   y1="15.1" x2="12.1" y2="18.8" stroke="currentColor" strokeWidth={2} strokeMiterlimit={10} />
-      <line x1=".7"   y1="28.5" x2="12.1" y2="24.8" stroke="currentColor" strokeWidth={2} strokeMiterlimit={10} />
-      <line x1="8.7"  y1="39.4" x2="15.7" y2="29.7" stroke="currentColor" strokeWidth={2} strokeMiterlimit={10} />
-      <line x1="21.5" y1="43.5" x2="21.5" y2="31.5" stroke="currentColor" strokeWidth={2} strokeMiterlimit={10} />
-      <line x1="34.2" y1="39.3" x2="27.2" y2="29.6" stroke="currentColor" strokeWidth={2} strokeMiterlimit={10} />
-      <line x1="42.1" y1="28.4" x2="30.7" y2="24.7" stroke="currentColor" strokeWidth={2} strokeMiterlimit={10} />
-      <line x1="42"   y1="15"   x2="30.6" y2="18.7" stroke="currentColor" strokeWidth={2} strokeMiterlimit={10} />
-      <line x1="34.1" y1="4.2"  x2="27.1" y2="13.9" stroke="currentColor" strokeWidth={2} strokeMiterlimit={10} />
+    <svg className={className} viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <circle cx="12" cy="12" r="4" />
+      <line x1="12" y1="2" x2="12" y2="5" />
+      <line x1="12" y1="19" x2="12" y2="22" />
+      <line x1="2" y1="12" x2="5" y2="12" />
+      <line x1="19" y1="12" x2="22" y2="12" />
+      <line x1="4.93" y1="4.93" x2="7.05" y2="7.05" />
+      <line x1="16.95" y1="16.95" x2="19.07" y2="19.07" />
+      <line x1="19.07" y1="4.93" x2="16.95" y2="7.05" />
+      <line x1="7.05" y1="16.95" x2="4.93" y2="19.07" />
     </svg>
   );
 }

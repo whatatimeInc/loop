@@ -1,9 +1,10 @@
 import Image from "next/image";
+import Link from "next/link";
 import { notFound } from "next/navigation";
 import { experts } from "@/lib/mockExperts";
 import { BookingSidebar } from "@/components/BookingSidebar";
-import { IconStar, IconShare, IconCheck } from "@/components/icons";
-import { LinkButton } from "@/components/ui/Button";
+import { IconStar } from "@/components/icons";
+
 type Props = { params: Promise<{ slug: string }> };
 
 export function generateStaticParams() {
@@ -24,7 +25,7 @@ const avaliacoesMock = [
   {
     nome: "Fernanda R.",
     nota: 5,
-    texto: "Sessão incrível. Sai com clareza total sobre o próximo passo na carreira.",
+    texto: "Sessão incrível. Saí com clareza total sobre o próximo passo na carreira.",
     data: "Mar 2025",
   },
   {
@@ -33,205 +34,225 @@ const avaliacoesMock = [
     texto: "Direto ao ponto, sem enrolação. Valeu cada centavo.",
     data: "Fev 2025",
   },
-  {
-    nome: "Camila T.",
-    nota: 5,
-    texto: "Esperava muito e superou. A experiência prática fez toda a diferença.",
-    data: "Jan 2025",
-  },
 ];
 
-export default async function PerfilMentor({ params }: Props) {
+function InstagramIcon() {
+  return (
+    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.5} strokeLinecap="round" strokeLinejoin="round">
+      <rect x="2" y="2" width="20" height="20" rx="5" ry="5" />
+      <circle cx="12" cy="12" r="4" />
+      <circle cx="17.5" cy="6.5" r="0.5" fill="currentColor" stroke="none" />
+    </svg>
+  );
+}
+
+function LinkedInIcon() {
+  return (
+    <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
+      <path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-2-2 2 2 0 0 0-2 2v7h-4v-7a6 6 0 0 1 6-6z" />
+      <rect x="2" y="9" width="4" height="12" />
+      <circle cx="4" cy="4" r="2" />
+    </svg>
+  );
+}
+
+export default async function CreatorPage({ params }: Props) {
   const { slug } = await params;
   const expert = experts.find((e) => e.slug === slug);
   if (!expert) notFound();
 
   return (
-    <div className="min-h-screen bg-cream">
-
-      {/* ======== HERO ======== */}
-      <section className="relative h-[420px] md:h-[520px]">
-        <Image
-          src={`/mentors/${expert.slug}/work.webp`}
-          alt={`Foto de ${expert.nome}`}
-          fill
-          priority
-          className="object-cover object-center"
-          sizes="100vw"
-        />
-        {/* Gradiente escuro de baixo */}
-        <div className="absolute inset-0 bg-gradient-to-t from-gray-900/80 via-gray-900/20 to-transparent" />
-
-        {/* Botão compartilhar */}
-        <button
-          className="absolute top-24 right-6 w-10 h-10 rounded-full bg-white/20 backdrop-blur-sm flex items-center justify-center hover:bg-white/30 transition-colors"
-          aria-label="Compartilhar perfil"
+    <div className="min-h-screen" style={{ background: "#F6F1E9" }}>
+      <div
+        className="max-w-[1194px] mx-auto px-6 pt-32 pb-20"
+      >
+        <div
+          className="grid gap-8 items-start"
+          style={{ gridTemplateColumns: "1fr 440px" }}
         >
-          <IconShare className="w-5 h-5 text-white" />
-        </button>
 
-        {/* Info no rodapé do hero */}
-        <div className="absolute bottom-0 left-0 right-0 px-6 md:px-10 pb-8 flex items-end gap-5">
-          {/* Avatar */}
-          <div className="relative w-24 h-24 rounded-2xl overflow-hidden border-4 border-white flex-shrink-0 shadow-soft">
-            <Image
-              src={`/mentors/${expert.slug}/profile.webp`}
-              alt={expert.nome}
-              fill
-              className="object-cover object-top"
-              sizes="96px"
-            />
-          </div>
-          {/* Nome e categoria */}
-          <div className="mb-1">
-            <div className="flex items-center gap-2 mb-1">
-              <h1 className="text-white text-2xl md:text-3xl font-bold leading-tight">
-                {expert.nome}
-              </h1>
-              <span className="w-5 h-5 rounded-full bg-lime flex items-center justify-center flex-shrink-0">
-                <IconCheck className="w-3 h-3 text-dark" />
-              </span>
-            </div>
-            <span className="text-gray-300 text-sm">{expert.categoria}</span>
-          </div>
-        </div>
-      </section>
+          {/* ══════════════ COLUNA ESQUERDA ══════════════ */}
+          <div className="flex flex-col gap-8">
 
-      {/* ======== CONTEÚDO ======== */}
-      <section className="max-w-6xl mx-auto px-6 py-10">
-        <div className="grid md:grid-cols-[1fr_360px] gap-10 items-start">
+            {/* 1. Breadcrumb */}
+            <nav className="text-sm" style={{ color: "#181D27" }}>
+              <Link href="/explorar" className="hover:opacity-60 transition-opacity">Creators</Link>
+              <span className="mx-2 opacity-40">|</span>
+              <Link href={`/explorar?categoria=${encodeURIComponent(expert.categoria)}`} className="hover:opacity-60 transition-opacity">{expert.categoria}</Link>
+              <span className="mx-2 opacity-40">|</span>
+              <span className="font-semibold">{expert.nome}</span>
+            </nav>
 
-          {/* ——— COLUNA ESQUERDA ——— */}
-          <div className="space-y-10">
-
-            {/* Stats */}
-            <div className="flex flex-wrap gap-6">
-              <div className="text-center">
-                <p className="text-2xl font-bold text-gray-900">{expert.sessoes}</p>
-                <p className="text-xs text-gray-500 mt-0.5">sessões realizadas</p>
-              </div>
-              <div className="text-center">
-                <p className="text-2xl font-bold text-gray-900">{expert.rating.toFixed(1)}</p>
-                <p className="text-xs text-gray-500 mt-0.5">avaliação média</p>
-              </div>
-              <div className="text-center">
-                <p className="text-2xl font-bold text-gray-900">98%</p>
-                <p className="text-xs text-gray-500 mt-0.5">taxa de resposta</p>
-              </div>
-              <div className="text-center">
-                <p className="text-2xl font-bold text-gray-900">72%</p>
-                <p className="text-xs text-gray-500 mt-0.5">clientes recorrentes</p>
+            {/* 2. Galeria */}
+            <div className="relative overflow-hidden rounded-3xl" style={{ height: 410 }}>
+              <div className="flex gap-8 h-full" style={{ width: "max-content" }}>
+                <div className="relative flex-shrink-0 rounded-3xl overflow-hidden" style={{ width: 335, height: 410 }}>
+                  <Image
+                    src={`/mentors/${expert.slug}/profile.webp`}
+                    alt={expert.nome}
+                    fill
+                    priority
+                    className="object-cover object-top"
+                    sizes="335px"
+                  />
+                </div>
+                <div className="relative flex-shrink-0 rounded-3xl overflow-hidden" style={{ width: 335, height: 410 }}>
+                  <Image
+                    src={`/mentors/${expert.slug}/work.webp`}
+                    alt={`Trabalho de ${expert.nome}`}
+                    fill
+                    className="object-cover object-center"
+                    sizes="335px"
+                  />
+                </div>
               </div>
             </div>
 
-            {/* Scarcity */}
-            {expert.scarcity && (
-              <div className="inline-flex items-center gap-2 bg-amber-50 border border-amber-200 text-amber-700 text-sm font-medium px-4 py-2 rounded-full">
-                <span className="w-2 h-2 rounded-full bg-amber-500 animate-pulse" />
-                {expert.scarcity}
+            {/* 3. Header do creator */}
+            <div className="flex items-start justify-between gap-4">
+              {/* Nome + bio */}
+              <div style={{ maxWidth: 237 }}>
+                <h1
+                  className="font-normal leading-tight mb-2"
+                  style={{ fontSize: 30, color: "#181D27" }}
+                >
+                  {expert.nome}
+                </h1>
+                <p style={{ fontSize: 16, color: "#181D27", lineHeight: "24px" }}>
+                  {expert.bio}
+                </p>
+              </div>
+
+              {/* Rating badge */}
+              <div
+                className="flex items-center gap-1.5 flex-shrink-0"
+                style={{
+                  background: "#E7DAC8",
+                  borderRadius: 999,
+                  padding: "12px 16px",
+                }}
+              >
+                <IconStar className="w-5 h-5" style={{ color: "#181D27" }} />
+                <span className="font-bold" style={{ fontSize: 16, color: "#181D27" }}>
+                  {expert.rating.toFixed(1)}
+                </span>
+                <span style={{ fontSize: 14, color: "#414651" }}>
+                  ({expert.sessoes})
+                </span>
+              </div>
+            </div>
+
+            {/* 4. Badge de doação */}
+            {expert.doacao && (
+              <div
+                className="inline-flex items-center gap-2 self-start"
+                style={{
+                  background: "#CEFD58",
+                  borderRadius: 999,
+                  padding: "8px 16px",
+                  fontSize: 13,
+                  fontWeight: 600,
+                  color: "#181D27",
+                }}
+              >
+                🤝 Impacto Social — doe o que ganha
               </div>
             )}
 
-            {/* Sobre */}
-            <div>
-              <h2 className="text-lg font-bold text-gray-900 mb-3">Sobre</h2>
-              <p className="text-gray-600 leading-relaxed">{expert.bio}</p>
+            {/* 5. Social icons */}
+            <div className="flex items-center gap-4" style={{ color: "#181D27" }}>
+              <a href="#" aria-label="Instagram" className="hover:opacity-60 transition-opacity">
+                <InstagramIcon />
+              </a>
+              <a href="#" aria-label="LinkedIn" className="hover:opacity-60 transition-opacity">
+                <LinkedInIcon />
+              </a>
             </div>
 
-            {/* O que você pode esperar */}
-            <div>
-              <h2 className="text-lg font-bold text-gray-900 mb-4">
-                O que você pode esperar
+            {/* 5. Sobre */}
+            <div className="flex flex-col gap-4">
+              <h2
+                className="font-normal"
+                style={{ fontSize: 24, color: "#181D27" }}
+              >
+                Sobre
               </h2>
-              <ul className="space-y-3">
-                {[
-                  "Sessão 100% focada na sua dúvida ou desafio",
-                  "Feedback direto e acionável, sem rodeios",
-                  "Acesso à experiência real, não a teoria",
-                  "Gravação disponível após a sessão",
-                ].map((item) => (
-                  <li key={item} className="flex items-start gap-3 text-gray-600 text-sm">
-                    <span className="w-5 h-5 rounded-full bg-lime flex items-center justify-center flex-shrink-0 mt-0.5">
-                      <IconCheck className="w-3 h-3 text-dark" />
-                    </span>
-                    {item}
-                  </li>
-                ))}
-              </ul>
+              <p style={{ fontSize: 16, color: "#181D27", lineHeight: "28px" }}>
+                {expert.bio}
+              </p>
             </div>
 
-            {/* Avaliações */}
-            <div>
-              <div className="flex items-center gap-3 mb-6">
-                <h2 className="text-lg font-bold text-gray-900">Avaliações</h2>
-                <div className="flex items-center gap-1">
-                  {[1, 2, 3, 4, 5].map((i) => (
-                    <IconStar
-                      key={i}
-                      className={`w-4 h-4 ${
-                        i <= Math.round(expert.rating)
-                          ? "text-amber-400"
-                          : "text-gray-200"
-                      }`}
-                    />
-                  ))}
-                  <span className="text-sm text-gray-500 ml-1">
-                    {expert.rating.toFixed(1)}
-                  </span>
-                </div>
-              </div>
-              <div className="space-y-4">
+            {/* 6. Avaliações */}
+            <div className="flex flex-col gap-8">
+              <h2
+                className="font-normal"
+                style={{ fontSize: 24, color: "#181D27" }}
+              >
+                Avaliações
+              </h2>
+
+              <div className="flex flex-col gap-6">
                 {avaliacoesMock.map((av) => (
                   <div
                     key={av.nome}
-                    className="bg-white rounded-2xl border border-gray-200 p-5"
+                    className="flex flex-col gap-4"
+                    style={{
+                      background: "#FCFBF8",
+                      borderRadius: 16,
+                      padding: 32,
+                    }}
                   >
-                    <div className="flex items-center justify-between mb-3">
-                      <div className="flex items-center gap-2">
-                        <div className="w-8 h-8 rounded-full bg-gray-200 flex items-center justify-center text-xs font-bold text-gray-600">
-                          {av.nome[0]}
-                        </div>
-                        <span className="font-medium text-sm text-gray-900">
+                    {/* Header do review */}
+                    <div className="flex items-start justify-between">
+                      <div className="flex flex-col gap-1">
+                        <span className="font-bold" style={{ fontSize: 16, color: "#181D27" }}>
                           {av.nome}
                         </span>
+                        <span style={{ fontSize: 14, color: "#181D27" }}>
+                          {av.data}
+                        </span>
                       </div>
-                      <span className="text-xs text-gray-400">{av.data}</span>
+                      <div className="flex items-center gap-1">
+                        <IconStar className="w-4 h-4" style={{ color: "#181D27" }} />
+                        <span className="font-bold" style={{ fontSize: 16, color: "#181D27" }}>
+                          {av.nota}.0
+                        </span>
+                      </div>
                     </div>
-                    <div className="flex gap-0.5 mb-2">
-                      {[1, 2, 3, 4, 5].map((i) => (
-                        <IconStar
-                          key={i}
-                          className={`w-3.5 h-3.5 ${
-                            i <= av.nota ? "text-amber-400" : "text-gray-200"
-                          }`}
-                        />
-                      ))}
-                    </div>
-                    <p className="text-gray-600 text-sm leading-relaxed">
+                    {/* Texto */}
+                    <p style={{ fontSize: 16, color: "#181D27", lineHeight: "28px" }}>
                       {av.texto}
                     </p>
                   </div>
                 ))}
               </div>
+
+              {/* Ver todas */}
+              <div className="flex justify-center">
+                <button
+                  className="px-5 py-2.5 rounded-lg font-semibold text-sm transition-opacity hover:opacity-70"
+                  style={{
+                    outline: "1px solid #414651",
+                    color: "#414651",
+                    background: "transparent",
+                    fontSize: 16,
+                    padding: "10px 18px",
+                  }}
+                >
+                  Ver todas
+                </button>
+              </div>
             </div>
+
           </div>
 
-          {/* ——— COLUNA DIREITA (sticky) ——— */}
-          <div className="md:sticky md:top-24">
+          {/* ══════════════ BOOKING CARD (sticky) ══════════════ */}
+          <div className="sticky top-24">
             <BookingSidebar expert={expert} />
-            <p className="text-center text-xs text-gray-400 mt-4">
-              Compartilhe este perfil
-            </p>
-            <div className="flex justify-center mt-2">
-              <LinkButton href={`/${expert.slug}`} variant="ghost" size="sm">
-                <IconShare className="w-4 h-4 mr-1.5" />
-                face.talk/{expert.slug}
-              </LinkButton>
-            </div>
           </div>
 
         </div>
-      </section>
+      </div>
     </div>
   );
 }

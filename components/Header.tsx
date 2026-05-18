@@ -12,7 +12,9 @@ export async function Header() {
       <nav className="flex items-center justify-between gap-6 px-4 py-2 rounded-full bg-white/70 backdrop-blur-md border border-white/40 shadow-soft w-full max-w-3xl">
 
         {/* Logo */}
-        <Logo size="header" />
+        <a href="/" aria-label="Ir para a Home">
+          <Logo size="header" />
+        </a>
 
         {/* Links centrais */}
         <div className="hidden md:flex items-center gap-6">
