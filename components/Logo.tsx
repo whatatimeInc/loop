@@ -9,28 +9,35 @@ const heights: Record<LogoSize, number> = {
 
 interface LogoProps {
   size?: LogoSize;
-  /** Usar em fundos escuros — inverte o SVG para branco */
+  /** Fundos escuros — inverte para branco */
   light?: boolean;
+  /** Versão lime (#CEFD58) para sidebars escuros */
+  lime?: boolean;
   className?: string;
 }
 
-export function Logo({ size = "header", light = false, className = "" }: LogoProps) {
+export function Logo({ size = "header", light = false, lime = false, className = "" }: LogoProps) {
   const h = heights[size];
-  // Aspect ratio do SVG original: 788.6 × 199.6 ≈ 3.95 : 1
-  const w = Math.round(h * 3.95);
+
+  let filter = "none";
+  if (lime) {
+    // black SVG → lime #CEFD58
+    filter = "brightness(0) saturate(100%) invert(95%) sepia(40%) saturate(800%) hue-rotate(30deg) brightness(108%)";
+  } else if (light) {
+    filter = "invert(1) brightness(10)";
+  }
 
   return (
     // eslint-disable-next-line @next/next/no-img-element
     <img
       src="/logo.svg"
       alt="Face.Talk"
-      width={w}
       height={h}
       className={className}
       style={{
         height: h,
         width: "auto",
-        filter: light ? "invert(1) brightness(10)" : "none",
+        filter,
         display: "block",
       }}
     />

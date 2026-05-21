@@ -21,20 +21,25 @@ export async function generateMetadata({ params }: Props) {
   };
 }
 
+// ─── mock reviews ─────────────────────────────────────────────────────────────
+
 const avaliacoesMock = [
   {
-    nome: "Fernanda R.",
+    nome: "Felipe M.",
     nota: 5,
-    texto: "Sessão incrível. Saí com clareza total sobre o próximo passo na carreira.",
-    data: "Mar 2025",
+    texto: "Really great person. Was very open and thoughtful with his feedback.",
+    data: "Abril 2026",
   },
   {
-    nome: "Lucas M.",
+    nome: "Marina M.",
     nota: 5,
-    texto: "Direto ao ponto, sem enrolação. Valeu cada centavo.",
-    data: "Fev 2025",
+    texto:
+      "He gave me some great ideas about the design for my app as well as different directions I can go with. He also mentioned some things that I had never even thought about. Thank you.",
+    data: "Fevereiro 2026",
   },
 ];
+
+// ─── icons ────────────────────────────────────────────────────────────────────
 
 function InstagramIcon() {
   return (
@@ -56,202 +61,236 @@ function LinkedInIcon() {
   );
 }
 
+// ─── page ─────────────────────────────────────────────────────────────────────
+
 export default async function CreatorPage({ params }: Props) {
   const { slug } = await params;
   const expert = experts.find((e) => e.slug === slug);
   if (!expert) notFound();
 
+  const recomendam = Math.round(expert.rating * 20);
+
   return (
-    <div className="min-h-screen" style={{ background: "#F6F1E9" }}>
-      <div
-        className="max-w-[1194px] mx-auto px-6 pt-32 pb-20"
-      >
+    <div className="min-h-screen" style={{ background: "#181D27" }}>
+      <div className="max-w-[1194px] mx-auto px-6 pt-28 pb-20">
+
+        {/* ══ HERO: 3 colunas ══════════════════════════════════════════════════ */}
         <div
-          className="grid gap-8 items-start"
-          style={{ gridTemplateColumns: "1fr 440px" }}
+          style={{
+            display: "grid",
+            gridTemplateColumns: "336px 1fr 335px",
+            gap: 32,
+            alignItems: "start",
+          }}
         >
 
-          {/* ══════════════ COLUNA ESQUERDA ══════════════ */}
-          <div className="flex flex-col gap-8">
+          {/* ── Col 1: info do creator ── */}
+          <div className="flex flex-col" style={{ gap: 32, paddingTop: 68 }}>
 
-            {/* 1. Breadcrumb */}
-            <nav className="text-sm" style={{ color: "#181D27" }}>
-              <Link href="/explorar" className="hover:opacity-60 transition-opacity">Creators</Link>
-              <span className="mx-2 opacity-40">|</span>
-              <Link href={`/explorar?categoria=${encodeURIComponent(expert.categoria)}`} className="hover:opacity-60 transition-opacity">{expert.categoria}</Link>
-              <span className="mx-2 opacity-40">|</span>
-              <span className="font-semibold">{expert.nome}</span>
-            </nav>
-
-            {/* 2. Galeria */}
-            <div className="relative overflow-hidden rounded-3xl" style={{ height: 410 }}>
-              <div className="flex gap-8 h-full" style={{ width: "max-content" }}>
-                <div className="relative flex-shrink-0 rounded-3xl overflow-hidden" style={{ width: 335, height: 410 }}>
-                  <Image
-                    src={`/mentors/${expert.slug}/profile.webp`}
-                    alt={expert.nome}
-                    fill
-                    priority
-                    className="object-cover object-top"
-                    sizes="335px"
-                  />
-                </div>
-                <div className="relative flex-shrink-0 rounded-3xl overflow-hidden" style={{ width: 335, height: 410 }}>
-                  <Image
-                    src={`/mentors/${expert.slug}/work.webp`}
-                    alt={`Trabalho de ${expert.nome}`}
-                    fill
-                    className="object-cover object-center"
-                    sizes="335px"
-                  />
-                </div>
-              </div>
-            </div>
-
-            {/* 3. Header do creator */}
-            <div className="flex items-start justify-between gap-4">
-              {/* Nome + bio */}
-              <div style={{ maxWidth: 237 }}>
-                <h1
-                  className="font-normal leading-tight mb-2"
-                  style={{ fontSize: 30, color: "#181D27" }}
-                >
-                  {expert.nome}
-                </h1>
-                <p style={{ fontSize: 16, color: "#181D27", lineHeight: "24px" }}>
-                  {expert.bio}
-                </p>
-              </div>
-
-              {/* Rating badge */}
-              <div
-                className="flex items-center gap-1.5 flex-shrink-0"
+            {/* Category pill */}
+            <div className="inline-flex self-start">
+              <span
+                className="text-sm font-semibold"
                 style={{
-                  background: "#E7DAC8",
-                  borderRadius: 999,
-                  padding: "12px 16px",
+                  background: "rgba(255,255,255,0.40)",
+                  borderRadius: 8,
+                  padding: "8px 14px",
+                  backdropFilter: "blur(20px)",
+                  color: "#E9EAEB",
                 }}
               >
-                <IconStar className="w-5 h-5" style={{ color: "#181D27" }} />
-                <span className="font-bold" style={{ fontSize: 16, color: "#181D27" }}>
-                  {expert.rating.toFixed(1)}
-                </span>
-                <span style={{ fontSize: 14, color: "#414651" }}>
-                  ({expert.sessoes})
-                </span>
-              </div>
+                {expert.categoria}
+              </span>
             </div>
 
-            {/* 4. Badge de doação */}
-            {expert.doacao && (
-              <div
-                className="inline-flex items-center gap-2 self-start"
-                style={{
-                  background: "#CEFD58",
-                  borderRadius: 999,
-                  padding: "8px 16px",
-                  fontSize: 13,
-                  fontWeight: 600,
-                  color: "#181D27",
-                }}
-              >
-                🤝 Impacto Social — doe o que ganha
-              </div>
-            )}
-
-            {/* 5. Social icons */}
-            <div className="flex items-center gap-4" style={{ color: "#181D27" }}>
-              <a href="#" aria-label="Instagram" className="hover:opacity-60 transition-opacity">
-                <InstagramIcon />
-              </a>
-              <a href="#" aria-label="LinkedIn" className="hover:opacity-60 transition-opacity">
-                <LinkedInIcon />
-              </a>
-            </div>
-
-            {/* 5. Sobre */}
+            {/* Nome + bio */}
             <div className="flex flex-col gap-4">
-              <h2
-                className="font-normal"
-                style={{ fontSize: 24, color: "#181D27" }}
-              >
-                Sobre
-              </h2>
-              <p style={{ fontSize: 16, color: "#181D27", lineHeight: "28px" }}>
+              <h1 className="font-normal" style={{ fontSize: 48, color: "#E9EAEB", lineHeight: "48px" }}>
+                {expert.nome}
+              </h1>
+              <p style={{ fontSize: 14, color: "#E9EAEB", lineHeight: "18px" }}>
                 {expert.bio}
               </p>
             </div>
 
-            {/* 6. Avaliações */}
-            <div className="flex flex-col gap-8">
-              <h2
-                className="font-normal"
-                style={{ fontSize: 24, color: "#181D27" }}
-              >
-                Avaliações
-              </h2>
-
-              <div className="flex flex-col gap-6">
-                {avaliacoesMock.map((av) => (
-                  <div
-                    key={av.nome}
-                    className="flex flex-col gap-4"
-                    style={{
-                      background: "#FCFBF8",
-                      borderRadius: 16,
-                      padding: 32,
-                    }}
-                  >
-                    {/* Header do review */}
-                    <div className="flex items-start justify-between">
-                      <div className="flex flex-col gap-1">
-                        <span className="font-bold" style={{ fontSize: 16, color: "#181D27" }}>
-                          {av.nome}
-                        </span>
-                        <span style={{ fontSize: 14, color: "#181D27" }}>
-                          {av.data}
-                        </span>
-                      </div>
-                      <div className="flex items-center gap-1">
-                        <IconStar className="w-4 h-4" style={{ color: "#181D27" }} />
-                        <span className="font-bold" style={{ fontSize: 16, color: "#181D27" }}>
-                          {av.nota}.0
-                        </span>
-                      </div>
-                    </div>
-                    {/* Texto */}
-                    <p style={{ fontSize: 16, color: "#181D27", lineHeight: "28px" }}>
-                      {av.texto}
-                    </p>
-                  </div>
-                ))}
-              </div>
-
-              {/* Ver todas */}
-              <div className="flex justify-center">
-                <button
-                  className="px-5 py-2.5 rounded-lg font-semibold text-sm transition-opacity hover:opacity-70"
-                  style={{
-                    outline: "1px solid #414651",
-                    color: "#414651",
-                    background: "transparent",
-                    fontSize: 16,
-                    padding: "10px 18px",
-                  }}
-                >
-                  Ver todas
-                </button>
-              </div>
+            {/* O que esperar */}
+            <div style={{ fontSize: 14, color: "#E9EAEB", lineHeight: "18px" }}>
+              <p className="mb-1">O que esperar:</p>
+              <ul className="flex flex-col gap-1">
+                <li>Sessão 100% focada na sua dúvida ou desafio</li>
+                <li>Feedback direto e acionável, sem rodeios</li>
+                <li>Acesso à experiência real, não a teoria</li>
+                <li>Gravação disponível após a sessão</li>
+              </ul>
             </div>
 
+            {/* Redes sociais */}
+            <div className="flex items-center gap-4" style={{ color: "#E9EAEB" }}>
+              <a href={expert.social.instagram ?? "#"} aria-label="Instagram" className="hover:opacity-60 transition-opacity">
+                <InstagramIcon />
+              </a>
+              <a href={expert.social.linkedin ?? "#"} aria-label="LinkedIn" className="hover:opacity-60 transition-opacity">
+                <LinkedInIcon />
+              </a>
+            </div>
           </div>
 
-          {/* ══════════════ BOOKING CARD (sticky) ══════════════ */}
+          {/* ── Col 2: foto principal ── */}
+          <div
+            className="relative overflow-hidden"
+            style={{ borderRadius: 24, aspectRatio: "456/557" }}
+          >
+            <Image
+              src={`/mentors/${expert.slug}/profile.webp`}
+              alt={expert.nome}
+              fill
+              priority
+              className="object-cover object-top"
+              sizes="456px"
+            />
+          </div>
+
+          {/* ── Col 3: booking sidebar ── */}
           <div className="sticky top-24">
             <BookingSidebar expert={expert} />
           </div>
 
         </div>
+
+        {/* ══ STATS + DOAÇÃO ═══════════════════════════════════════════════════ */}
+        <div
+          style={{
+            display: "grid",
+            gridTemplateColumns: "1fr 335px",
+            gap: 32,
+            marginTop: 24,
+          }}
+        >
+          {/* Stats bar */}
+          <div
+            className="flex items-start"
+            style={{ borderTop: "1px solid #535862", paddingTop: 24, gap: 64 }}
+          >
+            <div className="flex flex-col gap-1">
+              <div className="flex items-center gap-1">
+                <IconStar className="w-4 h-4" style={{ color: "#E9EAEB" }} />
+                <span style={{ fontSize: 24, color: "#E9EAEB", lineHeight: "32px" }}>
+                  {expert.rating.toFixed(1)}
+                </span>
+              </div>
+              <span style={{ fontSize: 14, color: "#E9EAEB" }}>
+                {expert.sessoes} avaliações
+              </span>
+            </div>
+
+            <div className="flex flex-col gap-1">
+              <span style={{ fontSize: 24, color: "#E9EAEB" }}>{expert.sessoes}+</span>
+              <span style={{ fontSize: 14, color: "#E9EAEB" }}>sessões</span>
+            </div>
+
+            <div className="flex flex-col gap-1">
+              <span style={{ fontSize: 24, color: "#E9EAEB" }}>{recomendam}%</span>
+              <span style={{ fontSize: 14, color: "#E9EAEB" }}>recomendam</span>
+            </div>
+          </div>
+
+          {/* Donation card (alinha com a col da sidebar) */}
+          {expert.doacao ? (
+            <div
+              className="flex items-center justify-center text-center"
+              style={{
+                background: "#414651",
+                borderRadius: 12,
+                padding: 24,
+                fontSize: 14,
+                color: "#E9EAEB",
+                lineHeight: "18px",
+              }}
+            >
+              100% dos ganhos serão doados para{" "}
+              <strong className="ml-1">uma instituição social</strong>
+            </div>
+          ) : (
+            <div /> /* placeholder para manter o grid alinhado */
+          )}
+        </div>
+
+        {/* ══ SOBRE + AVALIAÇÕES ═══════════════════════════════════════════════ */}
+        <div
+          style={{
+            maxWidth: 829,
+            borderTop: "1px solid #535862",
+            paddingTop: 24,
+            marginTop: 32,
+            display: "flex",
+            flexDirection: "column",
+            gap: 32,
+          }}
+        >
+          {/* Sobre */}
+          <div className="flex flex-col gap-2">
+            <h2 style={{ fontSize: 24, fontWeight: 400, color: "#E9EAEB", lineHeight: "32px" }}>
+              Sobre
+            </h2>
+            <p style={{ fontSize: 14, color: "#E9EAEB", lineHeight: "18px" }}>
+              {expert.bio}
+            </p>
+          </div>
+
+          {/* Avaliações */}
+          <div className="flex flex-col gap-8">
+            <h2 style={{ fontSize: 24, fontWeight: 400, color: "#E9EAEB", lineHeight: "32px" }}>
+              Avaliações
+            </h2>
+
+            <div className="flex flex-col gap-6">
+              {avaliacoesMock.map((av) => (
+                <div
+                  key={av.nome}
+                  className="flex flex-col"
+                  style={{ background: "#414651", borderRadius: 16, padding: 32, gap: 18 }}
+                >
+                  <div className="flex flex-col gap-1">
+                    <div className="flex items-center justify-between">
+                      <span style={{ fontSize: 16, fontWeight: 700, color: "#E9EAEB" }}>
+                        {av.nome}
+                      </span>
+                      <div className="flex items-center gap-2">
+                        <IconStar className="w-5 h-5" style={{ color: "#E9EAEB" }} />
+                        <span style={{ fontSize: 16, fontWeight: 700, color: "#E9EAEB" }}>
+                          {av.nota}.0
+                        </span>
+                      </div>
+                    </div>
+                    <span style={{ fontSize: 14, color: "#E9EAEB" }}>{av.data}</span>
+                  </div>
+                  <p style={{ fontSize: 16, color: "#E9EAEB", lineHeight: "24px" }}>
+                    {av.texto}
+                  </p>
+                </div>
+              ))}
+            </div>
+
+            {/* Ver todas */}
+            <div className="flex justify-center">
+              <button
+                className="font-semibold transition-opacity hover:opacity-70"
+                style={{
+                  outline: "1px solid #D5D7DA",
+                  outlineOffset: -1,
+                  color: "#D5D7DA",
+                  background: "transparent",
+                  fontSize: 16,
+                  padding: "10px 18px",
+                  borderRadius: 8,
+                }}
+              >
+                Ver todas
+              </button>
+            </div>
+          </div>
+        </div>
+
       </div>
     </div>
   );
