@@ -2,6 +2,7 @@
 
 import Image from "next/image";
 import Link from "next/link";
+import { useRef, useEffect } from "react";
 import { motion, cubicBezier } from "framer-motion";
 
 const ease = cubicBezier(0.22, 1, 0.36, 1);
@@ -15,137 +16,68 @@ const fadeUp = (delay = 0) => ({
   transition: { duration: 0.6, ease, delay },
 });
 
-// ── PhoneMockup ───────────────────────────────────────────────────────────────
+// ── HeroVideo ─────────────────────────────────────────────────────────────────
 
-function PhoneMockup() {
-  const expert = experts[0];
+function HeroVideo() {
+  const videoRef = useRef<HTMLVideoElement>(null);
+
+  useEffect(() => {
+    const el = videoRef.current;
+    if (!el) return;
+    el.muted = true;
+    el.play().catch(() => {});
+  }, []);
 
   return (
     <motion.div
-      className="relative flex items-center justify-center"
-      initial={{ opacity: 0, scale: 0.92, y: 24 }}
-      animate={{ opacity: 1, scale: 1, y: 0 }}
-      transition={{ duration: 0.8, ease, delay: 0.4 }}
+      className="relative w-full"
+      initial={{ opacity: 0, x: 40 }}
+      animate={{ opacity: 1, x: 0 }}
+      transition={{ duration: 0.9, ease, delay: 0.3 }}
     >
-      {/* Glow spots */}
-      <motion.div
-        className="absolute w-72 h-72 rounded-full bg-lime/25 blur-3xl -top-10 -right-10 pointer-events-none"
-        animate={{ scale: [1, 1.12, 1], opacity: [0.25, 0.4, 0.25] }}
-        transition={{ duration: 4, repeat: Infinity, ease: "easeInOut" }}
-      />
-      <motion.div
-        className="absolute w-52 h-52 rounded-full bg-purple-500/12 blur-3xl bottom-10 left-0 pointer-events-none"
-        animate={{ scale: [1, 1.08, 1], opacity: [0.12, 0.22, 0.12] }}
-        transition={{ duration: 5, repeat: Infinity, ease: "easeInOut", delay: 1 }}
+      {/* Subtle glow behind the video */}
+      <div
+        className="absolute -inset-6 rounded-3xl pointer-events-none"
+        style={{
+          background: "radial-gradient(ellipse at 60% 40%, rgba(206,253,88,0.12) 0%, transparent 70%)",
+          filter: "blur(20px)",
+        }}
       />
 
-      {/* Floating phone */}
-      <motion.div
-        animate={{ y: [0, -14, 0] }}
-        transition={{ duration: 3.5, repeat: Infinity, ease: "easeInOut" }}
+      {/* Video container */}
+      <div
+        className="relative overflow-hidden w-full"
+        style={{
+          borderRadius: 24,
+          aspectRatio: "16/10",
+          boxShadow: "0 40px 100px rgba(0,0,0,0.55), 0 0 0 1px rgba(255,255,255,0.08)",
+        }}
       >
-        {/* Frame */}
-        <div className="relative w-[260px] h-[520px] rounded-[2.8rem] overflow-hidden shadow-[0_32px_80px_rgba(0,0,0,0.45)] border border-white/15 bg-white/5 backdrop-blur-sm">
-          {/* Background photo */}
-          <Image
-            src={`/mentors/${expert.slug}/profile.webp`}
-            alt={expert.nome}
-            fill
-            className="object-cover object-top"
-            sizes="260px"
-            priority
-          />
+        <video
+          ref={videoRef}
+          src="/hero.mp4"
+          autoPlay
+          muted
+          loop
+          playsInline
+          className="w-full h-full object-cover"
+        />
 
-          {/* Gradient overlay */}
-          <div className="absolute inset-0 bg-gradient-to-b from-black/35 via-transparent to-black/75" />
+        {/* Subtle vignette on bottom edge */}
+        <div
+          className="absolute inset-x-0 bottom-0 h-24 pointer-events-none"
+          style={{
+            background: "linear-gradient(to top, rgba(24,26,24,0.45) 0%, transparent 100%)",
+          }}
+        />
+      </div>
 
-          {/* Status bar pills */}
-          <div className="absolute top-3 left-0 right-0 flex justify-center">
-            <div className="w-24 h-5 bg-black rounded-full" />
-          </div>
-
-          {/* Header */}
-          <div className="absolute top-10 left-0 right-0 flex flex-col items-center">
-            <span
-              className="font-black text-white text-lg tracking-tight"
-              style={{ fontFamily: "var(--font-permanent-marker)" }}
-            >
-              face<span className="text-lime">.</span>Talk
-            </span>
-            <div className="flex items-center gap-1.5 mt-1">
-              <div className="w-1.5 h-1.5 rounded-full bg-green-400 animate-pulse" />
-              <span className="text-white/80 text-xs">{expert.nome}</span>
-            </div>
-          </div>
-
-          {/* Live badge */}
-          <div className="absolute top-10 right-5">
-            <span className="bg-red-500 text-white text-[9px] font-bold px-2 py-0.5 rounded-full tracking-wider">
-              AO VIVO
-            </span>
-          </div>
-
-          {/* Wave visual */}
-          <div className="absolute inset-x-0 top-1/2 -translate-y-1/2 flex justify-center">
-            <motion.svg
-              width="180"
-              height="60"
-              viewBox="0 0 180 60"
-              fill="none"
-              xmlns="http://www.w3.org/2000/svg"
-            >
-              {[0, 1, 2, 3, 4, 5, 6].map((i) => (
-                <motion.rect
-                  key={i}
-                  x={i * 26 + 2}
-                  y={30}
-                  width={12}
-                  height={4}
-                  rx={6}
-                  fill="white"
-                  fillOpacity={0.6}
-                  animate={{ height: [4, 14 + i * 5, 4], y: [30, 23 - i * 2, 30] }}
-                  transition={{
-                    duration: 0.9 + i * 0.12,
-                    repeat: Infinity,
-                    ease: "easeInOut",
-                    delay: i * 0.1,
-                  }}
-                />
-              ))}
-            </motion.svg>
-          </div>
-
-          {/* Controls */}
-          <div className="absolute bottom-8 left-0 right-0 flex justify-center items-center gap-5">
-            <button className="w-12 h-12 rounded-full bg-white/20 backdrop-blur-sm flex items-center justify-center border border-white/20 hover:bg-white/30 transition-colors">
-              <svg viewBox="0 0 24 24" className="w-5 h-5 text-white" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round">
-                <path d="M23 7l-7 5 7 5V7z" /><rect x="1" y="5" width="15" height="14" rx="2" />
-              </svg>
-            </button>
-            <button className="w-12 h-12 rounded-full bg-white/20 backdrop-blur-sm flex items-center justify-center border border-white/20 hover:bg-white/30 transition-colors">
-              <svg viewBox="0 0 24 24" className="w-5 h-5 text-white" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round">
-                <path d="M12 1a3 3 0 00-3 3v8a3 3 0 006 0V4a3 3 0 00-3-3z" />
-                <path d="M19 10v2a7 7 0 01-14 0v-2" />
-                <line x1="12" y1="19" x2="12" y2="23" />
-                <line x1="8" y1="23" x2="16" y2="23" />
-              </svg>
-            </button>
-            <button className="w-14 h-14 rounded-full bg-red-500 flex items-center justify-center shadow-lg shadow-red-500/40 hover:bg-red-600 transition-colors">
-              <svg viewBox="0 0 24 24" className="w-5 h-5 text-white" fill="currentColor">
-                <path d="M10.68 13.31a16 16 0 003.41 2.6l1.27-1.27a2 2 0 012.11-.45c1.12.45 2.3.77 3.53.94a2 2 0 011.84 1.99V21a2 2 0 01-2.18 2C9.31 22.15 2 14.84 2 6a2 2 0 012-2h3.5a2 2 0 012 1.72c.16 1.22.47 2.4.91 3.52a2 2 0 01-.44 2.11l-1.27 1.27-.02-.11z" />
-              </svg>
-            </button>
-          </div>
-        </div>
-      </motion.div>
-
-      {/* Floating stat card */}
+      {/* Floating stat card — sessões */}
       <motion.div
-        className="absolute -left-10 top-1/3 bg-white/10 backdrop-blur-md border border-white/20 rounded-2xl px-4 py-3 shadow-xl"
-        initial={{ opacity: 0, x: -20 }}
+        className="absolute -left-6 top-8 bg-white/10 backdrop-blur-md border border-white/15 rounded-2xl px-4 py-3 shadow-xl"
+        initial={{ opacity: 0, x: -16 }}
         animate={{ opacity: 1, x: 0 }}
-        transition={{ delay: 1.1, duration: 0.6, ease }}
+        transition={{ delay: 0.9, duration: 0.6, ease }}
       >
         <p className="text-white/60 text-[10px] font-medium">Sessões hoje</p>
         <p className="text-white text-xl font-bold leading-tight">2.4k</p>
@@ -153,12 +85,12 @@ function PhoneMockup() {
 
       {/* Floating rating card */}
       <motion.div
-        className="absolute -right-8 bottom-1/3 bg-white/10 backdrop-blur-md border border-white/20 rounded-2xl px-4 py-3 shadow-xl"
-        initial={{ opacity: 0, x: 20 }}
+        className="absolute -right-6 bottom-12 bg-white/10 backdrop-blur-md border border-white/15 rounded-2xl px-4 py-3 shadow-xl"
+        initial={{ opacity: 0, x: 16 }}
         animate={{ opacity: 1, x: 0 }}
-        transition={{ delay: 1.3, duration: 0.6, ease }}
+        transition={{ delay: 1.1, duration: 0.6, ease }}
       >
-        <p className="text-white/60 text-[10px] font-medium">Avaliação</p>
+        <p className="text-white/60 text-[10px] font-medium">Avaliação média</p>
         <div className="flex items-center gap-1 mt-0.5">
           <svg viewBox="0 0 24 24" className="w-3.5 h-3.5 text-yellow-400" fill="currentColor">
             <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z" />
@@ -245,9 +177,9 @@ export function HeroSection() {
           </motion.div>
         </div>
 
-        {/* Right — Phone Mockup */}
-        <div className="hidden md:flex justify-center">
-          <PhoneMockup />
+        {/* Right — Hero Video */}
+        <div className="hidden md:flex items-center">
+          <HeroVideo />
         </div>
       </div>
     </section>
