@@ -17,7 +17,7 @@ export function Footer() {
       {/* Corpo */}
       <div className="max-w-5xl mx-auto px-6 py-12 grid grid-cols-2 md:grid-cols-4 gap-8">
         <div className="col-span-2 md:col-span-1">
-          <Logo size="footer" className="text-gray-25" />
+          <Logo size="footer" light />
           <p className="text-sm text-gray-400 mt-3">
             Monetize seu acesso.<br />Transforme seguidores em clientes.
           </p>
