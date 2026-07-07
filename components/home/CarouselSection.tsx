@@ -30,7 +30,7 @@ function CreatorCard({ expert, index }: { expert: typeof experts[0]; index: numb
     >
       <Link
         href={`/${expert.slug}`}
-        className="block relative rounded-3xl overflow-hidden group"
+        className="block relative rounded-xl overflow-hidden group"
         style={{ height: "400px" }}
       >
         {/* Foto ocupa o card inteiro */}
@@ -109,14 +109,14 @@ export function CarouselSection() {
     .filter(Boolean) as typeof experts;
 
   return (
-    <section ref={ref} className="bg-dark py-20">
-      <div className="max-w-7xl mx-auto px-6">
+    <section ref={ref} className="py-20" style={{ background: "#F4F2EB" }}>
+      <div className="max-w-[1194px] mx-auto px-6">
 
         {/* Header — spec: justify-content space-between */}
         <div className="flex items-center justify-between mb-12">
           <motion.h2
             className="text-2xl md:text-3xl font-normal"
-            style={{ color: "#D5D7DA" }}
+            style={{ color: "#272518" }}
             initial={{ opacity: 0, y: 20 }}
             animate={inView ? { opacity: 1, y: 0 } : {}}
             transition={{ duration: 0.55, ease }}
@@ -131,7 +131,7 @@ export function CarouselSection() {
             <Link
               href="/explorar"
               className="text-sm font-semibold flex items-center gap-1.5 whitespace-nowrap transition-opacity hover:opacity-70"
-              style={{ color: "#D5D7DA" }}
+              style={{ color: "#8E8857" }}
             >
               Ver todos
               <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2.5} strokeLinecap="round" strokeLinejoin="round">

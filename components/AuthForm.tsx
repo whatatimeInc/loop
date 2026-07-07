@@ -39,14 +39,14 @@ function Input({
   return (
     <div>
       <label className="block text-xs font-semibold text-gray-600 mb-2">{label}</label>
-      <div className={`flex items-center border-2 rounded-2xl transition-colors ${error ? "border-red-300" : "border-gray-200 focus-within:border-lime"}`}>
+      <div className={`flex items-center border-2 rounded-lg transition-colors ${error ? "border-red-300" : "border-gray-200 focus-within:border-lime"}`}>
         <input
           type={isPassword && show ? "text" : type}
           value={value}
           onChange={(e) => onChange(e.target.value)}
           placeholder={placeholder}
           autoComplete={autoComplete}
-          className="flex-1 px-4 py-3.5 text-sm text-gray-900 placeholder:text-gray-300 focus:outline-none bg-transparent rounded-2xl"
+          className="flex-1 px-4 py-3.5 text-sm text-gray-900 placeholder:text-gray-300 focus:outline-none bg-transparent rounded-lg"
         />
         {isPassword && (
           <button
@@ -199,12 +199,12 @@ export function AuthForm({ mode }: { mode: Mode }) {
         </div>
 
         {/* Card */}
-        <div className="bg-white rounded-3xl border border-gray-200 p-8 shadow-sm">
+        <div className="bg-white rounded-xl border border-gray-200 p-8 shadow-sm">
           {/* Google */}
           <button
             onClick={handleGoogle}
             disabled={googleLoading || sucesso}
-            className="w-full flex items-center justify-center gap-3 border-2 border-gray-200 rounded-2xl py-3.5 text-sm font-semibold text-gray-700 hover:bg-gray-50 hover:border-gray-300 transition-all disabled:opacity-50"
+            className="w-full flex items-center justify-center gap-3 border-2 border-gray-200 rounded-lg py-3.5 text-sm font-semibold text-gray-700 hover:bg-gray-50 hover:border-gray-300 transition-all disabled:opacity-50"
           >
             {googleLoading ? (
               <svg className="w-4 h-4 animate-spin text-gray-400" viewBox="0 0 24 24" fill="none">
@@ -253,14 +253,14 @@ export function AuthForm({ mode }: { mode: Mode }) {
                   </Link>
                 )}
               </div>
-              <div className={`flex items-center border-2 rounded-2xl transition-colors ${errors.senha ? "border-red-300" : "border-gray-200 focus-within:border-lime"}`}>
+              <div className={`flex items-center border-2 rounded-lg transition-colors ${errors.senha ? "border-red-300" : "border-gray-200 focus-within:border-lime"}`}>
                 <input
                   type="password"
                   value={senha}
                   onChange={(e) => setSenha(e.target.value)}
                   placeholder={isLogin ? "Sua senha" : "Mín. 8 caracteres"}
                   autoComplete={isLogin ? "current-password" : "new-password"}
-                  className="flex-1 px-4 py-3.5 text-sm text-gray-900 placeholder:text-gray-300 focus:outline-none bg-transparent rounded-2xl"
+                  className="flex-1 px-4 py-3.5 text-sm text-gray-900 placeholder:text-gray-300 focus:outline-none bg-transparent rounded-lg"
                 />
               </div>
               {errors.senha && <p className="text-xs text-red-400 mt-1.5">{errors.senha}</p>}
@@ -279,7 +279,7 @@ export function AuthForm({ mode }: { mode: Mode }) {
 
             {/* Erro geral (ex: credenciais inválidas) */}
             {errors.geral && (
-              <div className="bg-red-50 border border-red-200 rounded-xl px-4 py-3 text-xs text-red-600 font-medium">
+              <div className="bg-red-50 border border-red-200 rounded-md px-4 py-3 text-xs text-red-600 font-medium">
                 {errors.geral}
               </div>
             )}
@@ -288,7 +288,7 @@ export function AuthForm({ mode }: { mode: Mode }) {
             <button
               type="submit"
               disabled={loading || sucesso}
-              className="w-full py-4 rounded-2xl bg-gray-900 text-white font-bold text-sm disabled:opacity-50 hover:bg-gray-800 transition-all flex items-center justify-center gap-2"
+              className="w-full py-4 rounded-lg bg-gray-900 text-white font-bold text-sm disabled:opacity-50 hover:bg-gray-800 transition-all flex items-center justify-center gap-2"
             >
               {sucesso ? (
                 <>

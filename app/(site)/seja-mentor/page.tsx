@@ -30,7 +30,7 @@ const beneficios = [
 
 const steps = [
   { n: "01", titulo: "Crie seu perfil", desc: "Nome, foto, bio e preço. Leva 2 minutos." },
-  { n: "02", titulo: "Compartilhe o link", desc: "face.talk/seu-nome vai direto para seus seguidores." },
+  { n: "02", titulo: "Compartilhe o link", desc: "loop.talk/seu-nome vai direto para seus seguidores." },
   { n: "03", titulo: "Receba e converse", desc: "O cliente paga, você confirma, a call acontece no navegador." },
 ];
 
@@ -116,7 +116,7 @@ export default function SejaMentor() {
           </h2>
           <div className="grid sm:grid-cols-2 md:grid-cols-3 gap-6">
             {beneficios.map((b) => (
-              <div key={b.titulo} className="bg-gray-800/60 rounded-2xl p-6">
+              <div key={b.titulo} className="bg-gray-800/60 rounded-lg p-6">
                 <div className="w-6 h-6 rounded-full bg-lime flex items-center justify-center mb-4">
                   <IconCheck className="w-3.5 h-3.5 text-dark" />
                 </div>
@@ -136,7 +136,7 @@ export default function SejaMentor() {
           <span className="text-lime font-bold text-2xl">R$ 2.400</span>{" "}
           líquidos.
         </p>
-        <div className="bg-gray-800 rounded-2xl p-8 text-left space-y-4">
+        <div className="bg-gray-800 rounded-lg p-8 text-left space-y-4">
           {[
             { label: "Preço por sessão", valor: "R$ 300", cor: "" },
             { label: "Sessões por mês", valor: "10", cor: "" },
@@ -165,7 +165,7 @@ export default function SejaMentor() {
           </h2>
           <div className="grid md:grid-cols-3 gap-6">
             {depoimentos.map((d) => (
-              <div key={d.nome} className="bg-gray-800/60 rounded-2xl p-6">
+              <div key={d.nome} className="bg-gray-800/60 rounded-lg p-6">
                 <p className="text-gray-300 text-sm leading-relaxed mb-6">
                   &ldquo;{d.texto}&rdquo;
                 </p>

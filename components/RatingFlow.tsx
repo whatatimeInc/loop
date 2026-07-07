@@ -148,7 +148,7 @@ function StepAvaliarMentor({ expert, onProximo }: {
               onChange={(e) => setComentario(e.target.value)}
               placeholder="Conte mais sobre sua experiência... (opcional)"
               rows={3}
-              className="w-full rounded-2xl border-2 border-gray-200 p-4 text-sm text-gray-900 placeholder:text-gray-300 focus:outline-none focus:border-lime resize-none transition-colors"
+              className="w-full rounded-lg border-2 border-gray-200 p-4 text-sm text-gray-900 placeholder:text-gray-300 focus:outline-none focus:border-lime resize-none transition-colors"
             />
           </motion.div>
         )}
@@ -157,7 +157,7 @@ function StepAvaliarMentor({ expert, onProximo }: {
       <button
         onClick={() => onProximo(nota, tags, comentario)}
         disabled={!podeProsseguir}
-        className="w-full mt-8 py-4 rounded-2xl bg-gray-900 text-white font-bold text-sm disabled:opacity-40 disabled:cursor-not-allowed hover:bg-gray-800 transition-all"
+        className="w-full mt-8 py-4 rounded-lg bg-gray-900 text-white font-bold text-sm disabled:opacity-40 disabled:cursor-not-allowed hover:bg-gray-800 transition-all"
       >
         Continuar
       </button>
@@ -213,7 +213,7 @@ function StepAvaliarVoce({ onEnviar }: { onEnviar: () => void }) {
               onChange={(e) => setComentario(e.target.value)}
               placeholder="Comentário sobre o seguidor... (opcional)"
               rows={3}
-              className="w-full rounded-2xl border-2 border-gray-200 p-4 text-sm text-gray-900 placeholder:text-gray-300 focus:outline-none focus:border-lime resize-none transition-colors"
+              className="w-full rounded-lg border-2 border-gray-200 p-4 text-sm text-gray-900 placeholder:text-gray-300 focus:outline-none focus:border-lime resize-none transition-colors"
             />
           </motion.div>
         )}
@@ -222,7 +222,7 @@ function StepAvaliarVoce({ onEnviar }: { onEnviar: () => void }) {
       <button
         onClick={onEnviar}
         disabled={nota === 0}
-        className="w-full mt-8 py-4 rounded-2xl bg-gray-900 text-white font-bold text-sm disabled:opacity-40 disabled:cursor-not-allowed hover:bg-gray-800 transition-all"
+        className="w-full mt-8 py-4 rounded-lg bg-gray-900 text-white font-bold text-sm disabled:opacity-40 disabled:cursor-not-allowed hover:bg-gray-800 transition-all"
       >
         Enviar avaliações
       </button>
@@ -282,7 +282,7 @@ function StepObrigado({ expert, notaMentor, router }: {
           initial={{ opacity: 0, y: 8 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.3 }}
-          className="mt-4 mb-8 bg-lime/10 border border-lime/30 rounded-2xl px-5 py-4 max-w-xs"
+          className="mt-4 mb-8 bg-lime/10 border border-lime/30 rounded-lg px-5 py-4 max-w-xs"
         >
           <p className="text-sm text-gray-700">
             Que tal recomendar {expert.nome} para um amigo?
@@ -291,7 +291,7 @@ function StepObrigado({ expert, notaMentor, router }: {
             onClick={() => {
               if (navigator.share) {
                 navigator.share({
-                  title: `Sessão com ${expert.nome} no face.Talk`,
+                  title: `Sessão com ${expert.nome} no Loop.Talk`,
                   text: `Tive uma sessão incrível com ${expert.nome}! Recomendo muito.`,
                   url: window.location.origin + `/${expert.slug}`,
                 });
@@ -313,13 +313,13 @@ function StepObrigado({ expert, notaMentor, router }: {
       <div className="flex flex-col gap-3 w-full">
         <button
           onClick={() => router.push(`/${expert.slug}`)}
-          className="w-full py-4 rounded-2xl bg-gray-900 text-white font-bold text-sm hover:bg-gray-800 transition-all"
+          className="w-full py-4 rounded-lg bg-gray-900 text-white font-bold text-sm hover:bg-gray-800 transition-all"
         >
           Ver perfil de {expert.nome}
         </button>
         <button
           onClick={() => router.push("/explorar")}
-          className="w-full py-4 rounded-2xl border-2 border-gray-200 text-gray-700 font-semibold text-sm hover:bg-gray-50 transition-all"
+          className="w-full py-4 rounded-lg border-2 border-gray-200 text-gray-700 font-semibold text-sm hover:bg-gray-50 transition-all"
         >
           Explorar outros mentores
         </button>

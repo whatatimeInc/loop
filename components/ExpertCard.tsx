@@ -26,7 +26,7 @@ export function ExpertCard({ expert, fixedWidth = false }: ExpertCardProps) {
     <div className={fixedWidth ? "flex-shrink-0 w-[260px]" : "w-full"}>
       <Link
         href={`/${expert.slug}`}
-        className="block relative rounded-3xl overflow-hidden group"
+        className="block relative rounded-xl overflow-hidden group"
         style={{ height: "400px" }}
       >
         {/* Foto ocupa o card inteiro */}

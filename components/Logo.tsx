@@ -11,7 +11,7 @@ interface LogoProps {
   size?: LogoSize;
   /** Fundos escuros — inverte para branco */
   light?: boolean;
-  /** Versão lime (#CEFD58) para sidebars escuros */
+  /** Versão amarela (#EAEA68) para fundos escuros */
   lime?: boolean;
   className?: string;
 }
@@ -21,17 +21,18 @@ export function Logo({ size = "header", light = false, lime = false, className =
 
   let filter = "none";
   if (lime) {
-    // black SVG → lime #CEFD58
-    filter = "brightness(0) saturate(100%) invert(95%) sepia(40%) saturate(800%) hue-rotate(30deg) brightness(108%)";
+    // black SVG → brand yellow #EAEA68
+    filter = "brightness(0) saturate(100%) invert(96%) sepia(55%) saturate(400%) hue-rotate(5deg) brightness(103%)";
   } else if (light) {
-    filter = "invert(1) brightness(10)";
+    // black SVG → warm off-white #FCFBF8
+    filter = "invert(1) brightness(0.99) sepia(2%)";
   }
 
   return (
     // eslint-disable-next-line @next/next/no-img-element
     <img
       src="/logo.svg"
-      alt="Face.Talk"
+      alt="Loop.Talk"
       height={h}
       className={className}
       style={{

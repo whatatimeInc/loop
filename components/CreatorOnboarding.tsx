@@ -1,214 +1,821 @@
 "use client";
 
-import { useState, useRef } from "react";
+import { useState, useRef, useCallback } from "react";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
+import Link from "next/link";
 import { motion, AnimatePresence } from "framer-motion";
-import { categorias, type Categoria } from "@/lib/mockExperts";
-import { IconCheck } from "@/components/icons";
-import {
-  IconCategoriaCarreira,
-  IconCategoriaSaude,
-  IconCategoriaArte,
-  IconCategoriaGastronomia,
-  IconCategoriaModa,
-  IconCategoriaCasa,
-} from "@/components/icons";
+import { Logo } from "@/components/Logo";
+import { createClient } from "@/lib/supabase/client";
+import { tokens } from "@/components/ui/tokens";
+import { FloatingInput } from "@/components/ui/FloatingInput";
+import { FloatingTextarea } from "@/components/ui/FloatingTextarea";
+import { Stepper } from "@/components/ui/Stepper";
+import { SelectCard } from "@/components/ui/SelectCard";
+import { WizardFooter } from "@/components/ui/WizardFooter";
+import { FolderFrame } from "@/components/ui/FolderFrame";
 
-// ─── tipos ─────────────────────────────────────────────────────────────────────
+// ─── Types ─────────────────────────────────────────────────────────────────────
 
-interface FormData {
-  nome: string;
+type ProfileArea =
+  | "career_business"
+  | "lifestyle_fashion"
+  | "health_wellness"
+  | "technology"
+  | "creativity"
+  | "gastronomy";
+
+type Platform = "instagram" | "linkedin" | "twitter" | "youtube" | "tiktok" | "website";
+type SlugStatus = "idle" | "checking" | "available" | "taken" | "invalid";
+
+interface SocialLink {
+  id: string;
+  platform: Platform;
+  url: string;
+}
+
+interface AvailBlock {
+  id: string;
+  startTime: string;
+  endTime: string;
+  days: number[];
+}
+
+interface WizardState {
+  firstName: string;
+  lastName: string;
+  slug: string;
+  avatarFile: File | null;
+  avatarPreview: string | null;
+  headline: string;
   bio: string;
-  fotoPreview: string | null;
-  categoria: Categoria | null;
-  duracoes: number[];
-  precoBase: number;
+  socialLinks: SocialLink[];
+  area: ProfileArea | null;
   googleCalendar: boolean;
-  diasDisponiveis: number[];  // 0=Dom … 6=Sáb
-  horarioInicio: string;
-  horarioFim: string;
-  instagram: string;
-  linkedin: string;
-  twitter: string;
-  pixChave: string;
-  doacao: boolean;
-  doacaoInstituicao: string;
+  availBlocks: AvailBlock[];
 }
 
-const INITIAL: FormData = {
-  nome: "",
+const INITIAL: WizardState = {
+  firstName: "",
+  lastName: "",
+  slug: "",
+  avatarFile: null,
+  avatarPreview: null,
+  headline: "",
   bio: "",
-  fotoPreview: null,
-  categoria: null,
-  duracoes: [30, 60],
-  precoBase: 120,
+  socialLinks: [],
+  area: null,
   googleCalendar: false,
-  diasDisponiveis: [1, 2, 3, 4, 5],
-  horarioInicio: "09:00",
-  horarioFim: "18:00",
-  instagram: "",
-  linkedin: "",
-  twitter: "",
-  pixChave: "",
-  doacao: false,
-  doacaoInstituicao: "",
+  availBlocks: [],
 };
 
-const DURACOES_OPCOES = [30, 45, 60];
-const DIAS = ["Dom", "Seg", "Ter", "Qua", "Qui", "Sex", "Sáb"];
+// ─── Local token aliases (lê do DS) ────────────────────────────────────────────
 
-const categoriaIcones: Record<Categoria, React.ReactNode> = {
-  "Carreira e Negócios": <IconCategoriaCarreira className="w-7 h-7" />,
-  "Saúde e Bem Estar":   <IconCategoriaSaude className="w-7 h-7" />,
-  "Criatividade":        <IconCategoriaArte className="w-7 h-7" />,
-  "Gastronomia":         <IconCategoriaGastronomia className="w-7 h-7" />,
-  "Estilo de Vida":      <IconCategoriaModa className="w-7 h-7" />,
-  "Tecnologia":          <IconCategoriaCasa className="w-7 h-7" />,
-};
+const BG     = tokens.bg;
+const CARD   = tokens.card;
+const BORDER = tokens.border;
+const DARK   = tokens.dark;
+const LIME   = tokens.lime;
+const MUTED  = tokens.muted;
+const FAINT  = tokens.faint;
+const BEIGE  = tokens.beige;
+const RED    = tokens.red;
+const GREEN  = tokens.green;
 
-function fmt(v: number) {
-  return v.toLocaleString("pt-BR", { minimumFractionDigits: 2 });
+// ─── Utils ─────────────────────────────────────────────────────────────────────
+
+function slugify(s: string) {
+  return s
+    .toLowerCase()
+    .normalize("NFD")
+    .replace(/[̀-ͯ]/g, "")
+    .replace(/[^a-z0-9\s-]/g, "")
+    .trim()
+    .replace(/\s+/g, "-");
 }
 
-function precoPorDuracao(precoBase: number, min: number) {
-  return Math.round((precoBase * min) / 60);
+function uid() { return Math.random().toString(36).slice(2, 10); }
+
+// ─── Icons ─────────────────────────────────────────────────────────────────────
+
+function IcoCheck({ color = GREEN }: { color?: string }) {
+  return (
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
+      <path d="M5 13l4 4L19 7" stroke={color} strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" />
+    </svg>
+  );
 }
 
-// ─── toggle genérico ───────────────────────────────────────────────────────────
+function IcoX() {
+  return (
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
+      <path d="M18 6L6 18M6 6l12 12" stroke={DARK} strokeWidth="2" strokeLinecap="round" />
+    </svg>
+  );
+}
+
+
+function IcoArrowRight({ size = 14 }: { size?: number }) {
+  return (
+    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+      <path d="M5 12h14M12 5l7 7-7 7" />
+    </svg>
+  );
+}
+
+function IcoArrowLeft({ size = 14 }: { size?: number }) {
+  return (
+    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+      <path d="M19 12H5M12 19l-7-7 7-7" />
+    </svg>
+  );
+}
+
+function IcoChevron() {
+  return (
+    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+      <path d="M6 9l6 6 6-6" />
+    </svg>
+  );
+}
+
+function IcoPlus() {
+  return (
+    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round">
+      <path d="M12 5v14M5 12h14" />
+    </svg>
+  );
+}
+
+function IcoTrash() {
+  return (
+    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.5} strokeLinecap="round" strokeLinejoin="round">
+      <polyline points="3 6 5 6 21 6" />
+      <path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6" />
+      <path d="M10 11v6M14 11v6" />
+    </svg>
+  );
+}
+
+// FolderFrame, FloatingInput, FloatingTextarea → importados de @/components/ui
+
+// ─── Toggle ────────────────────────────────────────────────────────────────────
 
 function Toggle({ value, onChange }: { value: boolean; onChange: () => void }) {
   return (
     <button
       type="button"
       onClick={onChange}
-      className="relative flex-shrink-0 transition-colors"
-      style={{
-        width: 48,
-        height: 28,
-        borderRadius: 999,
-        background: value ? "#CEFD58" : "#E7DAC8",
-      }}
-      aria-checked={value}
       role="switch"
+      aria-checked={value}
+      style={{
+        position: "relative", flexShrink: 0,
+        width: 44, height: 26, borderRadius: 13,
+        background: value ? LIME : "#DAD9D5",
+        border: "none", cursor: "pointer",
+        transition: "background 0.2s",
+      }}
     >
-      <span
-        className="absolute top-1 transition-transform"
-        style={{
-          left: 4,
-          width: 20,
-          height: 20,
-          borderRadius: "50%",
-          background: "#181D27",
-          transform: value ? "translateX(20px)" : "translateX(0)",
-        }}
-      />
+      <span style={{
+        position: "absolute", top: 3, left: 3,
+        width: 20, height: 20, borderRadius: "50%",
+        background: DARK, transition: "transform 0.2s",
+        transform: value ? "translateX(18px)" : "translateX(0)",
+      }} />
     </button>
   );
 }
 
-// ─── step 1: perfil ────────────────────────────────────────────────────────────
+// Stepper → importado de @/components/ui
+const STEPS = ["Perfil", "Sobre", "Área", "Agenda"];
 
-function StepPerfil({ data, onChange }: { data: FormData; onChange: (p: Partial<FormData>) => void }) {
-  const inputRef = useRef<HTMLInputElement>(null);
+// ─── Platform icons & data ─────────────────────────────────────────────────────
+
+const PLATFORMS: { value: Platform; label: string }[] = [
+  { value: "instagram", label: "Instagram" },
+  { value: "linkedin",  label: "LinkedIn" },
+  { value: "twitter",   label: "X / Twitter" },
+  { value: "youtube",   label: "YouTube" },
+  { value: "tiktok",    label: "TikTok" },
+  { value: "website",   label: "Website" },
+];
+
+function PlatformIcon({ p }: { p: Platform }) {
+  if (p === "instagram") return (
+    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.5} strokeLinecap="round" strokeLinejoin="round">
+      <rect x="2" y="2" width="20" height="20" rx="5" />
+      <circle cx="12" cy="12" r="4" />
+      <circle cx="17.5" cy="6.5" r="0.5" fill="currentColor" stroke="none" />
+    </svg>
+  );
+  if (p === "linkedin") return (
+    <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor">
+      <path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-4 0v7h-4v-7a6 6 0 0 1 6-6z" />
+      <rect x="2" y="9" width="4" height="12" />
+      <circle cx="4" cy="4" r="2" />
+    </svg>
+  );
+  if (p === "twitter") return (
+    <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor">
+      <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z" />
+    </svg>
+  );
+  if (p === "youtube") return (
+    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.5} strokeLinecap="round">
+      <rect x="2" y="5" width="20" height="14" rx="3" />
+      <polygon points="10,9 15,12 10,15" fill="currentColor" stroke="none" />
+    </svg>
+  );
+  if (p === "tiktok") return (
+    <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor">
+      <path d="M19.59 6.69a4.83 4.83 0 0 1-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 0 1-5.77-.39 2.89 2.89 0 0 1 2.89-2.89c.28 0 .54.04.79.1V9.01a6.27 6.27 0 0 0-.79-.05 6.34 6.34 0 0 0 0 12.68 6.34 6.34 0 0 0 6.33-6.34V8.69a8.18 8.18 0 0 0 4.78 1.52V6.77a4.85 4.85 0 0 1-1.01-.08z" />
+    </svg>
+  );
+  return (
+    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.5} strokeLinecap="round">
+      <circle cx="12" cy="12" r="10" />
+      <path d="M2 12h20M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z" />
+    </svg>
+  );
+}
+
+// ─── SocialLinkRow ─────────────────────────────────────────────────────────────
+
+function SocialLinkRow({
+  link, onChange, onRemove,
+}: {
+  link: SocialLink;
+  onChange: (l: SocialLink) => void;
+  onRemove: () => void;
+}) {
+  return (
+    <div style={{ display: "flex", gap: 8, alignItems: "center" }}>
+      <div style={{
+        display: "flex", alignItems: "stretch", flex: 1,
+        border: `1.5px solid ${BORDER}`, borderRadius: 8,
+        overflow: "hidden", background: CARD,
+      }}>
+        {/* Platform selector — icon left, chevron right */}
+        <div style={{ position: "relative", flexShrink: 0 }}>
+          {/* Icon left */}
+          <span style={{
+            position: "absolute", left: 12, top: "50%",
+            transform: "translateY(-50%)", pointerEvents: "none",
+            color: DARK, display: "flex", alignItems: "center",
+          }}>
+            <PlatformIcon p={link.platform} />
+          </span>
+
+          <select
+            value={link.platform}
+            onChange={(e) => onChange({ ...link, platform: e.target.value as Platform })}
+            style={{
+              appearance: "none",
+              padding: "11px 32px 11px 34px",
+              border: "none", borderRight: `1.5px solid ${BORDER}`,
+              background: BEIGE, fontSize: 13, color: DARK,
+              cursor: "pointer", fontFamily: "inherit", outline: "none",
+              height: "100%",
+            }}
+          >
+            {PLATFORMS.map(p => (
+              <option key={p.value} value={p.value}>{p.label}</option>
+            ))}
+          </select>
+
+          {/* Chevron right */}
+          <span style={{
+            position: "absolute", right: 10, top: "50%",
+            transform: "translateY(-50%)", pointerEvents: "none", color: MUTED,
+            display: "flex", alignItems: "center",
+          }}>
+            <IcoChevron />
+          </span>
+        </div>
+
+        {/* URL */}
+        <input
+          type="url"
+          value={link.url}
+          onChange={(e) => onChange({ ...link, url: e.target.value })}
+          placeholder="https://..."
+          style={{
+            flex: 1, padding: "10px 12px",
+            border: "none", background: "transparent",
+            fontSize: 13, color: DARK,
+            outline: "none", fontFamily: "inherit",
+          }}
+        />
+      </div>
+
+      <button
+        type="button"
+        onClick={onRemove}
+        style={{
+          width: 34, height: 34, borderRadius: 8, flexShrink: 0,
+          border: `1.5px solid ${BORDER}`, background: CARD,
+          color: MUTED, cursor: "pointer",
+          display: "flex", alignItems: "center", justifyContent: "center",
+        }}
+      >
+        <IcoTrash />
+      </button>
+    </div>
+  );
+}
+
+// ─── Area icons (design-system SVGs) ───────────────────────────────────────────
+
+function AreaIconCarreira() {
+  return (
+    <svg width="20" height="20" viewBox="0 0 50.1 50" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <defs>
+        <clipPath id="car-cp0"><polygon points="1 33.1 1.1 .5 29.5 16.9 29.4 49.5 1 33.1"/></clipPath>
+        <clipPath id="car-cp1"><polygon points="11.1 33.1 11.1 .5 39.5 16.9 39.4 49.5 11.1 33.1"/></clipPath>
+        <clipPath id="car-cp2"><polygon points="21.1 33.1 21.2 .5 49.5 16.9 49.4 49.5 21.1 33.1"/></clipPath>
+      </defs>
+      <g style={{ isolation: "isolate" }}>
+        <g clipPath="url(#car-cp0)">
+          <path stroke="#272618" strokeWidth=".5" strokeMiterlimit="10" d="M1.8,32.7V1.7c0,0,27,15.6,27,15.6v31c0,0-27-15.6-27-15.6M29.5,16.9L1.1.5v32.6c0,0,28.3,16.4,28.3,16.4V16.9"/>
+        </g>
+        <polygon points="1 33.1 1.1 .5 29.5 16.9 29.4 49.5 1 33.1" fill="none" stroke="#272618" strokeWidth=".5" strokeMiterlimit="10"/>
+      </g>
+      <g style={{ isolation: "isolate" }}>
+        <g clipPath="url(#car-cp1)">
+          <path stroke="#272618" strokeWidth=".5" strokeMiterlimit="10" d="M11.8,32.7V1.7c0,0,27,15.6,27,15.6v31c0,0-27-15.6-27-15.6M39.5,16.9L11.1.5v32.6c0,0,28.3,16.4,28.3,16.4V16.9"/>
+        </g>
+        <polygon points="11.1 33.1 11.1 .5 39.5 16.9 39.4 49.5 11.1 33.1" fill="none" stroke="#272618" strokeWidth=".5" strokeMiterlimit="10"/>
+      </g>
+      <g style={{ isolation: "isolate" }}>
+        <g clipPath="url(#car-cp2)">
+          <path stroke="#272618" strokeWidth=".5" strokeMiterlimit="10" d="M21.8,32.7V1.7c0,0,27,15.6,27,15.6v31c0,0-27-15.6-27-15.6M49.5,16.9L21.2.5v32.6c0,0,28.3,16.4,28.3,16.4V16.9"/>
+        </g>
+        <polygon points="21.1 33.1 21.2 .5 49.5 16.9 49.4 49.5 21.1 33.1" fill="none" stroke="#272618" strokeWidth=".5" strokeMiterlimit="10"/>
+      </g>
+    </svg>
+  );
+}
+
+function AreaIconModa() {
+  return (
+    <svg width="20" height="20" viewBox="0 0 48.9 48.5" fill="#272618" xmlns="http://www.w3.org/2000/svg">
+      <path d="M24.7,2.8l21.4,21.4-21.4,21.4L3.3,24.2,24.7,2.8M24.7,0L.5,24.2l24.2,24.2,24.2-24.2L24.7,0h0Z"/>
+      <path d="M34.8,14.1v20.2H14.6V14.1h20.2M36.8,12.1H12.6v24.2h24.2V12.1h0Z"/>
+      <path d="M24.7,14.9l9.3,9.3-9.3,9.3-9.3-9.3,9.3-9.3M24.7,12.1l-12.1,12.1,12.1,12.1,12.1-12.1-12.1-12.1h0Z"/>
+    </svg>
+  );
+}
+
+function AreaIconSaude() {
+  return (
+    <svg width="20" height="20" viewBox="0 0 42.8 43.5" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <g stroke="#272618" strokeWidth="2" strokeMiterlimit="10">
+        <line x1="21.3" y1="0" x2="21.3" y2="12"/>
+        <line x1="8.6" y1="4.2" x2="15.6" y2="13.9"/>
+        <line x1=".7" y1="15.1" x2="12.1" y2="18.8"/>
+        <line x1=".7" y1="28.5" x2="12.1" y2="24.8"/>
+        <line x1="8.7" y1="39.4" x2="15.7" y2="29.7"/>
+        <line x1="21.5" y1="43.5" x2="21.5" y2="31.5"/>
+        <line x1="34.2" y1="39.3" x2="27.2" y2="29.6"/>
+        <line x1="42.1" y1="28.4" x2="30.7" y2="24.7"/>
+        <line x1="42" y1="15" x2="30.6" y2="18.7"/>
+        <line x1="34.1" y1="4.2" x2="27.1" y2="13.9"/>
+      </g>
+    </svg>
+  );
+}
+
+function AreaIconTecnologia() {
+  return (
+    <svg width="20" height="20" viewBox="0 0 58.5 51.8" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <defs>
+        <clipPath id="tec-cp0"><polygon points=".5 34.5 29.4 17.7 58.5 34.5 29.6 51.3 .5 34.5"/></clipPath>
+        <clipPath id="tec-cp1"><polygon points=".5 25.9 29.4 9.1 58.5 25.9 29.6 42.7 .5 25.9"/></clipPath>
+        <clipPath id="tec-cp2"><polygon points=".5 17.3 29.4 .5 58.5 17.3 29.6 34.1 .5 17.3"/></clipPath>
+      </defs>
+      <g style={{ isolation: "isolate" }}>
+        <g clipPath="url(#tec-cp0)">
+          <path stroke="#272618" strokeWidth=".5" strokeMiterlimit="10" d="M1.9,34.5l27.5-16,27.7,16-27.5,16L1.9,34.5M58.5,34.5l-29.1-16.8L.5,34.5l29.1,16.8,28.9-16.8"/>
+        </g>
+        <polygon points=".5 34.5 29.4 17.7 58.5 34.5 29.6 51.3 .5 34.5" fill="none" stroke="#272618" strokeWidth=".5" strokeMiterlimit="10"/>
+      </g>
+      <g style={{ isolation: "isolate" }}>
+        <g clipPath="url(#tec-cp1)">
+          <path stroke="#272618" strokeWidth=".5" strokeMiterlimit="10" d="M1.9,25.9l27.5-16,27.7,16-27.5,16L1.9,25.9M58.5,25.9L29.4,9.1.5,25.9l29.1,16.8,28.9-16.8"/>
+        </g>
+        <polygon points=".5 25.9 29.4 9.1 58.5 25.9 29.6 42.7 .5 25.9" fill="none" stroke="#272618" strokeWidth=".5" strokeMiterlimit="10"/>
+      </g>
+      <g style={{ isolation: "isolate" }}>
+        <g clipPath="url(#tec-cp2)">
+          <path stroke="#272618" strokeWidth=".5" strokeMiterlimit="10" d="M1.9,17.3L29.4,1.3l27.7,16-27.5,16L1.9,17.3M58.5,17.3L29.4.5.5,17.3l29.1,16.8,28.9-16.8"/>
+        </g>
+        <polygon points=".5 17.3 29.4 .5 58.5 17.3 29.6 34.1 .5 17.3" fill="none" stroke="#272618" strokeWidth=".5" strokeMiterlimit="10"/>
+      </g>
+    </svg>
+  );
+}
+
+function AreaIconCriatividade() {
+  return (
+    <svg width="20" height="20" viewBox="0 0 40.5 40" fill="#272618" xmlns="http://www.w3.org/2000/svg">
+      <path d="M20.5,2c9.9,0,18,8.1,18,18s-8.1,18-18,18S2.5,29.9,2.5,20,10.5,2,20.5,2M20.5,0C9.4,0,.5,8.9.5,20s9,20,20,20,20-9,20-20S31.5,0,20.5,0h0Z"/>
+      <path d="M20.5,18c5.5,0,10,4.5,10,10s-4.5,10-10,10-10-4.5-10-10,4.5-10,10-10M20.5,16c-6.6,0-12,5.4-12,12s5.4,12,12,12,12-5.4,12-12-5.4-12-12-12h0Z"/>
+      <path d="M20.5,26c3.3,0,6,2.7,6,6s-2.7,6-6,6-6-2.7-6-6,2.7-6,6-6M20.5,24c-4.4,0-8,3.6-8,8s3.6,8,8,8,8-3.6,8-8-3.6-8-8-8h0Z"/>
+    </svg>
+  );
+}
+
+function AreaIconGastronomia() {
+  return (
+    <svg width="20" height="20" viewBox="0 0 60 40" fill="#272618" xmlns="http://www.w3.org/2000/svg">
+      <path d="M20,2c9.9,0,18,8.1,18,18s-8.1,18-18,18S2,29.9,2,20,10.1,2,20,2M20,0C9,0,0,9,0,20s9,20,20,20,20-9,20-20S31,0,20,0h0Z"/>
+      <path d="M40,2c9.9,0,18,8.1,18,18s-8.1,18-18,18-18-8.1-18-18S30.1,2,40,2M40,0c-11,0-20,9-20,20s9,20,20,20,20-9,20-20S51,0,40,0h0Z"/>
+    </svg>
+  );
+}
+
+// ─── Area data ─────────────────────────────────────────────────────────────────
+
+const AREAS: { value: ProfileArea; label: string; icon: React.ReactNode }[] = [
+  { value: "career_business",  label: "Carreira e Negócios", icon: <AreaIconCarreira /> },
+  { value: "lifestyle_fashion", label: "Moda e Lifestyle",   icon: <AreaIconModa /> },
+  { value: "health_wellness",  label: "Saúde e Bem estar",   icon: <AreaIconSaude /> },
+  { value: "technology",       label: "Tecnologia",          icon: <AreaIconTecnologia /> },
+  { value: "creativity",       label: "Criatividade",        icon: <AreaIconCriatividade /> },
+  { value: "gastronomy",       label: "Gastronomia",         icon: <AreaIconGastronomia /> },
+];
+
+// ─── DayChips ──────────────────────────────────────────────────────────────────
+
+const DAY_LABELS = ["Seg", "Ter", "Qua", "Qui", "Sex", "Sáb", "Dom"];
+
+function DayChips({ selected, onToggle }: { selected: number[]; onToggle: (d: number) => void }) {
+  return (
+    <div style={{ display: "flex", flexWrap: "wrap", gap: 6 }}>
+      {DAY_LABELS.map((label, i) => {
+        const on = selected.includes(i);
+        return (
+          <button
+            key={label}
+            type="button"
+            onClick={() => onToggle(i)}
+            style={{
+              padding: "6px 12px", borderRadius: 6,
+              border: `1.5px solid ${on ? LIME : BORDER}`,
+              background: on ? LIME : CARD,
+              color: DARK, fontSize: 13, fontWeight: on ? 600 : 400,
+              cursor: "pointer", fontFamily: "inherit", transition: "all 0.15s",
+            }}
+          >
+            {label}
+          </button>
+        );
+      })}
+    </div>
+  );
+}
+
+// ─── AvailBlockRow ─────────────────────────────────────────────────────────────
+
+function AvailBlockRow({
+  block, onChange, onRemove, canRemove,
+}: {
+  block: AvailBlock;
+  onChange: (b: AvailBlock) => void;
+  onRemove: () => void;
+  canRemove: boolean;
+}) {
+  function toggleDay(d: number) {
+    const days = block.days.includes(d)
+      ? block.days.filter(x => x !== d)
+      : [...block.days, d].sort((a, b) => a - b);
+    onChange({ ...block, days });
+  }
 
   return (
-    <div className="flex flex-col gap-6">
-      <div>
-        <h2 className="text-2xl font-normal mb-1" style={{ color: "#181D27" }}>Seu perfil público</h2>
-        <p className="text-sm" style={{ color: "#535862" }}>Essa é a primeira impressão que os seguidores terão de você.</p>
+    <div style={{
+      background: CARD, borderRadius: 8, padding: 16,
+      display: "flex", flexDirection: "column", gap: 16,
+    }}>
+      {/* Time inputs row */}
+      <div style={{ display: "flex", gap: 12 }}>
+        {/* De */}
+        <div style={{
+          flex: 1, height: 48, position: "relative",
+          background: tokens.bg, borderRadius: 8,
+          outline: `1px solid ${tokens.borderSubtle}`,
+          boxShadow: "0 1px 2px rgba(10,13,18,0.05)",
+        }}>
+          <label style={{
+            position: "absolute", left: 14, top: 8,
+            fontSize: 10, lineHeight: "12px",
+            color: MUTED, pointerEvents: "none", fontFamily: "inherit",
+          }}>De</label>
+          <input
+            type="time"
+            value={block.startTime}
+            onChange={(e) => onChange({ ...block, startTime: e.target.value })}
+            style={{
+              position: "absolute", left: 0, right: 0, bottom: 0,
+              height: 28, padding: "0 14px",
+              background: "transparent", border: "none", outline: "none",
+              fontSize: 14, color: DARK, fontFamily: "inherit",
+              width: "100%", boxSizing: "border-box",
+            }}
+          />
+        </div>
+
+        {/* Até */}
+        <div style={{
+          flex: 1, height: 48, position: "relative",
+          background: tokens.bg, borderRadius: 8,
+          outline: `1px solid ${tokens.borderSubtle}`,
+          boxShadow: "0 1px 2px rgba(10,13,18,0.05)",
+        }}>
+          <label style={{
+            position: "absolute", left: 14, top: 8,
+            fontSize: 10, lineHeight: "12px",
+            color: MUTED, pointerEvents: "none", fontFamily: "inherit",
+          }}>Até</label>
+          <input
+            type="time"
+            value={block.endTime}
+            onChange={(e) => onChange({ ...block, endTime: e.target.value })}
+            style={{
+              position: "absolute", left: 0, right: 0, bottom: 0,
+              height: 28, padding: "0 14px",
+              background: "transparent", border: "none", outline: "none",
+              fontSize: 14, color: DARK, fontFamily: "inherit",
+              width: "100%", boxSizing: "border-box",
+            }}
+          />
+        </div>
       </div>
 
-      {/* Foto */}
-      <div className="flex flex-col items-center gap-3">
-        <button
-          onClick={() => inputRef.current?.click()}
-          className="relative overflow-hidden transition-opacity hover:opacity-80"
-          style={{ width: 96, height: 96, borderRadius: "50%", background: "#E7DAC8", border: "2px dashed #C4B8A8" }}
-        >
-          {data.fotoPreview ? (
-            <Image src={data.fotoPreview} alt="foto" fill className="object-cover" sizes="96px" />
-          ) : (
-            <div className="flex flex-col items-center justify-center h-full gap-1" style={{ color: "#717680" }}>
-              <svg viewBox="0 0 24 24" className="w-6 h-6" fill="none" stroke="currentColor" strokeWidth={1.5} strokeLinecap="round">
-                <path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2" /><circle cx="12" cy="7" r="4" />
-              </svg>
-              <span className="text-[10px] font-medium">Adicionar foto</span>
-            </div>
-          )}
-        </button>
-        <input ref={inputRef} type="file" accept="image/*" className="hidden" onChange={(e) => {
-          const f = e.target.files?.[0];
-          if (f) onChange({ fotoPreview: URL.createObjectURL(f) });
-        }} />
-        {data.fotoPreview && (
-          <button onClick={() => onChange({ fotoPreview: null })} className="text-xs transition-opacity hover:opacity-60" style={{ color: "#717680" }}>
-            Remover foto
+      <DayChips selected={block.days} onToggle={toggleDay} />
+
+      {/* Trash — bottom-right */}
+      {canRemove && (
+        <div style={{ display: "flex", justifyContent: "flex-end" }}>
+          <button
+            type="button"
+            onClick={onRemove}
+            style={{
+              width: 32, height: 32, borderRadius: 6, flexShrink: 0,
+              border: "none", background: "none",
+              color: FAINT, cursor: "pointer",
+              display: "flex", alignItems: "center", justifyContent: "center",
+            }}
+          >
+            <IcoTrash />
           </button>
-        )}
+        </div>
+      )}
+    </div>
+  );
+}
+
+// ─── Step 1 — Perfil ───────────────────────────────────────────────────────────
+
+function StepPerfil({
+  state, patch, slugStatus, setSlugStatus,
+}: {
+  state: WizardState;
+  patch: (p: Partial<WizardState>) => void;
+  slugStatus: SlugStatus;
+  setSlugStatus: (s: SlugStatus) => void;
+}) {
+  const timerRef = useRef<ReturnType<typeof setTimeout>>();
+
+  const checkSlug = useCallback(async (slug: string) => {
+    if (slug.length < 2) { setSlugStatus("idle"); return; }
+    if (!/^[a-z0-9][a-z0-9-]*$/.test(slug)) { setSlugStatus("invalid"); return; }
+    setSlugStatus("checking");
+    try {
+      const sb = createClient();
+      const { data, error } = await sb.rpc("check_username_available", { p_username: slug });
+      if (error) {
+        setSlugStatus("idle"); // RPC não disponível (migration pendente) — deixa passar
+      } else {
+        setSlugStatus(data ? "available" : "taken");
+      }
+    } catch { setSlugStatus("idle"); }
+  }, [setSlugStatus]);
+
+  function scheduleCheck(slug: string) {
+    clearTimeout(timerRef.current);
+    timerRef.current = setTimeout(() => checkSlug(slug), 420);
+  }
+
+  function onFirstName(v: string) {
+    const s = slugify(`${v} ${state.lastName}`);
+    patch({ firstName: v, slug: s });
+    scheduleCheck(s);
+  }
+
+  function onLastName(v: string) {
+    const s = slugify(`${state.firstName} ${v}`);
+    patch({ lastName: v, slug: s });
+    scheduleCheck(s);
+  }
+
+  function onSlug(v: string) {
+    const s = v.toLowerCase().replace(/[^a-z0-9-]/g, "");
+    patch({ slug: s });
+    scheduleCheck(s);
+  }
+
+  const slugInfo = {
+    idle:      { text: "",                                       color: FAINT },
+    checking:  { text: "Verificando...",                         color: FAINT },
+    available: { text: `loop.talk/${state.slug} disponível`,    color: GREEN },
+    taken:     { text: "Esse endereço já está em uso",           color: RED   },
+    invalid:   { text: "Somente letras minúsculas, números e -", color: RED   },
+  }[slugStatus];
+
+  return (
+    <div style={{ display: "flex", flexDirection: "column", gap: 28, maxWidth: 480, margin: "0 auto", width: "100%" }}>
+      <div style={{ textAlign: "center" }}>
+        <h2 style={{ fontFamily: "var(--font-host-grotesk)", fontSize: 24, fontWeight: 400, color: DARK, margin: "0 0 6px" }}>
+          Complete seu perfil
+        </h2>
+        <p style={{ fontSize: 14, color: MUTED, margin: 0 }}>
+          Adicione sua foto e seus dados de perfil
+        </p>
       </div>
 
-      {/* Nome */}
-      <div className="flex flex-col gap-2">
-        <label className="text-xs font-semibold" style={{ color: "#414651" }}>Nome completo *</label>
-        <input
-          type="text"
-          value={data.nome}
-          onChange={(e) => onChange({ nome: e.target.value })}
-          placeholder="Como você quer ser chamado?"
-          className="w-full px-4 py-3.5 text-sm rounded-xl focus:outline-none transition-colors"
-          style={{ border: "1px solid #E7DAC8", background: "#FCFBF8", color: "#181D27" }}
+      <div style={{ display: "flex", justifyContent: "center" }}>
+        <FolderFrame
+          photoUrl={state.avatarPreview}
+          firstName={state.firstName}
+          lastName={state.lastName}
+          onPhotoSelect={(f) => patch({ avatarFile: f, avatarPreview: URL.createObjectURL(f) })}
+          width={220}
         />
       </div>
 
-      {/* Bio */}
-      <div className="flex flex-col gap-2">
-        <label className="text-xs font-semibold flex items-center justify-between" style={{ color: "#414651" }}>
-          Bio *
-          <span className="font-normal" style={{ color: "#717680" }}>{data.bio.length}/300</span>
-        </label>
-        <textarea
-          value={data.bio}
-          onChange={(e) => onChange({ bio: e.target.value.slice(0, 300) })}
-          placeholder="Conte quem você é, o que você ensina e para quem..."
-          rows={4}
-          className="w-full px-4 py-3.5 text-sm rounded-xl focus:outline-none resize-none transition-colors"
-          style={{ border: "1px solid #E7DAC8", background: "#FCFBF8", color: "#181D27" }}
+      <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
+        <FloatingInput
+          label="Nome"
+          value={state.firstName}
+          onChange={onFirstName}
+          valid={state.firstName.trim().length >= 2}
+          autoComplete="given-name"
         />
-        {data.bio.length > 0 && data.bio.length < 50 && (
-          <p className="text-xs" style={{ color: "#D92D20" }}>Mínimo 50 caracteres ({data.bio.length}/50)</p>
+        <FloatingInput
+          label="Sobrenome"
+          value={state.lastName}
+          onChange={onLastName}
+          valid={state.lastName.trim().length >= 2}
+          autoComplete="family-name"
+        />
+      </div>
+
+      {/* Slug field */}
+      <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
+        <label style={{ fontSize: 12, fontWeight: 500, color: MUTED }}>URL pública</label>
+        <div style={{
+          display: "flex", alignItems: "center", overflow: "hidden",
+          borderRadius: 8,
+          border: `1.5px solid ${slugStatus === "available" ? GREEN : slugStatus === "taken" || slugStatus === "invalid" ? RED : BORDER}`,
+          transition: "border-color 0.2s",
+        }}>
+          <span style={{
+            padding: "12px 14px", background: BEIGE, color: MUTED,
+            fontSize: 13, whiteSpace: "nowrap",
+            borderRight: `1.5px solid ${BORDER}`, flexShrink: 0,
+          }}>
+            loop.talk/
+          </span>
+          <input
+            value={state.slug}
+            onChange={(e) => onSlug(e.target.value)}
+            placeholder="seu-nome"
+            style={{
+              flex: 1, padding: "12px 14px",
+              border: "none", background: "transparent",
+              fontSize: 14, color: DARK,
+              outline: "none", fontFamily: "inherit",
+            }}
+          />
+          {slugStatus === "available" && (
+            <span style={{ paddingRight: 12 }}><IcoCheck /></span>
+          )}
+        </div>
+        {slugInfo.text && (
+          <p style={{ fontSize: 12, color: slugInfo.color, margin: 0 }}>{slugInfo.text}</p>
         )}
       </div>
     </div>
   );
 }
 
-// ─── step 2: categoria ─────────────────────────────────────────────────────────
+// ─── Step 2 — Sobre ────────────────────────────────────────────────────────────
 
-function StepCategoria({ data, onChange }: { data: FormData; onChange: (p: Partial<FormData>) => void }) {
+function StepSobre({ state, patch }: { state: WizardState; patch: (p: Partial<WizardState>) => void }) {
+  function addLink() {
+    patch({ socialLinks: [...state.socialLinks, { id: uid(), platform: "instagram", url: "" }] });
+  }
+  function updateLink(id: string, l: SocialLink) {
+    patch({ socialLinks: state.socialLinks.map(x => x.id === id ? l : x) });
+  }
+  function removeLink(id: string) {
+    patch({ socialLinks: state.socialLinks.filter(x => x.id !== id) });
+  }
+
   return (
-    <div className="flex flex-col gap-6">
-      <div>
-        <h2 className="text-2xl font-normal mb-1" style={{ color: "#181D27" }}>Qual é a sua área?</h2>
-        <p className="text-sm" style={{ color: "#535862" }}>Escolha a categoria que melhor representa o seu conhecimento.</p>
+    <div style={{ display: "flex", flexDirection: "column", gap: 24, maxWidth: 480, margin: "0 auto", width: "100%" }}>
+      <div style={{ textAlign: "center" }}>
+        <h2 style={{ fontFamily: "var(--font-host-grotesk)", fontSize: 24, fontWeight: 400, color: DARK, margin: "0 0 6px" }}>
+          Complete seu perfil
+        </h2>
+        <p style={{ fontSize: 14, color: MUTED, margin: 0 }}>
+          Ajude as pessoas a te conhecerem melhor.
+        </p>
       </div>
-      <div className="grid grid-cols-2 gap-3">
-        {categorias.map((cat) => {
-          const ativo = data.categoria === cat;
+
+      {/* Descrição */}
+      <div style={{ display: "flex", flexDirection: "column", gap: 4 }}>
+        <FloatingInput
+          label="Descrição"
+          value={state.headline}
+          onChange={(v) => patch({ headline: v.slice(0, 200) })}
+          valid={state.headline.length > 0}
+        />
+        <span style={{ fontSize: 10, color: MUTED, textAlign: "right" }}>{state.headline.length}/200</span>
+      </div>
+
+      {/* Sobre */}
+      <div style={{ display: "flex", flexDirection: "column", gap: 4 }}>
+        <FloatingTextarea
+          label="Sobre"
+          value={state.bio}
+          onChange={(v) => patch({ bio: v.slice(0, 1000) })}
+          rows={8}
+        />
+        <span style={{ fontSize: 10, color: MUTED, textAlign: "right" }}>{state.bio.length}/1000</span>
+      </div>
+
+      {/* Social links */}
+      {state.socialLinks.length > 0 && (
+        <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
+          {state.socialLinks.map(l => (
+            <SocialLinkRow
+              key={l.id}
+              link={l}
+              onChange={(upd) => updateLink(l.id, upd)}
+              onRemove={() => removeLink(l.id)}
+            />
+          ))}
+        </div>
+      )}
+
+      <button
+        type="button"
+        onClick={addLink}
+        style={{
+          display: "flex", alignItems: "center", justifyContent: "center", gap: 8,
+          padding: "13px 20px", borderRadius: 8,
+          border: `1.5px solid ${BORDER}`,
+          background: CARD, color: DARK,
+          fontSize: 14, fontWeight: 500,
+          cursor: "pointer", fontFamily: "inherit", width: "100%",
+        }}
+      >
+        <IcoPlus />
+        Adicionar Rede Social
+      </button>
+    </div>
+  );
+}
+
+// SelectCard → importado de @/components/ui
+
+// ─── Step 3 — Área ─────────────────────────────────────────────────────────────
+
+function StepArea({ state, patch }: { state: WizardState; patch: (p: Partial<WizardState>) => void }) {
+  return (
+    <div style={{ display: "flex", flexDirection: "column", gap: 24, maxWidth: 480, margin: "0 auto", width: "100%" }}>
+      <div style={{ textAlign: "center" }}>
+        <h2 style={{ fontFamily: "var(--font-host-grotesk)", fontSize: 24, fontWeight: 400, color: DARK, margin: "0 0 6px" }}>
+          Área
+        </h2>
+        <p style={{ fontSize: 14, color: MUTED, margin: 0 }}>
+          Qual sua principal área de interesse?
+        </p>
+      </div>
+
+      <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
+        {AREAS.map(({ value, label, icon }) => {
+          const on = state.area === value;
           return (
-            <button
-              key={cat}
-              onClick={() => onChange({ categoria: cat })}
-              className="rounded-2xl p-5 text-left transition-all"
-              style={{
-                border: ativo ? "2px solid #181D27" : "1px solid #E7DAC8",
-                background: ativo ? "#181D27" : "#FCFBF8",
-                color: ativo ? "#FDFDFD" : "#181D27",
-              }}
-            >
-              <div className="mb-3">{categoriaIcones[cat]}</div>
-              <p className="text-sm font-semibold leading-tight">{cat}</p>
-            </button>
+            <SelectCard
+              key={value}
+              selected={on}
+              icon={icon}
+              label={label}
+              onClick={() => patch({ area: value })}
+            />
           );
         })}
       </div>
@@ -216,537 +823,416 @@ function StepCategoria({ data, onChange }: { data: FormData; onChange: (p: Parti
   );
 }
 
-// ─── step 3: preços e durações ─────────────────────────────────────────────────
+// ─── Step 4 — Agenda ───────────────────────────────────────────────────────────
 
-function StepPrecos({ data, onChange }: { data: FormData; onChange: (p: Partial<FormData>) => void }) {
-  function toggleDuracao(min: number) {
-    const atual = data.duracoes;
-    if (atual.includes(min)) {
-      if (atual.length === 1) return;
-      onChange({ duracoes: atual.filter((d) => d !== min) });
-    } else {
-      onChange({ duracoes: [...atual, min].sort((a, b) => a - b) });
-    }
+function StepAgenda({ state, patch }: { state: WizardState; patch: (p: Partial<WizardState>) => void }) {
+  function addBlock() {
+    patch({
+      availBlocks: [
+        ...state.availBlocks,
+        { id: uid(), startTime: "09:00", endTime: "18:00", days: [1, 2, 3, 4, 5] },
+      ],
+    });
+  }
+  function updateBlock(id: string, b: AvailBlock) {
+    patch({ availBlocks: state.availBlocks.map(x => x.id === id ? b : x) });
+  }
+  function removeBlock(id: string) {
+    patch({ availBlocks: state.availBlocks.filter(x => x.id !== id) });
   }
 
   return (
-    <div className="flex flex-col gap-8">
-      <div>
-        <h2 className="text-2xl font-normal mb-1" style={{ color: "#181D27" }}>Preços e durações</h2>
-        <p className="text-sm" style={{ color: "#535862" }}>Defina o valor por hora e as durações que você oferece.</p>
-      </div>
-
-      {/* Preço por hora */}
-      <div className="flex flex-col gap-4">
-        <label className="text-xs font-semibold" style={{ color: "#414651" }}>Preço por hora (R$)</label>
-        <div className="flex items-center gap-6">
-          <button
-            onClick={() => onChange({ precoBase: Math.max(30, data.precoBase - 10) })}
-            className="w-10 h-10 rounded-full flex items-center justify-center text-lg font-bold transition-colors"
-            style={{ border: "1px solid #E7DAC8", color: "#181D27", background: "#FCFBF8" }}
-          >−</button>
-          <div className="flex-1 text-center">
-            <span className="text-4xl font-normal" style={{ color: "#181D27" }}>R$ {data.precoBase}</span>
-            <span className="text-sm ml-1" style={{ color: "#717680" }}>/hora</span>
-          </div>
-          <button
-            onClick={() => onChange({ precoBase: Math.min(1000, data.precoBase + 10) })}
-            className="w-10 h-10 rounded-full flex items-center justify-center text-lg font-bold transition-colors"
-            style={{ border: "1px solid #E7DAC8", color: "#181D27", background: "#FCFBF8" }}
-          >+</button>
-        </div>
-        <input
-          type="range" min={30} max={500} step={10}
-          value={data.precoBase}
-          onChange={(e) => onChange({ precoBase: Number(e.target.value) })}
-          className="w-full accent-[#CEFD58]"
-        />
-        <div className="flex justify-between text-xs" style={{ color: "#C4B8A8" }}>
-          <span>R$ 30</span><span>R$ 500</span>
-        </div>
-      </div>
-
-      {/* Durações */}
-      <div className="flex flex-col gap-4">
-        <label className="text-xs font-semibold" style={{ color: "#414651" }}>Durações disponíveis</label>
-        <div className="grid grid-cols-3 gap-3">
-          {DURACOES_OPCOES.map((min) => {
-            const ativo = data.duracoes.includes(min);
-            const preco = precoPorDuracao(data.precoBase, min);
-            return (
-              <button
-                key={min}
-                onClick={() => toggleDuracao(min)}
-                className="rounded-xl py-4 text-center transition-all"
-                style={{
-                  border: ativo ? "2px solid #181D27" : "1px solid #E7DAC8",
-                  background: ativo ? "#181D27" : "#FCFBF8",
-                  color: ativo ? "#FDFDFD" : "#181D27",
-                }}
-              >
-                <p className="text-lg font-normal">{min} min</p>
-                <p className="text-xs mt-1" style={{ color: ativo ? "#D5D7DA" : "#717680" }}>R$ {fmt(preco)}</p>
-              </button>
-            );
-          })}
-        </div>
-      </div>
-
-      {/* Preview receita */}
-      <div className="rounded-2xl p-5" style={{ background: "#FCFBF8", border: "1px solid #E7DAC8" }}>
-        <p className="text-xs font-semibold mb-3" style={{ color: "#535862" }}>Receita estimada por sessão</p>
-        <div className="flex flex-col gap-2">
-          {data.duracoes.map((min) => {
-            const bruto = precoPorDuracao(data.precoBase, min);
-            const liquido = Math.round(bruto * 0.85);
-            return (
-              <div key={min} className="flex justify-between text-sm">
-                <span style={{ color: "#535862" }}>{min} min</span>
-                <span className="font-semibold" style={{ color: "#181D27" }}>R$ {fmt(liquido)} <span className="font-normal text-xs" style={{ color: "#717680" }}>líquido</span></span>
-              </div>
-            );
-          })}
-        </div>
-        <p className="text-xs mt-3" style={{ color: "#717680" }}>* Após taxa de 15% da plataforma</p>
-      </div>
-    </div>
-  );
-}
-
-// ─── step 4: agenda + google calendar ──────────────────────────────────────────
-
-function StepAgenda({ data, onChange }: { data: FormData; onChange: (p: Partial<FormData>) => void }) {
-  function toggleDia(d: number) {
-    const atual = data.diasDisponiveis;
-    if (atual.includes(d)) {
-      if (atual.length === 1) return;
-      onChange({ diasDisponiveis: atual.filter((x) => x !== d) });
-    } else {
-      onChange({ diasDisponiveis: [...atual, d].sort() });
-    }
-  }
-
-  return (
-    <div className="flex flex-col gap-8">
-      <div>
-        <h2 className="text-2xl font-normal mb-1" style={{ color: "#181D27" }}>Sua disponibilidade</h2>
-        <p className="text-sm" style={{ color: "#535862" }}>Configure os dias e horários em que você atende, e opcionalmente sincronize com o Google Calendar.</p>
-      </div>
-
-      {/* Google Calendar */}
-      <div
-        className="rounded-2xl p-6 flex flex-col gap-5"
-        style={{ border: "1px solid #E7DAC8", background: "#FCFBF8" }}
-      >
-        <div className="flex items-start justify-between gap-4">
-          <div className="flex items-center gap-3">
-            {/* Google icon */}
-            <div className="w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0" style={{ background: "#fff", border: "1px solid #E7DAC8" }}>
-              <svg viewBox="0 0 24 24" className="w-5 h-5">
-                <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"/>
-                <path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/>
-                <path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" fill="#FBBC05"/>
-                <path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"/>
-              </svg>
-            </div>
-            <div>
-              <p className="text-sm font-semibold" style={{ color: "#181D27" }}>Google Calendar</p>
-              <p className="text-xs" style={{ color: "#535862" }}>
-                {data.googleCalendar
-                  ? "Agenda conectada — suas sessões serão sincronizadas automaticamente"
-                  : "Gerencie sessões junto com sua agenda pessoal"}
-              </p>
-            </div>
-          </div>
-          <Toggle value={data.googleCalendar} onChange={() => onChange({ googleCalendar: !data.googleCalendar })} />
-        </div>
-
-        {data.googleCalendar && (
-          <motion.div
-            initial={{ opacity: 0, height: 0 }}
-            animate={{ opacity: 1, height: "auto" }}
-            exit={{ opacity: 0, height: 0 }}
-            className="flex flex-col gap-2 pt-4"
-            style={{ borderTop: "1px solid #E7DAC8" }}
-          >
-            {[
-              "Sessões confirmadas aparecem automaticamente na sua agenda",
-              "Bloqueios de horário no Google Calendar são respeitados",
-              "Lembretes e notificações via Google",
-            ].map((t) => (
-              <div key={t} className="flex items-center gap-2 text-xs" style={{ color: "#414651" }}>
-                <span className="w-4 h-4 rounded-full flex items-center justify-center flex-shrink-0" style={{ background: "#CEFD58" }}>
-                  <IconCheck className="w-2.5 h-2.5 text-[#181D27]" />
-                </span>
-                {t}
-              </div>
-            ))}
-            <button
-              className="mt-2 flex items-center justify-center gap-2 rounded-lg py-2.5 text-sm font-semibold transition-opacity hover:opacity-80"
-              style={{ background: "#181D27", color: "#FDFDFD", borderRadius: 8 }}
-            >
-              <svg viewBox="0 0 24 24" className="w-4 h-4">
-                <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"/>
-                <path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/>
-                <path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" fill="#FBBC05"/>
-                <path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"/>
-              </svg>
-              Autorizar acesso ao Google Calendar
-            </button>
-          </motion.div>
-        )}
-      </div>
-
-      {/* Dias disponíveis */}
-      <div className="flex flex-col gap-3">
-        <label className="text-xs font-semibold" style={{ color: "#414651" }}>Dias disponíveis</label>
-        <div className="grid grid-cols-7 gap-2">
-          {DIAS.map((dia, i) => {
-            const ativo = data.diasDisponiveis.includes(i);
-            return (
-              <button
-                key={dia}
-                onClick={() => toggleDia(i)}
-                className="py-3 rounded-xl text-xs font-semibold transition-all"
-                style={{
-                  border: ativo ? "2px solid #181D27" : "1px solid #E7DAC8",
-                  background: ativo ? "#181D27" : "#FCFBF8",
-                  color: ativo ? "#CEFD58" : "#535862",
-                }}
-              >
-                {dia}
-              </button>
-            );
-          })}
-        </div>
-      </div>
-
-      {/* Horários */}
-      <div className="flex flex-col gap-3">
-        <label className="text-xs font-semibold" style={{ color: "#414651" }}>Horário de atendimento</label>
-        <div className="flex items-center gap-4">
-          <div className="flex-1 flex flex-col gap-1.5">
-            <span className="text-xs" style={{ color: "#717680" }}>Das</span>
-            <input
-              type="time"
-              value={data.horarioInicio}
-              onChange={(e) => onChange({ horarioInicio: e.target.value })}
-              className="w-full px-4 py-3 rounded-xl text-sm focus:outline-none"
-              style={{ border: "1px solid #E7DAC8", background: "#FCFBF8", color: "#181D27" }}
-            />
-          </div>
-          <div className="flex-1 flex flex-col gap-1.5">
-            <span className="text-xs" style={{ color: "#717680" }}>Até</span>
-            <input
-              type="time"
-              value={data.horarioFim}
-              onChange={(e) => onChange({ horarioFim: e.target.value })}
-              className="w-full px-4 py-3 rounded-xl text-sm focus:outline-none"
-              style={{ border: "1px solid #E7DAC8", background: "#FCFBF8", color: "#181D27" }}
-            />
-          </div>
-        </div>
-      </div>
-    </div>
-  );
-}
-
-// ─── step 5: redes sociais ─────────────────────────────────────────────────────
-
-function StepRedes({ data, onChange }: { data: FormData; onChange: (p: Partial<FormData>) => void }) {
-  return (
-    <div className="flex flex-col gap-6">
-      <div>
-        <h2 className="text-2xl font-normal mb-1" style={{ color: "#181D27" }}>Redes sociais</h2>
-        <p className="text-sm" style={{ color: "#535862" }}>Ajude os seguidores a conhecer mais sobre você. Todos opcionais.</p>
-      </div>
-      <div className="flex flex-col gap-4">
-        {[
-          { key: "instagram" as const, label: "Instagram", prefix: "instagram.com/", placeholder: "@seuperfil" },
-          { key: "linkedin"  as const, label: "LinkedIn",  prefix: "linkedin.com/in/", placeholder: "seu-nome" },
-          { key: "twitter"   as const, label: "X / Twitter", prefix: "x.com/", placeholder: "@seuperfil" },
-        ].map(({ key, label, prefix, placeholder }) => (
-          <div key={key} className="flex flex-col gap-2">
-            <label className="text-xs font-semibold" style={{ color: "#414651" }}>{label}</label>
-            <div className="flex items-center rounded-xl overflow-hidden" style={{ border: "1px solid #E7DAC8" }}>
-              <span className="px-4 py-3.5 text-xs whitespace-nowrap" style={{ background: "#F6F1E9", color: "#717680", borderRight: "1px solid #E7DAC8" }}>
-                {prefix}
-              </span>
-              <input
-                type="text"
-                value={data[key]}
-                onChange={(e) => onChange({ [key]: e.target.value })}
-                placeholder={placeholder}
-                className="flex-1 px-4 py-3.5 text-sm focus:outline-none"
-                style={{ background: "#FCFBF8", color: "#181D27" }}
-              />
-            </div>
-          </div>
-        ))}
-      </div>
-      <div className="rounded-2xl p-4" style={{ background: "#CEFD58" }}>
-        <p className="text-xs" style={{ color: "#181D27" }}>
-          <span className="font-semibold">Dica:</span> Creators com pelo menos uma rede social recebem 40% mais agendamentos.
+    <div style={{ display: "flex", flexDirection: "column", gap: 24, maxWidth: 480, margin: "0 auto", width: "100%" }}>
+      <div style={{ textAlign: "center" }}>
+        <h2 style={{ fontFamily: "var(--font-host-grotesk)", fontSize: 24, fontWeight: 400, color: DARK, margin: "0 0 6px" }}>
+          Quando você está disponível?
+        </h2>
+        <p style={{ fontSize: 14, color: MUTED, margin: 0 }}>
+          Configure os horários e dias em que você atende.
         </p>
       </div>
-    </div>
-  );
-}
 
-// ─── step 6: pagamento ─────────────────────────────────────────────────────────
-
-function StepPagamento({ data, onChange }: { data: FormData; onChange: (p: Partial<FormData>) => void }) {
-  return (
-    <div className="flex flex-col gap-8">
-      <div>
-        <h2 className="text-2xl font-normal mb-1" style={{ color: "#181D27" }}>Recebimento</h2>
-        <p className="text-sm" style={{ color: "#535862" }}>Configure como você quer receber seus pagamentos semanais.</p>
+      {/* Google Calendar — TODO: implementar OAuth quando disponível */}
+      <div style={{
+        display: "flex", alignItems: "center", justifyContent: "space-between",
+        padding: "14px 16px", borderRadius: 10,
+        border: `1.5px solid ${BORDER}`, background: CARD,
+      }}>
+        <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
+          <div style={{
+            width: 36, height: 36, borderRadius: 8,
+            background: BEIGE, border: `1px solid ${BORDER}`,
+            display: "flex", alignItems: "center", justifyContent: "center",
+          }}>
+            <svg viewBox="0 0 24 24" width="18" height="18">
+              <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4" />
+              <path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853" />
+              <path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l3.66-2.84z" fill="#FBBC05" />
+              <path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335" />
+            </svg>
+          </div>
+          <div>
+            <p style={{ fontSize: 14, fontWeight: 600, color: DARK, margin: 0 }}>Google Calendar</p>
+            <p style={{ fontSize: 12, color: MUTED, margin: 0 }}>Sincronizar com sua agenda pessoal</p>
+          </div>
+        </div>
+        <Toggle value={state.googleCalendar} onChange={() => patch({ googleCalendar: !state.googleCalendar })} />
       </div>
 
-      {/* Chave Pix */}
-      <div className="flex flex-col gap-2">
-        <label className="text-xs font-semibold" style={{ color: "#414651" }}>Chave Pix *</label>
-        <input
-          type="text"
-          value={data.pixChave}
-          onChange={(e) => onChange({ pixChave: e.target.value })}
-          placeholder="CPF, e-mail, telefone ou chave aleatória"
-          className="w-full px-4 py-3.5 text-sm rounded-xl focus:outline-none"
-          style={{ border: "1px solid #E7DAC8", background: "#FCFBF8", color: "#181D27" }}
-        />
-        <p className="text-xs" style={{ color: "#717680" }}>Os repasses são feitos toda segunda-feira via Pix.</p>
-      </div>
-
-      {/* Doação */}
-      <div
-        className="rounded-2xl p-6 flex flex-col gap-5"
-        style={{ border: "1px solid #E7DAC8", background: "#FCFBF8" }}
+      {/* Adicionar horário — fixed at top so it's always visible on scroll */}
+      <button
+        type="button"
+        onClick={addBlock}
+        style={{
+          display: "flex", alignItems: "center", justifyContent: "center", gap: 8,
+          padding: "12px 20px", borderRadius: 8,
+          border: `1px solid ${tokens.border}`,
+          background: tokens.bg, color: DARK,
+          fontSize: 16, fontWeight: 600,
+          cursor: "pointer", fontFamily: "inherit", width: "100%",
+          boxShadow: "0 1px 2px rgba(10,13,18,0.05)",
+        }}
       >
-        <div className="flex items-start justify-between gap-4">
-          <div className="flex items-start gap-3">
-            <span className="text-2xl flex-shrink-0">🤝</span>
-            <div>
-              <p className="text-sm font-semibold" style={{ color: "#181D27" }}>Doe sua receita para uma causa</p>
-              <p className="text-xs mt-0.5" style={{ color: "#535862" }}>
-                Opte por destinar parte ou toda a sua receita para uma instituição. Um badge exclusivo aparecerá no seu perfil público.
-              </p>
-            </div>
-          </div>
-          <Toggle value={data.doacao} onChange={() => onChange({ doacao: !data.doacao })} />
-        </div>
+        <IcoPlus />
+        Adicionar horário
+      </button>
 
-        <AnimatePresence>
-          {data.doacao && (
-            <motion.div
-              initial={{ opacity: 0, height: 0 }}
-              animate={{ opacity: 1, height: "auto" }}
-              exit={{ opacity: 0, height: 0 }}
-              className="flex flex-col gap-4 pt-4"
-              style={{ borderTop: "1px solid #E7DAC8" }}
-            >
-              <div className="flex flex-col gap-2">
-                <label className="text-xs font-semibold" style={{ color: "#414651" }}>Nome da instituição</label>
-                <input
-                  type="text"
-                  value={data.doacaoInstituicao}
-                  onChange={(e) => onChange({ doacaoInstituicao: e.target.value })}
-                  placeholder="ex: Instituto Ayrton Senna, AACD..."
-                  className="w-full px-4 py-3.5 text-sm rounded-xl focus:outline-none"
-                  style={{ border: "1px solid #E7DAC8", background: "#F6F1E9", color: "#181D27" }}
-                />
-              </div>
-              <div className="flex items-start gap-3 rounded-xl p-4" style={{ background: "#CEFD58" }}>
-                <span className="text-lg flex-shrink-0">✨</span>
-                <p className="text-xs" style={{ color: "#181D27" }}>
-                  <span className="font-semibold">Badge "Impacto Social"</span> — aparece no seu perfil público destacando seu compromisso com a causa.
-                </p>
-              </div>
-            </motion.div>
-          )}
-        </AnimatePresence>
+      {/* Blocos */}
+      {state.availBlocks.length > 0 && (
+        <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
+          {state.availBlocks.map(b => (
+            <AvailBlockRow
+              key={b.id}
+              block={b}
+              onChange={(upd) => updateBlock(b.id, upd)}
+              onRemove={() => removeBlock(b.id)}
+              canRemove={state.availBlocks.length > 1}
+            />
+          ))}
+        </div>
+      )}
+
+      <p style={{ fontSize: 12, color: FAINT, textAlign: "center", margin: 0 }}>
+        A agenda é opcional — você pode configurar depois no painel.
+      </p>
+    </div>
+  );
+}
+
+// ─── Sucesso ───────────────────────────────────────────────────────────────────
+
+function StepSucesso({ state }: { state: WizardState }) {
+  return (
+    <div style={{
+      maxWidth: 400, margin: "0 auto", width: "100%",
+      background: CARD, borderRadius: 12,
+      outline: `1px solid ${BORDER}`, outlineOffset: -1,
+      padding: 24, display: "flex", flexDirection: "column", gap: 24,
+    }}>
+      {/* Check + título */}
+      <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 12 }}>
+        <div style={{
+          padding: 10, background: LIME, borderRadius: 99,
+          display: "flex", alignItems: "center", justifyContent: "center",
+        }}>
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+            <path d="M4 13l6 6 10-10" stroke={DARK} strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" />
+          </svg>
+        </div>
+        <div style={{ textAlign: "center", display: "flex", flexDirection: "column", gap: 4 }}>
+          <p style={{ fontSize: 16, fontWeight: 400, color: DARK, margin: 0, lineHeight: "24px" }}>Perfil criado</p>
+          <p style={{ fontSize: 14, color: MUTED, lineHeight: "20px", margin: 0 }}>
+            Agora você pode configurar seu pagamento e compartilhar seu perfil.
+          </p>
+        </div>
       </div>
 
-      {/* Taxa */}
-      <div className="rounded-2xl p-5" style={{ background: "#FCFBF8", border: "1px solid #E7DAC8" }}>
-        <p className="text-xs font-semibold mb-3" style={{ color: "#535862" }}>Como funciona a taxa</p>
-        <div className="flex flex-col gap-2 text-sm">
-          <div className="flex justify-between">
-            <span style={{ color: "#535862" }}>Valor da sessão</span>
-            <span className="font-semibold" style={{ color: "#181D27" }}>R$ {fmt(precoPorDuracao(120, 30))}</span>
-          </div>
-          <div className="flex justify-between">
-            <span style={{ color: "#535862" }}>Taxa face.Talk (15%)</span>
-            <span style={{ color: "#D92D20" }}>− R$ {fmt(Math.round(precoPorDuracao(120, 30) * 0.15))}</span>
-          </div>
-          <div className="flex justify-between pt-2" style={{ borderTop: "1px solid #E7DAC8" }}>
-            <span className="font-semibold" style={{ color: "#181D27" }}>Você recebe</span>
-            <span className="font-semibold" style={{ color: "#181D27" }}>R$ {fmt(Math.round(precoPorDuracao(120, 30) * 0.85))}</span>
-          </div>
-        </div>
-        <p className="text-xs mt-3" style={{ color: "#717680" }}>Exemplo: sessão 30 min · preço base R$ 120/hora</p>
+      {/* FolderFrame preview */}
+      <div style={{ display: "flex", justifyContent: "center" }}>
+        <FolderFrame
+          photoUrl={state.avatarPreview}
+          firstName={state.firstName}
+          lastName={state.lastName}
+          width={177}
+        />
+      </div>
+
+      {/* CTAs */}
+      <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
+        <button
+          type="button"
+          onClick={() => {
+            const url = `${window.location.origin}/${state.slug}`;
+            if (navigator.share) {
+              navigator.share({ url });
+            } else {
+              navigator.clipboard.writeText(url);
+            }
+          }}
+          style={{
+            display: "flex", alignItems: "center", justifyContent: "center", gap: 8,
+            width: "100%", padding: "12px 20px", borderRadius: 8,
+            background: DARK, color: "#FCFBF8", border: "none",
+            fontSize: 16, fontWeight: 600, cursor: "pointer", fontFamily: "inherit",
+            boxShadow: "0 1px 2px rgba(10,13,18,0.05)",
+          }}
+        >
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+            <path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8" />
+            <polyline points="16 6 12 2 8 6" />
+            <line x1="12" y1="2" x2="12" y2="15" />
+          </svg>
+          Compartilhar
+        </button>
+
+        <Link
+          href="/dashboard/pagamento"
+          style={{
+            display: "flex", alignItems: "center", justifyContent: "center",
+            width: "100%", padding: "12px 20px", borderRadius: 8,
+            outline: "1px solid #8E8857", outlineOffset: -1,
+            background: tokens.bg, color: DARK,
+            fontSize: 16, fontWeight: 600,
+            textDecoration: "none", boxSizing: "border-box",
+            boxShadow: "0 1px 2px rgba(10,13,18,0.05)",
+          }}
+        >
+          Configurar Pagamento
+        </Link>
       </div>
     </div>
   );
 }
 
-// ─── componente principal ──────────────────────────────────────────────────────
+// ─── Slide animation ───────────────────────────────────────────────────────────
 
-const STEPS = ["Perfil", "Categoria", "Preços", "Agenda", "Redes", "Pagamento"];
-
-const variants = {
-  enter: (dir: number) => ({ x: dir > 0 ? 40 : -40, opacity: 0 }),
+const slideV = {
+  enter:  (d: number) => ({ x: d > 0 ? 40 : -40, opacity: 0 }),
   center: { x: 0, opacity: 1 },
-  exit:  (dir: number) => ({ x: dir > 0 ? -40 : 40, opacity: 0 }),
+  exit:   (d: number) => ({ x: d > 0 ? -40 : 40, opacity: 0 }),
 };
-const transition = { duration: 0.25, ease: [0.22, 1, 0.36, 1] as const };
+const slideT = { duration: 0.25, ease: [0.22, 1, 0.36, 1] as const };
+
+// ─── Wizard ────────────────────────────────────────────────────────────────────
 
 export function CreatorOnboarding() {
-  const router = useRouter();
-  const [step, setStep] = useState(0);
-  const [dir, setDir] = useState(1);
-  const [data, setData] = useState<FormData>(INITIAL);
+  const router     = useRouter();
+  const [step,    setStep]    = useState(0);
+  const [dir,     setDir]     = useState(1);
+  const [state,   setState]   = useState<WizardState>(INITIAL);
+  const [slugSt,  setSlugSt]  = useState<SlugStatus>("idle");
+  const [saving,  setSaving]  = useState(false);
+  const [saveErr, setSaveErr] = useState<string | null>(null);
 
-  function patch(p: Partial<FormData>) {
-    setData((prev) => ({ ...prev, ...p }));
+  const isSuccess = step === 4;
+
+  function patch(p: Partial<WizardState>) {
+    setState(prev => ({ ...prev, ...p }));
   }
 
-  function avancar() { setDir(1); setStep((s) => s + 1); }
-  function voltar()  { setDir(-1); setStep((s) => s - 1); }
+  function next() { setDir(1);  setStep(s => s + 1); }
+  function back() { setDir(-1); setStep(s => s - 1); }
 
-  function podeProsseguir() {
-    if (step === 0) return data.nome.trim().length >= 2 && data.bio.trim().length >= 50;
-    if (step === 1) return data.categoria !== null;
-    if (step === 2) return data.duracoes.length >= 1;
-    if (step === 3) return data.diasDisponiveis.length >= 1;
-    if (step === 4) return true;
-    if (step === 5) return data.pixChave.trim().length >= 5;
-    return false;
+  function canAdvance(): boolean {
+    if (step === 0) {
+      const slugOk  = state.slug.length >= 2 && /^[a-z0-9][a-z0-9-]*$/.test(state.slug);
+      const slugBad = slugSt === "taken" || slugSt === "invalid" || slugSt === "checking";
+      return (
+        state.firstName.trim().length >= 2 &&
+        state.lastName.trim().length >= 2 &&
+        slugOk &&
+        !slugBad
+      );
+    }
+    if (step === 1) {
+      return state.socialLinks.every(l => !l.url || l.url.startsWith("http"));
+    }
+    if (step === 2) return state.area !== null;
+    if (step === 3) {
+      return state.availBlocks.every(b => b.startTime < b.endTime && b.days.length > 0);
+    }
+    return true;
   }
 
-  const progresso = (step / (STEPS.length - 1)) * 100;
+  async function handleCreateProfile() {
+    if (!canAdvance() || saving) return;
+    setSaving(true);
+    setSaveErr(null);
+
+    try {
+      const sb = createClient();
+
+      // Upload avatar if user chose one
+      let avatarUrl = state.avatarPreview;
+      if (state.avatarFile) {
+        const { data: { user } } = await sb.auth.getUser();
+        if (user) {
+          const ext  = state.avatarFile.name.split(".").pop() ?? "jpg";
+          const path = `${user.id}/avatar.${ext}`;
+          const { error: upErr } = await sb.storage
+            .from("avatars")
+            .upload(path, state.avatarFile, { upsert: true });
+          if (!upErr) {
+            const { data: { publicUrl } } = sb.storage.from("avatars").getPublicUrl(path);
+            avatarUrl = publicUrl;
+          }
+        }
+      }
+
+      // Atomic save via RPC
+      const { error } = await sb.rpc("save_creator_profile", {
+        p_first_name:   state.firstName,
+        p_last_name:    state.lastName,
+        p_slug:         state.slug,
+        p_avatar_url:   avatarUrl ?? null,
+        p_headline:     state.headline,
+        p_bio:          state.bio,
+        p_area:         state.area,
+        p_social_links: state.socialLinks.map((l, i) => ({
+          platform: l.platform, url: l.url, sort_order: i,
+        })),
+        p_availability: state.availBlocks.map(b => ({
+          start_time: b.startTime, end_time: b.endTime, days: b.days,
+        })),
+      });
+
+      if (error) throw error;
+      next();
+    } catch (err) {
+      console.error(err);
+      setSaveErr("Algo deu errado. Tente novamente.");
+    } finally {
+      setSaving(false);
+    }
+  }
 
   return (
-    <div className="min-h-screen" style={{ background: "#F6F1E9" }}>
+    <div style={{ minHeight: "100vh", background: BEIGE, display: "flex", flexDirection: "column" }}>
 
-      {/* Header sticky */}
-      <div
-        className="sticky top-0 z-20 backdrop-blur-md"
-        style={{ background: "rgba(246,241,233,0.85)", borderBottom: "1px solid #E7DAC8" }}
-      >
-        <div className="max-w-2xl mx-auto px-6 py-4 flex items-center justify-between">
-          <span className="text-sm font-semibold" style={{ color: "#181D27" }}>Criar perfil</span>
-          <span className="text-xs" style={{ color: "#717680" }}>
-            {step + 1} de {STEPS.length}
-          </span>
-        </div>
-        {/* Barra de progresso */}
-        <div className="h-0.5 w-full" style={{ background: "#E7DAC8" }}>
-          <motion.div
-            className="h-full"
-            style={{ background: "#CEFD58" }}
-            animate={{ width: `${progresso}%` }}
-            transition={{ duration: 0.4, ease: [0.22, 1, 0.36, 1] }}
-          />
-        </div>
-      </div>
+      {/* ── Header ──────────────────────────────────────────────────── */}
+      <header style={{
+        position: "fixed", top: 0, left: 0, right: 0, zIndex: 50,
+        height: 60,
+        display: "flex", alignItems: "center", justifyContent: "center",
+        padding: "0 20px",
+        background: `${BG}f0`,
+        backdropFilter: "blur(12px)",
+        WebkitBackdropFilter: "blur(12px)",
+        borderBottom: `1px solid ${BORDER}`,
+      }}>
+        <Logo size="header" />
+        {!isSuccess && (
+          <button
+            type="button"
+            onClick={() => router.back()}
+            style={{
+              position: "absolute", right: 20,
+              width: 32, height: 32, borderRadius: 7,
+              border: `1.5px solid ${BORDER}`, background: CARD,
+              cursor: "pointer",
+              display: "flex", alignItems: "center", justifyContent: "center",
+            }}
+          >
+            <IcoX />
+          </button>
+        )}
+      </header>
 
-      <div className="max-w-2xl mx-auto px-6 pt-10 pb-28">
+      {/* ── Content ─────────────────────────────────────────────────── */}
+      <main style={{
+        flex: 1,
+        paddingTop: 60,
+        paddingBottom: 116,
+        display: "flex", flexDirection: "column",
+      }}>
+        {!isSuccess && (
+          <div style={{ padding: "24px 20px 0" }}>
+            <Stepper steps={STEPS} current={step} />
+          </div>
+        )}
 
-        {/* Stepper */}
-        <div className="flex items-center mb-10 overflow-x-auto pb-1">
-          {STEPS.map((label, i) => {
-            const concluido = i < step;
-            const atual = i === step;
-            return (
-              <div key={label} className="flex items-center flex-1 last:flex-none min-w-0">
-                <div className="flex flex-col items-center gap-1.5 flex-shrink-0">
-                  <div
-                    className="w-8 h-8 rounded-full flex items-center justify-center text-xs font-semibold transition-all"
-                    style={{
-                      background: concluido ? "#CEFD58" : atual ? "#181D27" : "#E7DAC8",
-                      color: concluido ? "#181D27" : atual ? "#FDFDFD" : "#717680",
-                    }}
-                  >
-                    {concluido ? <IconCheck className="w-4 h-4" /> : i + 1}
-                  </div>
-                  <span
-                    className="text-[10px] font-medium whitespace-nowrap"
-                    style={{ color: atual ? "#181D27" : "#717680" }}
-                  >
-                    {label}
-                  </span>
-                </div>
-                {i < STEPS.length - 1 && (
-                  <div
-                    className="flex-1 h-0.5 mx-2 mb-4 rounded transition-colors"
-                    style={{ background: concluido ? "#CEFD58" : "#E7DAC8" }}
-                  />
-                )}
-              </div>
-            );
-          })}
-        </div>
-
-        {/* Conteúdo animado */}
-        <div className="relative overflow-hidden min-h-[420px]">
+        <div style={{ flex: 1, padding: "32px 20px 0" }}>
           <AnimatePresence mode="wait" custom={dir}>
             <motion.div
               key={step}
               custom={dir}
-              variants={variants}
+              variants={slideV}
               initial="enter"
               animate="center"
               exit="exit"
-              transition={transition}
+              transition={slideT}
             >
-              {step === 0 && <StepPerfil    data={data} onChange={patch} />}
-              {step === 1 && <StepCategoria data={data} onChange={patch} />}
-              {step === 2 && <StepPrecos    data={data} onChange={patch} />}
-              {step === 3 && <StepAgenda    data={data} onChange={patch} />}
-              {step === 4 && <StepRedes     data={data} onChange={patch} />}
-              {step === 5 && <StepPagamento data={data} onChange={patch} />}
+              {step === 0 && <StepPerfil   state={state} patch={patch} slugStatus={slugSt} setSlugStatus={setSlugSt} />}
+              {step === 1 && <StepSobre    state={state} patch={patch} />}
+              {step === 2 && <StepArea     state={state} patch={patch} />}
+              {step === 3 && <StepAgenda   state={state} patch={patch} />}
+              {step === 4 && <StepSucesso  state={state} />}
             </motion.div>
           </AnimatePresence>
         </div>
+      </main>
 
-        {/* Navegação */}
-        <div
-          className="flex justify-between items-center mt-10 pt-6"
-          style={{ borderTop: "1px solid #E7DAC8" }}
-        >
-          <button
-            onClick={voltar}
-            className="px-5 py-2.5 rounded-lg text-sm font-semibold transition-opacity hover:opacity-60"
-            style={{
-              color: "#414651",
-              visibility: step === 0 ? "hidden" : "visible",
-            }}
-          >
-            ← Voltar
-          </button>
+      {/* ── Footer wizard ─────────────────────────────────────────── */}
+      {!isSuccess && (
+        <WizardFooter
+          step={step}
+          totalSteps={STEPS.length}
+          onBack={back}
+          onNext={step < 3 ? next : handleCreateProfile}
+          canAdvance={canAdvance()}
+          nextLabel={step < 3 ? "Próximo" : "Criar perfil"}
+          saving={saving}
+          error={saveErr}
+        />
+      )}
 
-          {step < STEPS.length - 1 ? (
-            <button
-              onClick={avancar}
-              disabled={!podeProsseguir()}
-              className="flex items-center gap-2 px-6 py-2.5 rounded-lg text-sm font-semibold transition-opacity disabled:opacity-30"
-              style={{ background: "#181D27", color: "#FDFDFD" }}
+      {/* ── Footer sucesso ────────────────────────────────────────── */}
+      {isSuccess && (
+        <footer style={{
+          position: "fixed", bottom: 0, left: 0, right: 0, zIndex: 50,
+          display: "flex", flexDirection: "column",
+        }}>
+          {/* Progress bar — todos completos */}
+          <div style={{ display: "flex", height: 4 }}>
+            {STEPS.map((_, i) => (
+              <div key={i} style={{ flex: 1, background: tokens.lime }} />
+            ))}
+          </div>
+
+          {/* Nav row */}
+          <div style={{
+            display: "flex", alignItems: "center", justifyContent: "space-between",
+            padding: "16px 20px 20px",
+            background: "rgba(255,255,255,0.50)",
+            backdropFilter: "blur(20px)",
+            WebkitBackdropFilter: "blur(20px)",
+          }}>
+            <Link
+              href="/"
+              style={{
+                fontSize: 16, fontWeight: 600, color: DARK,
+                textDecoration: "none", fontFamily: "inherit",
+              }}
             >
-              Próximo →
-            </button>
-          ) : (
-            <button
-              onClick={() => router.push("/dashboard")}
-              disabled={!podeProsseguir()}
-              className="flex items-center gap-2 px-6 py-2.5 rounded-lg text-sm font-semibold transition-opacity disabled:opacity-30"
-              style={{ background: "#CEFD58", color: "#181D27" }}
+              Sair
+            </Link>
+
+            <Link
+              href={`/${state.slug}`}
+              style={{
+                display: "flex", alignItems: "center", gap: 8,
+                padding: "12px 20px", borderRadius: 8,
+                background: DARK, color: "#FCFBF8",
+                fontSize: 16, fontWeight: 600,
+                textDecoration: "none", fontFamily: "inherit",
+              }}
             >
-              Publicar perfil
-              <IconCheck className="w-4 h-4" />
-            </button>
-          )}
-        </div>
-      </div>
+              Ver perfil
+              <IcoArrowRight size={20} />
+            </Link>
+          </div>
+        </footer>
+      )}
     </div>
   );
 }

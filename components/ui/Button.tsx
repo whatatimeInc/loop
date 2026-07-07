@@ -17,7 +17,7 @@ interface LinkButtonProps {
 }
 
 const base =
-  "inline-flex items-center justify-center font-medium rounded-full transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-lime cursor-pointer";
+  "inline-flex items-center justify-center font-medium rounded-md transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-lime cursor-pointer whitespace-nowrap";
 
 const variants: Record<Variant, string> = {
   primary:   "bg-lime text-dark hover:bg-lime-dark",

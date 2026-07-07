@@ -17,145 +17,153 @@ const ease = cubicBezier(0.22, 1, 0.36, 1);
 
 const CATEGORIES = [
   { label: "Carreira e Negócios", Icon: IconCategoriaCarreira },
-  { label: "Saúde e Bem estar", Icon: IconCategoriaSaude },
-  { label: "Casa e Arquitetura", Icon: IconCategoriaCasa },
-  { label: "Moda e Beleza", Icon: IconCategoriaModa },
-  { label: "Arte e Design", Icon: IconCategoriaArte },
-  { label: "Gastronomia", Icon: IconCategoriaGastronomia },
+  { label: "Saúde e Bem estar",   Icon: IconCategoriaSaude },
+  { label: "Casa e Arquitetura",  Icon: IconCategoriaCasa },
+  { label: "Moda e Beleza",       Icon: IconCategoriaModa },
+  { label: "Arte e Design",       Icon: IconCategoriaArte },
+  { label: "Gastronomia",         Icon: IconCategoriaGastronomia },
 ];
 
-function BentoCard({
-  children,
-  className = "",
-  delay = 0,
-  style,
-}: {
-  children: React.ReactNode;
-  className?: string;
-  delay?: number;
-  style?: React.CSSProperties;
-}) {
+const DURACOES = [
+  { label: "30 minutos", active: false },
+  { label: "45 minutos", active: false },
+  { label: "60 minutos", active: true },
+];
+
+const HORARIOS = [
+  { dia: "Seg", hora: "14h", active: false },
+  { dia: "Seg", hora: "15h", active: false },
+  { dia: "Seg", hora: "16h", active: true },
+];
+
+const MENTOR_PHOTOS = [
+  { slug: "estevan-sartoreli", w: 150 },
+  { slug: "manuela-cit",       w: 110 },
+  { slug: "mauricio-arruda",   w: 150 },
+  { slug: "renata-vanzetto",   w: 110 },
+  { slug: "estevan-sartoreli", w: 150 },
+  { slug: "manuela-cit",       w: 110 },
+];
+
+// ── Card de agendamento (decorativo) ─────────────────────────────────────────
+
+function BookingUI() {
+  return (
+    <div
+      style={{
+        position: "absolute",
+        left: 40,
+        bottom: 40,
+        width: 160,
+        display: "flex",
+        flexDirection: "column",
+        gap: 8,
+      }}
+    >
+      {/* Durações */}
+      <div style={{ display: "flex", flexDirection: "column", borderRadius: 8, overflow: "hidden" }}>
+        {DURACOES.map(({ label, active }) => (
+          <div
+            key={label}
+            style={{
+              padding: "8px 14px",
+              background: active ? "#A39E79" : "#F4F2EB",
+              color: active ? "#fff" : "#514F41",
+              fontSize: 14,
+              textAlign: "center",
+            }}
+          >
+            {label}
+          </div>
+        ))}
+      </div>
+
+      {/* Horários */}
+      <div style={{ display: "flex", flexDirection: "column", borderRadius: 8, overflow: "hidden" }}>
+        {HORARIOS.map(({ dia, hora, active }) => (
+          <div
+            key={hora}
+            style={{
+              padding: "8px 14px",
+              background: active ? "#A39E79" : "#F6F1E9",
+              display: "flex",
+              justifyContent: "space-between",
+              color: active ? "#fff" : "#514F41",
+              fontSize: 14,
+              outline: "1px solid rgba(255,255,255,0.25)",
+              outlineOffset: -1,
+            }}
+          >
+            <span>{dia}</span>
+            <span style={{ fontWeight: 600 }}>{hora}</span>
+          </div>
+        ))}
+      </div>
+
+      {/* Botão */}
+      <div
+        style={{
+          padding: "8px 14px",
+          background: "#EAEA68",
+          borderRadius: 8,
+          textAlign: "center",
+          fontWeight: 600,
+          fontSize: 14,
+          color: "#272518",
+        }}
+      >
+        Agendar
+      </div>
+    </div>
+  );
+}
+
+// ── Bento ─────────────────────────────────────────────────────────────────────
+
+export function BentoSection() {
   const ref = useRef<HTMLDivElement>(null);
   const inView = useInView(ref, { once: true, margin: "-5% 0px" });
 
   return (
-    <motion.div
-      ref={ref}
-      className={className}
-      style={style}
-      initial={{ opacity: 0, y: 20, scale: 0.98 }}
-      animate={inView ? { opacity: 1, y: 0, scale: 1 } : {}}
-      transition={{ duration: 0.55, ease, delay }}
-    >
-      {children}
-    </motion.div>
-  );
-}
-
-export function BentoSection() {
-  return (
-    <section className="bg-dark py-20 px-6">
+    <section className="py-20 px-6" style={{ background: "#F4F2EB" }}>
       <div
-        className="max-w-[1194px] mx-auto grid gap-8"
-        style={{
-          gridTemplateColumns: "1fr 1fr 1.35fr",
-          gridTemplateRows: "320px 320px",
-        }}
+        ref={ref}
+        className="max-w-[1194px] mx-auto flex gap-8"
+        style={{ height: 560 }}
       >
 
-        {/* Card A — Seu tempo, sua disponibilidade — col-span-2, row 1 */}
-        <BentoCard
-          className="col-span-2 bg-white rounded-3xl overflow-hidden"
-          delay={0}
+        {/* ── Card Esquerdo: Disponibilidade ── */}
+        <motion.div
+          className="flex-1 relative overflow-hidden rounded-xl flex flex-col justify-start"
+          style={{ background: "#E0DDC1", padding: "40px 40px 0" }}
+          initial={{ opacity: 0, y: 20 }}
+          animate={inView ? { opacity: 1, y: 0 } : {}}
+          transition={{ duration: 0.55, ease, delay: 0 }}
         >
-          <div className="h-full flex items-center justify-between px-10">
-            {/* Text block */}
-            <div className="max-w-[240px]">
-              <p className="text-[#181D27] text-2xl font-normal leading-snug mb-3">
-                Seu tempo,<br />sua disponibilidade
-              </p>
-              <p className="text-[#535862] text-sm leading-relaxed">
-                De um papo rápido a uma sessão de mentoria. Escolha o seu tempo.
-              </p>
-            </div>
-
-            {/* Duration pills */}
-            <div className="flex flex-col gap-3">
-              {[30, 45, 60].map((m) => (
-                <span
-                  key={m}
-                  className="px-4 py-2 rounded-lg text-sm font-normal text-[#535862]"
-                  style={{ background: "#F6F1E9" }}
-                >
-                  {m} minutos
-                </span>
-              ))}
-            </div>
-          </div>
-        </BentoCard>
-
-        {/* Card D — Photo tall — col 3, row-span-2 */}
-        <BentoCard
-          className="row-span-2 relative rounded-3xl overflow-hidden group"
-          style={{ gridColumn: "3", gridRow: "1 / 3" }}
-          delay={0.08}
-        >
-          <Image
-            src="/bento-hero.jpg"
-            alt="Creator"
-            fill
-            className="object-cover object-top group-hover:scale-105 transition-transform duration-700"
-            sizes="33vw"
-          />
-          {/* Dark gradient overlay */}
-          <div
-            className="absolute inset-0"
-            style={{
-              background: "linear-gradient(180deg, rgba(27,26,24,0.80) 6%, rgba(27,26,24,0) 47%)",
-            }}
-          />
-          {/* Text at bottom */}
-          <div className="absolute bottom-10 left-10 right-10 z-10">
-            <p className="text-[#FDFDFD] text-2xl font-normal leading-snug">
-              Desbloqueie o seu potencial com conselhos de quem sabe
-            </p>
-          </div>
-          {/* Bottom dark fade */}
-          <div
-            className="absolute inset-0 pointer-events-none"
-            style={{
-              background: "linear-gradient(to top, rgba(27,26,24,0.85) 0%, transparent 45%)",
-            }}
-          />
-        </BentoCard>
-
-        {/* Card B — Os melhores do mundo — col 1, row 2 */}
-        <BentoCard
-          className="rounded-3xl overflow-hidden flex flex-col justify-end p-10"
-          style={{ background: "#CEFD58", gridColumn: "1", gridRow: "2" }}
-          delay={0.16}
-        >
-          <p className="text-[#181D27] text-2xl font-normal leading-snug mb-2">
-            Os melhores do mundo.<br />Onde você estiver.
+          <p style={{ color: "#181D27", fontSize: 24, fontWeight: 400, lineHeight: "1.33", marginBottom: 16 }}>
+            Seu tempo,<br />sua disponibilidade
           </p>
-          <p className="text-[#414651] text-sm leading-relaxed">
-            Design, Negócios, Bem-estar, Moda. Sessões 100% online, sob medida.
+          <p style={{ color: "#414651", fontSize: 14, lineHeight: "1.3" }}>
+            De um papo rápido a uma sessão de mentoria. Escolha o seu tempo.
           </p>
-        </BentoCard>
+          <BookingUI />
+        </motion.div>
 
-        {/* Card C — Categorias scroll — col 2, row 2 */}
-        <BentoCard
-          className="rounded-3xl overflow-hidden relative"
-          style={{ background: "#E7DAC8", gridColumn: "2", gridRow: "2" }}
-          delay={0.24}
+        {/* ── Card Central: Categorias ── */}
+        <motion.div
+          className="flex-1 relative rounded-xl overflow-hidden"
+          style={{ background: "#fff" }}
+          initial={{ opacity: 0, y: 20 }}
+          animate={inView ? { opacity: 1, y: 0 } : {}}
+          transition={{ duration: 0.55, ease, delay: 0.08 }}
         >
-          {/* Horizontal scrolling row of category cards, overflowing left */}
           <div
             className="absolute inset-0 flex items-center overflow-hidden"
+            style={{ top: 180 }}
           >
             <div
-              className="flex gap-3 flex-shrink-0"
-              style={{ transform: "translateX(-80px)" }}
+              className="flex gap-4 flex-shrink-0"
+              style={{ transform: "translateX(-48px)" }}
             >
               {CATEGORIES.map(({ label, Icon }) => (
                 <div
@@ -164,61 +172,120 @@ export function BentoSection() {
                   style={{
                     width: 160,
                     height: 160,
-                    background: "#F6F1E9",
+                    background: "#E0DDC1",
                     padding: "32px 24px",
                   }}
                 >
                   <Icon className="w-12 h-12" />
-                  <span className="text-[#535862] text-xs font-normal text-center leading-snug">
+                  <span
+                    style={{
+                      color: "#626053",
+                      fontSize: 12,
+                      textAlign: "center",
+                      lineHeight: "1.3",
+                    }}
+                  >
                     {label}
                   </span>
                 </div>
               ))}
             </div>
           </div>
-        </BentoCard>
+        </motion.div>
+
+        {/* ── Card Direito: Curadoria ── */}
+        <motion.div
+          className="flex-1 relative overflow-hidden rounded-xl flex flex-col justify-start"
+          style={{ background: "#E0DDC1", padding: "40px 40px 0" }}
+          initial={{ opacity: 0, y: 20 }}
+          animate={inView ? { opacity: 1, y: 0 } : {}}
+          transition={{ duration: 0.55, ease, delay: 0.16 }}
+        >
+          <p style={{ color: "#181D27", fontSize: 24, fontWeight: 400, lineHeight: "1.33", marginBottom: 16 }}>
+            Curadoria com<br />os melhores
+          </p>
+          <p style={{ color: "#414651", fontSize: 14, lineHeight: "1.3" }}>
+            Creators verificados em todas as áreas, prontos para conversar com você.
+          </p>
+
+          {/* Grade de fotos */}
+          <div
+            className="absolute overflow-hidden"
+            style={{ left: -40, bottom: 0, right: -40, height: 220 }}
+          >
+            <div
+              className="flex gap-3 items-end"
+              style={{ paddingLeft: 40, paddingBottom: 24 }}
+            >
+              {MENTOR_PHOTOS.map(({ slug, w }, i) => (
+                <div
+                  key={i}
+                  className="flex-shrink-0 relative overflow-hidden"
+                  style={{ width: w, height: 190, borderRadius: 12 }}
+                >
+                  <Image
+                    src={`/mentors/${slug}/profile.webp`}
+                    alt=""
+                    fill
+                    className="object-cover object-top"
+                    sizes="160px"
+                  />
+                </div>
+              ))}
+            </div>
+          </div>
+        </motion.div>
 
       </div>
     </section>
   );
 }
 
+// ── CTA ───────────────────────────────────────────────────────────────────────
+
 export function CTASection() {
   const ref = useRef<HTMLDivElement>(null);
   const inView = useInView(ref, { once: true, margin: "-10% 0px" });
 
   return (
-    <section className="bg-dark px-6 pb-20">
+    <section className="px-6 pb-20" style={{ background: "#F4F2EB" }}>
       <div className="max-w-[1194px] mx-auto" ref={ref}>
         <motion.div
-          className="flex flex-col md:flex-row items-center justify-between gap-10 rounded-3xl px-12 py-12"
-          style={{ background: "#E7DAC8" }}
+          className="flex flex-col md:flex-row items-center justify-between gap-10 rounded-xl px-12 py-12"
+          style={{ background: "#EAEA68" }}
           initial={{ opacity: 0, y: 24 }}
           animate={inView ? { opacity: 1, y: 0 } : {}}
           transition={{ duration: 0.6, ease }}
         >
           <div className="flex-1">
             <h2
-              className="font-normal leading-tight mb-2"
-              style={{ fontSize: 36, color: "#181D27" }}
+              className="font-normal leading-tight mb-3"
+              style={{
+                fontSize: 48,
+                color: "#272518",
+                fontFamily: "var(--font-host-grotesk), 'Host Grotesk', sans-serif",
+                fontWeight: 300,
+                lineHeight: 1.1,
+              }}
             >
-              Seja um Creator e inspire pessoas
+              Seja um mentor<br />e inspire pessoas.
             </h2>
-            <p className="text-sm" style={{ color: "#414651" }}>
+            <p style={{ color: "#272518", fontSize: 16, maxWidth: 320 }}>
               Conecte-se virtualmente, aconselhe e ganhe até R$ 100.000 em um mês.
             </p>
           </div>
           <Link
-            href="/seja-mentor"
-            className="flex-shrink-0 inline-flex items-center justify-center px-4 py-2 rounded-lg font-semibold text-sm whitespace-nowrap transition-opacity hover:opacity-80"
+            href="/criar"
+            className="flex-shrink-0 inline-flex items-center justify-center font-semibold text-base transition-opacity hover:opacity-80"
             style={{
-              background: "#CEFD58",
-              color: "#181D27",
-              outline: "1px solid #CEFD58",
-              boxShadow: "0px 1px 2px rgba(10, 13, 18, 0.05)",
+              background: "#272518",
+              color: "#FCFBF8",
+              padding: "10px 18px",
+              borderRadius: 8,
+              boxShadow: "0px 1px 2px rgba(10,13,18,0.05)",
             }}
           >
-            Seja um Creator
+            Quero ser Creator
           </Link>
         </motion.div>
       </div>

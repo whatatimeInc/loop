@@ -29,10 +29,10 @@ export function CategoriesSection() {
 
   return (
     /* Wrapper com bg dark e padding para o container flutuante */
-    <section className="bg-dark py-6 px-4 md:px-6">
+    <section className="py-6 px-4 md:px-6" style={{ background: "#F4F2EB" }}>
       <div
         ref={ref}
-        className="relative overflow-hidden rounded-3xl min-h-[60vh] flex items-center justify-center max-w-7xl mx-auto"
+        className="relative overflow-hidden rounded-xl min-h-[60vh] flex items-center justify-center max-w-7xl mx-auto"
       >
         {/* Vídeo de fundo */}
         <video
@@ -70,7 +70,7 @@ export function CategoriesSection() {
               >
                 <Link
                   href={href}
-                  className="flex items-center gap-2.5 h-12 px-5 rounded-xl border border-white/20 text-sm font-medium text-white bg-white/10 backdrop-blur-md hover:bg-white/25 hover:border-white/35 hover:scale-[1.04] transition-all"
+                  className="flex items-center gap-2.5 h-12 px-5 rounded-md border border-white/20 text-sm font-medium text-white bg-white/10 backdrop-blur-md hover:bg-white/25 hover:border-white/35 hover:scale-[1.04] transition-all"
                 >
                   {icon}
                   {label}

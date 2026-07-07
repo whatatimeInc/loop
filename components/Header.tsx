@@ -8,33 +8,20 @@ export async function Header() {
   const { data: { user } } = await supabase.auth.getUser();
 
   return (
-    <header className="fixed top-4 left-0 right-0 z-50 flex justify-center px-4">
-      <nav className="flex items-center justify-between gap-6 px-4 py-2 rounded-full bg-white/70 backdrop-blur-md border border-white/40 shadow-soft w-full max-w-3xl">
+    <header className="fixed top-0 md:top-4 left-0 right-0 z-50 flex justify-center md:px-4">
+      <nav className="flex items-center justify-between gap-4 px-4 h-16 md:h-auto md:py-2 md:rounded-xl bg-white/50 backdrop-blur-md md:bg-white/70 md:border md:border-white/40 md:shadow-soft w-full md:max-w-3xl">
 
         {/* Logo */}
         <a href="/" aria-label="Ir para a Home">
           <Logo size="header" />
         </a>
 
-        {/* Links centrais */}
-        <div className="hidden md:flex items-center gap-6">
-          <a href="/explorar" className="text-sm font-medium hover:opacity-70 transition-opacity">
-            Explorar
-          </a>
-          <a href="/seja-mentor" className="text-sm font-medium hover:opacity-70 transition-opacity">
-            Seja um mentor
-          </a>
-        </div>
-
         {/* Auth */}
         <div className="flex items-center gap-2">
           {user ? (
             <>
-              <LinkButton href="/agenda" variant="ghost" size="sm">
-                Agenda
-              </LinkButton>
-              <LinkButton href="/dashboard" variant="ghost" size="sm">
-                Dashboard
+              <LinkButton href="/conta" variant="ghost" size="sm">
+                Minha conta
               </LinkButton>
               <LogoutButton />
             </>
@@ -43,9 +30,11 @@ export async function Header() {
               <LinkButton href="/login" variant="ghost" size="sm">
                 Entrar
               </LinkButton>
-              <LinkButton href="/signup" variant="primary" size="sm">
-                Começar
-              </LinkButton>
+              <span className="hidden md:inline-flex">
+                <LinkButton href="/cadastro" variant="primary" size="sm">
+                  Criar perfil
+                </LinkButton>
+              </span>
             </>
           )}
         </div>

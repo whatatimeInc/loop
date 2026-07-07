@@ -1,40 +1,82 @@
 @import "tailwindcss";
 
+@font-face {
+  font-family: "Nerfos";
+  src: url("/fonts/Nerfos.otf") format("opentype");
+  font-weight: normal;
+  font-style: normal;
+  font-display: swap;
+}
+
 @theme {
-  --color-lime:         #CEFD58;
-  --color-lime-dark:    #BDEC47;
-  --color-cream:        #F6F1E9;
-  --color-tan:          #E7DAC8;
-  --color-tan-dark:     #D6C9B5;
-  --color-dark:         #1B1A18;
-  --color-dark-overlay: rgba(0, 0, 0, 0.4);
+  /* ── brand ───────────────────────────────────────────────────── */
+  --color-yellow:        #EAEA68;   /* brand-primary */
+  --color-yellow-light:  #F8F68D;   /* brand-light */
+  --color-yellow-dark:   #D8D85A;   /* hover state */
 
-  --color-gray-25:  #FDFDFD;
-  --color-gray-50:  #FAFAFA;
-  --color-gray-100: #F5F5F5;
-  --color-gray-200: #E9EAEB;
-  --color-gray-300: #D5D7DA;
-  --color-gray-400: #A4A7AE;
-  --color-gray-500: #717680;
-  --color-gray-600: #535862;
-  --color-gray-700: #414651;
-  --color-gray-800: #252B37;
-  --color-gray-900: #181D27;
+  /* ── olive accents ───────────────────────────────────────────── */
+  --color-olive-100:     #E0DDC1;
+  --color-olive-400:     #A39E79;
+  --color-olive-600:     #8E8857;
 
-  --font-sans:   var(--font-inter);
-  --font-marker: var(--font-permanent-marker);
+  /* ── backgrounds ─────────────────────────────────────────────── */
+  --color-bg:            #FCFBF8;   /* bg-primary — warm off-white */
+  --color-bg-subtle:     #F4F2EB;   /* bg-secondary */
+  --color-bg-white:      #FFFFFF;   /* elevated cards only */
 
-  --shadow-soft: 0 1px 2px rgba(10, 13, 18, 0.05);
+  /* ── near-black ──────────────────────────────────────────────── */
+  --color-dark:          #272518;   /* primary dark surface & text */
+
+  /* ── neutral scale (warm) ────────────────────────────────────── */
+  --color-neutral-50:    #FCFBF8;
+  --color-neutral-100:   #F4F2EB;
+  --color-neutral-200:   #DAD9D5;
+  --color-neutral-400:   #AEADA4;
+  --color-neutral-600:   #626053;
+  --color-neutral-700:   #807F71;
+  --color-neutral-800:   #373525;
+  --color-neutral-900:   #272518;
+
+  /* ── semantic ────────────────────────────────────────────────── */
+  --color-error:         #EB6A67;
+  --color-success:       #68A279;
+
+  /* ── legacy aliases (keep Tailwind class names working) ──────── */
+  --color-lime:          #EAEA68;   /* was #CEFD58 */
+  --color-lime-dark:     #D8D85A;   /* was #BDEC47 */
+  --color-cream:         #FCFBF8;   /* was #F6F1E9 */
+  --color-tan:           #E0DDC1;   /* was #E7DAC8 */
+  --color-tan-dark:      #A39E79;   /* was #D6C9B5 */
+
+  /* ── gray scale (warm-toned, for backwards compat) ───────────── */
+  --color-gray-25:       #FDFDFD;
+  --color-gray-50:       #FAFAFA;
+  --color-gray-100:      #F4F2EB;
+  --color-gray-200:      #DAD9D5;
+  --color-gray-300:      #C8C7C0;
+  --color-gray-400:      #AEADA4;
+  --color-gray-500:      #807F71;
+  --color-gray-600:      #626053;
+  --color-gray-700:      #514F41;
+  --color-gray-800:      #373525;
+  --color-gray-900:      #272518;
+
+  /* ── typography ──────────────────────────────────────────────── */
+  --font-sans:           var(--font-inter);
+  --font-display:        var(--font-host-grotesk);
+
+  /* ── shadow ──────────────────────────────────────────────────── */
+  --shadow-soft:         0px 1px 2px rgba(10, 12.67, 18, 0.05);
 }
 
 :root {
-  --background: var(--color-cream);
-  --foreground: var(--color-gray-900);
+  --background: var(--color-bg);
+  --foreground: var(--color-dark);
 }
 
 .theme-dark {
   --background: var(--color-dark);
-  --foreground: var(--color-gray-25);
+  --foreground: var(--color-neutral-50);
 }
 
 body {

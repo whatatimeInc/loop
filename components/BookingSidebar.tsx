@@ -9,13 +9,15 @@ interface Props {
   expert: Expert;
 }
 
+const DURACOES = [30, 45, 60];
+
 function formatPrice(preco: number) {
   return preco.toLocaleString("pt-BR", { minimumFractionDigits: 2 });
 }
 
 function IconLink() {
   return (
-    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.5} strokeLinecap="round" strokeLinejoin="round">
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.5} strokeLinecap="round" strokeLinejoin="round">
       <path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71" />
       <path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71" />
     </svg>
@@ -23,81 +25,61 @@ function IconLink() {
 }
 
 export function BookingSidebar({ expert }: Props) {
-  const duracoes = expert.duracoes.slice(0, 3);
-  const [duracaoSelecionada, setDuracaoSelecionada] = useState(
-    duracoes[Math.floor(duracoes.length / 2)] ?? duracoes[0]
-  );
-
+  const [duracaoSelecionada, setDuracaoSelecionada] = useState(60);
   const precoFinal = Math.round((expert.preco * duracaoSelecionada) / 60);
 
   return (
     <div
-      className="flex flex-col justify-between"
       style={{
-        width: 335,
-        minHeight: 557,
-        background: "#181D27",
-        borderRadius: 16,
-        outline: "1px solid #535862",
+        background: "#F4F2EB",
+        borderRadius: 12,
+        outline: "1px solid #DAD9D5",
         outlineOffset: -1,
-        paddingLeft: 24,
-        paddingRight: 24,
-        paddingTop: 40,
-        paddingBottom: 40,
+        padding: "40px 24px",
+        display: "flex",
+        flexDirection: "column",
+        justifyContent: "space-between",
+        gap: 24,
+        height: 557,
+        boxSizing: "border-box",
       }}
     >
-      {/* ── Topo: logo + nome + badge ── */}
-      <div className="flex flex-col items-center gap-2">
-        <Logo size="header" lime />
-
-        <p
-          className="font-normal text-center leading-tight mt-2"
-          style={{ fontSize: 30, color: "#E9EAEB", lineHeight: "38px" }}
-        >
+      {/* Logo + nome */}
+      <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 8 }}>
+        <Logo size="header" />
+        <p style={{ fontSize: 30, fontWeight: 400, color: "#181D27", lineHeight: "38px", textAlign: "center", margin: 0 }}>
           {expert.nome}
         </p>
-
-        {/* Badge Popular */}
-        <div
-          className="flex items-center gap-1"
-          style={{
-            background: "#414651",
-            borderRadius: 8,
-            padding: "8px 12px",
-            marginTop: 4,
-          }}
-        >
-          <span style={{ fontSize: 16, color: "#E9EAEB", fontWeight: 400 }}>Popular</span>
-        </div>
       </div>
 
-      {/* ── Base: selector + CTA + link ── */}
-      <div className="flex flex-col gap-6 mt-8">
-
-        {/* Duration selector */}
-        <div className="flex items-center gap-2">
-          {duracoes.map((min) => {
+      {/* Duration selector + CTA + link */}
+      <div style={{ display: "flex", flexDirection: "column", gap: 24 }}>
+        <div style={{ display: "flex", gap: 8 }}>
+          {DURACOES.map((min) => {
             const preco = Math.round((expert.preco * min) / 60);
             const ativo = min === duracaoSelecionada;
-
             return (
               <button
                 key={min}
                 onClick={() => setDuracaoSelecionada(min)}
-                className="flex-1 flex flex-col items-center justify-center transition-all"
                 style={{
+                  flex: 1,
                   height: 72,
-                  borderRadius: 8,
-                  outline: ativo ? "2px solid #E9EAEB" : "1px solid #535862",
-                  outlineOffset: -1,
-                  background: "transparent",
+                  borderRadius: 4,
+                  border: "none",
+                  background: ativo ? "#EAEA68" : "#fff",
+                  display: "flex",
+                  flexDirection: "column",
+                  alignItems: "center",
+                  justifyContent: "center",
                   gap: 4,
+                  cursor: "pointer",
                 }}
               >
-                <span style={{ fontSize: 18, fontWeight: 400, color: "#E9EAEB" }}>
+                <span style={{ fontSize: 16, fontWeight: 400, color: "#272618" }}>
                   {min} min
                 </span>
-                <span style={{ fontSize: 12, color: "#A4A7AE" }}>
+                <span style={{ fontSize: 12, color: "#807F71" }}>
                   R$ {formatPrice(preco)}
                 </span>
               </button>
@@ -105,30 +87,28 @@ export function BookingSidebar({ expert }: Props) {
           })}
         </div>
 
-        {/* CTA */}
         <Link
-          href={`/agendar/${expert.slug}`}
-          className="flex items-center justify-center font-semibold transition-opacity hover:opacity-85"
+          href={`/agendar/${expert.slug}?duracao=${duracaoSelecionada}`}
           style={{
-            height: 56,
-            background: "#CEFD58",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            padding: "12px 20px",
+            background: "#272618",
             borderRadius: 8,
             fontSize: 16,
-            color: "#181D27",
+            fontWeight: 600,
+            color: "#FCFBF8",
+            textDecoration: "none",
           }}
         >
-          Agendar Face.Talk
+          Agendar Loop.Talk
         </Link>
 
-        {/* Link público */}
-        <div
-          className="flex items-center justify-center gap-3"
-          style={{ color: "#E9EAEB", fontSize: 16 }}
-        >
+        <div style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: 12, color: "#181D27", fontSize: 14 }}>
           <IconLink />
-          <span>face.talk/{expert.slug}</span>
+          <span>loop.talk/{expert.slug}</span>
         </div>
-
       </div>
     </div>
   );

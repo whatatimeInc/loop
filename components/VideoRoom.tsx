@@ -93,7 +93,7 @@ function Lobby({ expert, onEntrar }: {
     <div className="flex flex-col items-center justify-center min-h-screen bg-gray-950 px-6 text-white">
       <div className="w-full max-w-sm flex flex-col items-center">
         {/* Preview câmera (mock) */}
-        <div className="relative w-full aspect-video rounded-3xl overflow-hidden bg-gray-800 mb-8">
+        <div className="relative w-full aspect-video rounded-xl overflow-hidden bg-gray-800 mb-8">
           <div className="absolute inset-0 flex items-center justify-center text-gray-600 text-sm">
             Câmera — preview
           </div>
@@ -121,7 +121,7 @@ function Lobby({ expert, onEntrar }: {
         <button
           onClick={onEntrar}
           disabled={!micOk || !camOk}
-          className="w-full py-4 rounded-2xl bg-lime text-dark font-bold text-base disabled:opacity-50 disabled:cursor-not-allowed hover:bg-lime/90 transition-all"
+          className="w-full py-4 rounded-lg bg-lime text-dark font-bold text-base disabled:opacity-50 disabled:cursor-not-allowed hover:bg-lime/90 transition-all"
         >
           {micOk && camOk ? "Entrar na sessão" : "Verificando dispositivos..."}
         </button>
@@ -153,7 +153,7 @@ function ModalGift({ onSelect, onClose }: {
         exit={{ y: 40, opacity: 0 }}
         transition={{ duration: 0.22 }}
         onClick={(e) => e.stopPropagation()}
-        className="bg-gray-900 rounded-3xl p-6 w-full max-w-xs"
+        className="bg-gray-900 rounded-xl p-6 w-full max-w-xs"
       >
         <div className="flex items-center gap-2 mb-2">
           <IconGift />
@@ -165,7 +165,7 @@ function ModalGift({ onSelect, onClose }: {
         <div className="grid grid-cols-2 gap-3 mb-4">
           <button
             onClick={() => onSelect(1)}
-            className="border-2 border-lime rounded-2xl py-4 text-center hover:bg-lime/10 transition-colors"
+            className="border-2 border-lime rounded-lg py-4 text-center hover:bg-lime/10 transition-colors"
           >
             <p className="text-2xl font-bold text-white">+1</p>
             <p className="text-xs text-gray-400 mt-1">minuto</p>
@@ -173,7 +173,7 @@ function ModalGift({ onSelect, onClose }: {
           </button>
           <button
             onClick={() => onSelect(15)}
-            className="border-2 border-gray-700 rounded-2xl py-4 text-center hover:border-lime hover:bg-lime/10 transition-colors"
+            className="border-2 border-gray-700 rounded-lg py-4 text-center hover:border-lime hover:bg-lime/10 transition-colors"
           >
             <p className="text-2xl font-bold text-white">+15</p>
             <p className="text-xs text-gray-400 mt-1">minutos</p>
@@ -242,7 +242,7 @@ function InCall({ expert, duracao, onEncerrar }: {
         </div>
 
         {/* Self-view (pip) */}
-        <div className="absolute bottom-4 right-4 w-24 aspect-video rounded-xl bg-gray-700 border-2 border-gray-600 flex items-center justify-center overflow-hidden">
+        <div className="absolute bottom-4 right-4 w-24 aspect-video rounded-md bg-gray-700 border-2 border-gray-600 flex items-center justify-center overflow-hidden">
           <span className="text-xs text-gray-400">Você</span>
         </div>
 
@@ -281,7 +281,7 @@ function InCall({ expert, duracao, onEncerrar }: {
             <motion.div
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
-              className="absolute bottom-28 left-4 right-4 bg-red-500/90 rounded-2xl px-4 py-3 text-center text-sm font-medium"
+              className="absolute bottom-28 left-4 right-4 bg-red-500/90 rounded-lg px-4 py-3 text-center text-sm font-medium"
             >
               Menos de 1 minuto restante — deseja adicionar mais tempo?
             </motion.div>
@@ -354,13 +354,13 @@ function Ended({ expert, bookingId, router }: {
       <div className="flex flex-col gap-3 w-full max-w-xs">
         <button
           onClick={() => router.push(`/avaliar/${bookingId}`)}
-          className="w-full py-4 rounded-2xl bg-lime text-dark font-bold text-sm hover:bg-lime/90 transition-all"
+          className="w-full py-4 rounded-lg bg-lime text-dark font-bold text-sm hover:bg-lime/90 transition-all"
         >
           Avaliar sessão ⭐
         </button>
         <button
           onClick={() => router.push("/explorar")}
-          className="w-full py-4 rounded-2xl border border-gray-700 text-gray-300 font-medium text-sm hover:bg-gray-800 transition-all"
+          className="w-full py-4 rounded-lg border border-gray-700 text-gray-300 font-medium text-sm hover:bg-gray-800 transition-all"
         >
           Explorar outros mentores
         </button>

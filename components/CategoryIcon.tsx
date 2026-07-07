@@ -1,0 +1,78 @@
+import { Categoria } from "@/lib/mockExperts";
+
+export function CategoryIcon({ categoria }: { categoria: Categoria }) {
+  switch (categoria) {
+    case "Criatividade":
+      return (
+        <svg width="16" height="16" viewBox="0 0 40.5 40" fill="currentColor">
+          <path d="M20.5,2c9.9,0,18,8.1,18,18s-8.1,18-18,18S2.5,29.9,2.5,20,10.5,2,20.5,2M20.5,0C9.4,0,.5,8.9.5,20s9,20,20,20,20-9,20-20S31.5,0,20.5,0h0Z"/>
+          <path d="M20.5,18c5.5,0,10,4.5,10,10s-4.5,10-10,10-10-4.5-10-10,4.5-10,10-10M20.5,16c-6.6,0-12,5.4-12,12s5.4,12,12,12,12-5.4,12-12-5.4-12-12-12h0Z"/>
+          <path d="M20.5,26c3.3,0,6,2.7,6,6s-2.7,6-6,6-6-2.7-6-6,2.7-6,6-6M20.5,24c-4.4,0-8,3.6-8,8s3.6,8,8,8,8-3.6,8-8-3.6-8-8-8h0Z"/>
+        </svg>
+      );
+    case "Carreira e Negócios":
+      return (
+        <svg width="16" height="16" viewBox="0 0 50.1 50" fill="none">
+          <defs>
+            <clipPath id="cp-car0"><polygon points="1 33.1 1.1 .5 29.5 16.9 29.4 49.5 1 33.1"/></clipPath>
+            <clipPath id="cp-car1"><polygon points="11.1 33.1 11.1 .5 39.5 16.9 39.4 49.5 11.1 33.1"/></clipPath>
+            <clipPath id="cp-car2"><polygon points="21.1 33.1 21.2 .5 49.5 16.9 49.4 49.5 21.1 33.1"/></clipPath>
+          </defs>
+          <g clipPath="url(#cp-car0)"><path stroke="currentColor" strokeWidth=".5" d="M1.8,32.7V1.7l27,15.6v31L1.8,32.7M29.5,16.9L1.1.5v32.6l28.3,16.4V16.9"/></g>
+          <polygon points="1 33.1 1.1 .5 29.5 16.9 29.4 49.5 1 33.1" fill="none" stroke="currentColor" strokeWidth=".5"/>
+          <g clipPath="url(#cp-car1)"><path stroke="currentColor" strokeWidth=".5" d="M11.8,32.7V1.7l27,15.6v31L11.8,32.7M39.5,16.9L11.1.5v32.6l28.3,16.4V16.9"/></g>
+          <polygon points="11.1 33.1 11.1 .5 39.5 16.9 39.4 49.5 11.1 33.1" fill="none" stroke="currentColor" strokeWidth=".5"/>
+          <g clipPath="url(#cp-car2)"><path stroke="currentColor" strokeWidth=".5" d="M21.8,32.7V1.7l27,15.6v31L21.8,32.7M49.5,16.9L21.2.5v32.6l28.3,16.4V16.9"/></g>
+          <polygon points="21.1 33.1 21.2 .5 49.5 16.9 49.4 49.5 21.1 33.1" fill="none" stroke="currentColor" strokeWidth=".5"/>
+        </svg>
+      );
+    case "Saúde e Bem Estar":
+      return (
+        <svg width="16" height="16" viewBox="0 0 42.8 43.5" fill="none" stroke="currentColor" strokeWidth="2">
+          <line x1="21.3" y1="0" x2="21.3" y2="12"/>
+          <line x1="8.6" y1="4.2" x2="15.6" y2="13.9"/>
+          <line x1=".7" y1="15.1" x2="12.1" y2="18.8"/>
+          <line x1=".7" y1="28.5" x2="12.1" y2="24.8"/>
+          <line x1="8.7" y1="39.4" x2="15.7" y2="29.7"/>
+          <line x1="21.5" y1="43.5" x2="21.5" y2="31.5"/>
+          <line x1="34.2" y1="39.3" x2="27.2" y2="29.6"/>
+          <line x1="42.1" y1="28.4" x2="30.7" y2="24.7"/>
+          <line x1="42" y1="15" x2="30.6" y2="18.7"/>
+          <line x1="34.1" y1="4.2" x2="27.1" y2="13.9"/>
+        </svg>
+      );
+    case "Tecnologia":
+      return (
+        <svg width="16" height="16" viewBox="0 0 58.5 51.8" fill="none">
+          <defs>
+            <clipPath id="cp-tec0"><polygon points=".5 34.5 29.4 17.7 58.5 34.5 29.6 51.3 .5 34.5"/></clipPath>
+            <clipPath id="cp-tec1"><polygon points=".5 25.9 29.4 9.1 58.5 25.9 29.6 42.7 .5 25.9"/></clipPath>
+            <clipPath id="cp-tec2"><polygon points=".5 17.3 29.4 .5 58.5 17.3 29.6 34.1 .5 17.3"/></clipPath>
+          </defs>
+          <g clipPath="url(#cp-tec0)"><path stroke="currentColor" strokeWidth=".5" d="M1.9,34.5l27.5-16,27.7,16-27.5,16L1.9,34.5M58.5,34.5L29.4,17.7.5,34.5l29.1,16.8,28.9-16.8"/></g>
+          <polygon points=".5 34.5 29.4 17.7 58.5 34.5 29.6 51.3 .5 34.5" fill="none" stroke="currentColor" strokeWidth=".5"/>
+          <g clipPath="url(#cp-tec1)"><path stroke="currentColor" strokeWidth=".5" d="M1.9,25.9l27.5-16,27.7,16-27.5,16L1.9,25.9M58.5,25.9L29.4,9.1.5,25.9l29.1,16.8,28.9-16.8"/></g>
+          <polygon points=".5 25.9 29.4 9.1 58.5 25.9 29.6 42.7 .5 25.9" fill="none" stroke="currentColor" strokeWidth=".5"/>
+          <g clipPath="url(#cp-tec2)"><path stroke="currentColor" strokeWidth=".5" d="M1.9,17.3L29.4,1.3l27.7,16-27.5,16L1.9,17.3M58.5,17.3L29.4.5.5,17.3l29.1,16.8,28.9-16.8"/></g>
+          <polygon points=".5 17.3 29.4 .5 58.5 17.3 29.6 34.1 .5 17.3" fill="none" stroke="currentColor" strokeWidth=".5"/>
+        </svg>
+      );
+    case "Gastronomia":
+      return (
+        <svg width="16" height="16" viewBox="0 0 60 40" fill="currentColor">
+          <path d="M20,2c9.9,0,18,8.1,18,18s-8.1,18-18,18S2,29.9,2,20,10.1,2,20,2M20,0C9,0,0,9,0,20s9,20,20,20,20-9,20-20S31,0,20,0h0Z"/>
+          <path d="M40,2c9.9,0,18,8.1,18,18s-8.1,18-18,18-18-8.1-18-18S30.1,2,40,2M40,0c-11,0-20,9-20,20s9,20,20,20,20-9,20-20S51,0,40,0h0Z"/>
+        </svg>
+      );
+    case "Estilo de Vida":
+      return (
+        <svg width="16" height="16" viewBox="0 0 48.9 48.5" fill="currentColor">
+          <path d="M24.7,2.8l21.4,21.4-21.4,21.4L3.3,24.2,24.7,2.8M24.7,0L.5,24.2l24.2,24.2,24.2-24.2L24.7,0h0Z"/>
+          <path d="M34.8,14.1v20.2H14.6V14.1h20.2M36.8,12.1H12.6v24.2h24.2V12.1h0Z"/>
+          <path d="M24.7,14.9l9.3,9.3-9.3,9.3-9.3-9.3,9.3-9.3M24.7,12.1l-12.1,12.1,12.1,12.1,12.1-12.1-12.1-12.1h0Z"/>
+        </svg>
+      );
+    default:
+      return null;
+  }
+}

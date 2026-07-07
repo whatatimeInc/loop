@@ -119,12 +119,12 @@ function CardSessao({ sessao }: { sessao: Sessao }) {
   const proxima = sessao.status === "proxima" || sessao.status === "acontecendo";
 
   return (
-    <div className={`bg-white rounded-3xl border overflow-hidden transition-shadow hover:shadow-sm ${
+    <div className={`bg-white rounded-xl border overflow-hidden transition-shadow hover:shadow-sm ${
       proxima ? "border-gray-200" : "border-gray-100"
     }`}>
       <div className="flex items-start gap-4 p-5">
         {/* Foto */}
-        <div className="relative w-14 h-14 rounded-2xl overflow-hidden flex-shrink-0">
+        <div className="relative w-14 h-14 rounded-lg overflow-hidden flex-shrink-0">
           <Image
             src={`/mentors/${expert.slug}/profile.webp`}
             alt={expert.nome}
@@ -162,7 +162,7 @@ function CardSessao({ sessao }: { sessao: Sessao }) {
               <span className="text-xs text-lime font-semibold">{diasAte(sessao.data)}</span>
               <Link
                 href={`/sala/${sessao.bookingId}`}
-                className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-gray-900 text-white text-xs font-semibold hover:bg-gray-800 transition-colors"
+                className="flex items-center gap-1.5 px-3 py-1.5 rounded-md bg-gray-900 text-white text-xs font-semibold hover:bg-gray-800 transition-colors"
               >
                 <IconVideo className="w-3.5 h-3.5" />
                 Entrar
@@ -172,7 +172,7 @@ function CardSessao({ sessao }: { sessao: Sessao }) {
           {sessao.status === "concluida" && sessao.nota === undefined && (
             <Link
               href={`/avaliar/${sessao.bookingId}`}
-              className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl border border-gray-200 text-gray-600 text-xs font-medium hover:bg-gray-50 transition-colors"
+              className="flex items-center gap-1.5 px-3 py-1.5 rounded-md border border-gray-200 text-gray-600 text-xs font-medium hover:bg-gray-50 transition-colors"
             >
               <IconStar className="w-3.5 h-3.5 text-amber-400" />
               Avaliar
@@ -188,7 +188,7 @@ function CardSessao({ sessao }: { sessao: Sessao }) {
           {sessao.status === "cancelada" && (
             <Link
               href={`/${expert.slug}`}
-              className="px-3 py-1.5 rounded-xl border border-gray-200 text-gray-500 text-xs font-medium hover:bg-gray-50 transition-colors"
+              className="px-3 py-1.5 rounded-md border border-gray-200 text-gray-500 text-xs font-medium hover:bg-gray-50 transition-colors"
             >
               Reagendar
             </Link>
@@ -236,7 +236,7 @@ function Empty({ tab }: { tab: "proximas" | "historico" }) {
       </p>
       <Link
         href="/explorar"
-        className="px-6 py-3 rounded-2xl bg-gray-900 text-white text-sm font-semibold hover:bg-gray-800 transition-colors"
+        className="px-6 py-3 rounded-lg bg-gray-900 text-white text-sm font-semibold hover:bg-gray-800 transition-colors"
       >
         Explorar mentores
       </Link>
@@ -278,15 +278,15 @@ export default function AgendaPage() {
 
         {/* KPIs */}
         <div className="grid grid-cols-3 gap-3 mb-8">
-          <div className="bg-white rounded-2xl p-4 border border-gray-100 text-center">
+          <div className="bg-white rounded-lg p-4 border border-gray-100 text-center">
             <p className="text-2xl font-bold text-gray-900">{proximas.length}</p>
             <p className="text-xs text-gray-400 mt-0.5">Próximas</p>
           </div>
-          <div className="bg-white rounded-2xl p-4 border border-gray-100 text-center">
+          <div className="bg-white rounded-lg p-4 border border-gray-100 text-center">
             <p className="text-2xl font-bold text-gray-900">{historico.filter((s) => s.status === "concluida").length}</p>
             <p className="text-xs text-gray-400 mt-0.5">Concluídas</p>
           </div>
-          <div className="bg-white rounded-2xl p-4 border border-gray-100 text-center">
+          <div className="bg-white rounded-lg p-4 border border-gray-100 text-center">
             <p className="text-2xl font-bold text-gray-900">
               {mediaNota > 0 ? mediaNota.toFixed(1) : "—"}
             </p>
@@ -296,19 +296,19 @@ export default function AgendaPage() {
 
         {/* Total investido */}
         {totalGasto > 0 && (
-          <div className="bg-gray-900 rounded-2xl px-5 py-4 flex items-center justify-between mb-8">
+          <div className="bg-gray-900 rounded-lg px-5 py-4 flex items-center justify-between mb-8">
             <p className="text-gray-400 text-sm">Total investido em mentoria</p>
             <p className="text-white font-bold text-lg">R$ {formatPreco(totalGasto)}</p>
           </div>
         )}
 
         {/* Tabs */}
-        <div className="flex gap-1 bg-gray-100 rounded-2xl p-1 mb-6">
+        <div className="flex gap-1 bg-gray-100 rounded-lg p-1 mb-6">
           {(["proximas", "historico"] as Tab[]).map((t) => (
             <button
               key={t}
               onClick={() => setTab(t)}
-              className={`flex-1 py-2.5 rounded-xl text-sm font-semibold transition-all ${
+              className={`flex-1 py-2.5 rounded-md text-sm font-semibold transition-all ${
                 tab === t ? "bg-white text-gray-900 shadow-sm" : "text-gray-400 hover:text-gray-600"
               }`}
             >
@@ -343,7 +343,7 @@ export default function AgendaPage() {
           <p className="text-sm text-gray-400 mb-3">Quer aprender mais?</p>
           <Link
             href="/explorar"
-            className="inline-flex items-center gap-2 px-6 py-3 rounded-2xl border-2 border-gray-200 text-gray-700 text-sm font-semibold hover:bg-white transition-colors"
+            className="inline-flex items-center gap-2 px-6 py-3 rounded-lg border-2 border-gray-200 text-gray-700 text-sm font-semibold hover:bg-white transition-colors"
           >
             Explorar mentores
           </Link>

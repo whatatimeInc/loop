@@ -45,7 +45,7 @@ function MockQRCode() {
     "1111111010101111111",
   ];
   return (
-    <div className="inline-block bg-white p-3 rounded-xl border border-gray-200">
+    <div className="inline-block bg-white p-3 rounded-md border border-gray-200">
       {pattern.map((row, i) => (
         <div key={i} className="flex">
           {row.split("").map((cell, j) => (
@@ -96,7 +96,7 @@ function PainelPix({ preco }: { preco: number }) {
 
   return (
     <div className="space-y-6">
-      <div className="bg-lime/10 border border-lime/30 rounded-2xl px-4 py-3 flex items-center justify-between text-sm">
+      <div className="bg-lime/10 border border-lime/30 rounded-lg px-4 py-3 flex items-center justify-between text-sm">
         <span className="text-gray-700">Código expira em</span>
         <span className="font-bold text-base">
           <Countdown segundos={30 * 60} />
@@ -112,13 +112,13 @@ function PainelPix({ preco }: { preco: number }) {
 
       <div>
         <p className="text-xs text-gray-500 mb-2 font-medium">Ou copie o código Pix</p>
-        <div className="flex items-center gap-2 bg-gray-50 border border-gray-200 rounded-xl px-3 py-2">
+        <div className="flex items-center gap-2 bg-gray-50 border border-gray-200 rounded-md px-3 py-2">
           <p className="flex-1 text-xs text-gray-500 font-mono truncate">
             {PIX_CODIGO.slice(0, 48)}...
           </p>
           <button
             onClick={copiar}
-            className="flex-shrink-0 flex items-center gap-1.5 bg-lime hover:bg-lime-dark text-dark text-xs font-semibold px-3 py-1.5 rounded-lg transition-colors"
+            className="flex-shrink-0 flex items-center gap-1.5 bg-lime hover:bg-lime-dark text-dark text-xs font-semibold px-3 py-1.5 rounded transition-colors"
           >
             {copiado ? (
               <><IconCheck className="w-3.5 h-3.5" /> Copiado</>
@@ -129,7 +129,7 @@ function PainelPix({ preco }: { preco: number }) {
         </div>
       </div>
 
-      <div className="bg-gray-50 rounded-xl px-4 py-3 text-xs text-gray-500 space-y-1">
+      <div className="bg-gray-50 rounded-md px-4 py-3 text-xs text-gray-500 space-y-1">
         <p className="flex items-center gap-2"><IconCheck className="w-3.5 h-3.5 text-lime flex-shrink-0" /> Confirmação instantânea após o pagamento</p>
         <p className="flex items-center gap-2"><IconCheck className="w-3.5 h-3.5 text-lime flex-shrink-0" /> Você recebe confirmação por e-mail em segundos</p>
         <p className="flex items-center gap-2"><IconCheck className="w-3.5 h-3.5 text-lime flex-shrink-0" /> 100% seguro — processado via Pagar.me</p>
@@ -160,7 +160,7 @@ function PainelCartao({ preco }: { preco: number }) {
 
   const completo = numero.replace(/\s/g, "").length === 16 && nome.length > 3 && validade.length === 5 && cvv.length === 3;
 
-  const inputCls = "w-full border border-gray-200 rounded-xl px-4 py-3 text-sm text-gray-900 placeholder:text-gray-300 focus:outline-none focus:border-lime transition-colors";
+  const inputCls = "w-full border border-gray-200 rounded-md px-4 py-3 text-sm text-gray-900 placeholder:text-gray-300 focus:outline-none focus:border-lime transition-colors";
 
   return (
     <div className="space-y-4">
@@ -236,7 +236,7 @@ function PainelBoleto({ preco }: { preco: number }) {
   return (
     <div className="space-y-6">
       {/* Código de barras visual */}
-      <div className="bg-white border border-gray-200 rounded-2xl p-4 flex items-center justify-center">
+      <div className="bg-white border border-gray-200 rounded-lg p-4 flex items-center justify-center">
         <div className="flex items-end gap-px h-14">
           {Array.from({ length: 60 }).map((_, i) => {
             const largura = [1, 1, 2, 1, 3, 1, 2, 1, 1, 2, 3, 1, 2, 1, 1, 3, 1, 1, 2, 1][i % 20];
@@ -253,23 +253,23 @@ function PainelBoleto({ preco }: { preco: number }) {
 
       <div>
         <p className="text-xs text-gray-500 mb-2 font-medium">Linha digitável</p>
-        <div className="flex items-center gap-2 bg-gray-50 border border-gray-200 rounded-xl px-3 py-2">
+        <div className="flex items-center gap-2 bg-gray-50 border border-gray-200 rounded-md px-3 py-2">
           <p className="flex-1 text-xs text-gray-600 font-mono">{BOLETO_CODIGO}</p>
         </div>
         <div className="flex gap-2 mt-2">
           <button
             onClick={copiar}
-            className="flex items-center gap-1.5 border border-gray-200 text-gray-700 text-xs font-medium px-3 py-1.5 rounded-lg hover:bg-gray-50 transition-colors"
+            className="flex items-center gap-1.5 border border-gray-200 text-gray-700 text-xs font-medium px-3 py-1.5 rounded hover:bg-gray-50 transition-colors"
           >
             {copiado ? <><IconCheck className="w-3.5 h-3.5 text-lime" /> Copiado</> : <><IconCopy className="w-3.5 h-3.5" /> Copiar código</>}
           </button>
-          <button className="flex items-center gap-1.5 bg-gray-900 text-white text-xs font-medium px-3 py-1.5 rounded-lg hover:bg-gray-800 transition-colors">
+          <button className="flex items-center gap-1.5 bg-gray-900 text-white text-xs font-medium px-3 py-1.5 rounded hover:bg-gray-800 transition-colors">
             Baixar boleto
           </button>
         </div>
       </div>
 
-      <div className="bg-amber-50 border border-amber-200 rounded-xl px-4 py-3 text-xs text-amber-700 space-y-1">
+      <div className="bg-amber-50 border border-amber-200 rounded-md px-4 py-3 text-xs text-amber-700 space-y-1">
         <p className="font-semibold">Atenção</p>
         <p>Vence em <strong>3 dias úteis</strong>. Confirmação em até 2 dias úteis após o pagamento.</p>
         <p>Boleto não disponível para agendamentos com menos de 4 dias de antecedência.</p>
@@ -325,12 +325,12 @@ export function CheckoutFlow() {
         <div className="grid md:grid-cols-[1fr_420px] gap-8 items-start">
 
           {/* ——— RESUMO ——— */}
-          <div className="bg-white rounded-3xl border border-gray-200 p-6 space-y-6">
+          <div className="bg-white rounded-xl border border-gray-200 p-6 space-y-6">
             <h2 className="font-semibold text-gray-900">Resumo</h2>
 
             {/* Expert */}
             <div className="flex items-center gap-3">
-              <div className="relative w-12 h-12 rounded-xl overflow-hidden flex-shrink-0">
+              <div className="relative w-12 h-12 rounded-md overflow-hidden flex-shrink-0">
                 <Image
                   src={`/mentors/${expert.slug}/profile.webp`}
                   alt={expert.nome}
@@ -377,7 +377,7 @@ export function CheckoutFlow() {
             </div>
 
             {/* Garantia */}
-            <div className="bg-gray-50 rounded-xl px-4 py-3 text-xs text-gray-500 space-y-1">
+            <div className="bg-gray-50 rounded-md px-4 py-3 text-xs text-gray-500 space-y-1">
               <p className="flex items-center gap-2">
                 <IconCheck className="w-3.5 h-3.5 text-lime flex-shrink-0" />
                 Se o mentor cancelar, reembolso 100% imediato
@@ -394,15 +394,15 @@ export function CheckoutFlow() {
           </div>
 
           {/* ——— PAGAMENTO ——— */}
-          <div className="bg-white rounded-3xl border border-gray-200 p-6">
+          <div className="bg-white rounded-xl border border-gray-200 p-6">
 
             {/* Tabs */}
-            <div className="flex gap-1 bg-gray-100 rounded-xl p-1 mb-6">
+            <div className="flex gap-1 bg-gray-100 rounded-md p-1 mb-6">
               {tabs.map((t) => (
                 <button
                   key={t.id}
                   onClick={() => setMetodo(t.id)}
-                  className={`flex-1 py-2 rounded-lg text-sm font-medium transition-colors ${
+                  className={`flex-1 py-2 rounded text-sm font-medium transition-colors ${
                     metodo === t.id
                       ? "bg-white text-gray-900 shadow-soft"
                       : "text-gray-500 hover:text-gray-700"

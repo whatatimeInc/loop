@@ -33,9 +33,9 @@ function CalendarButtons({ bookingId, data, hora, expertNome }: {
     return `${d.getFullYear()}${pad(d.getMonth() + 1)}${pad(d.getDate())}T${pad(d.getHours())}${pad(d.getMinutes())}00`;
   }
 
-  const titulo = encodeURIComponent(`face.Talk com ${expertNome}`);
-  const descricao = encodeURIComponent(`Sessão de mentoria via face.Talk. ID: ${bookingId}`);
-  const local = encodeURIComponent("face.Talk — link enviado por e-mail");
+  const titulo = encodeURIComponent(`Loop.Talk com ${expertNome}`);
+  const descricao = encodeURIComponent(`Sessão de mentoria via Loop.Talk. ID: ${bookingId}`);
+  const local = encodeURIComponent("Loop.Talk — link enviado por e-mail");
 
   const googleUrl = `https://calendar.google.com/calendar/render?action=TEMPLATE&text=${titulo}&dates=${toGoogleDate(inicio)}/${toGoogleDate(fim)}&details=${descricao}&location=${local}`;
   const outlookUrl = `https://outlook.live.com/calendar/0/deeplink/compose?subject=${titulo}&startdt=${inicio.toISOString()}&enddt=${fim.toISOString()}&body=${descricao}&location=${local}`;
@@ -47,13 +47,13 @@ function CalendarButtons({ bookingId, data, hora, expertNome }: {
     const ics = [
       "BEGIN:VCALENDAR",
       "VERSION:2.0",
-      "PRODID:-//face.Talk//PT",
+      "PRODID:-//Loop.Talk//PT",
       "BEGIN:VEVENT",
-      `SUMMARY:face.Talk com ${expertNome}`,
+      `SUMMARY:Loop.Talk com ${expertNome}`,
       `DTSTART:${toIcsDate(inicio)}`,
       `DTEND:${toIcsDate(fim)}`,
-      `DESCRIPTION:Sessão de mentoria via face.Talk. ID: ${bookingId}`,
-      `LOCATION:face.Talk — link enviado por e-mail`,
+      `DESCRIPTION:Sessão de mentoria via Loop.Talk. ID: ${bookingId}`,
+      `LOCATION:Loop.Talk — link enviado por e-mail`,
       `UID:${bookingId}@facetalk`,
       "END:VEVENT",
       "END:VCALENDAR",
@@ -76,7 +76,7 @@ function CalendarButtons({ bookingId, data, hora, expertNome }: {
           href={googleUrl}
           target="_blank"
           rel="noopener noreferrer"
-          className="flex items-center justify-center gap-1.5 border border-gray-200 rounded-xl py-2.5 text-xs font-medium text-gray-700 hover:bg-gray-50 transition-colors"
+          className="flex items-center justify-center gap-1.5 border border-gray-200 rounded-md py-2.5 text-xs font-medium text-gray-700 hover:bg-gray-50 transition-colors"
         >
           <svg viewBox="0 0 24 24" className="w-4 h-4 flex-shrink-0" fill="none">
             <path d="M6 2v2M18 2v2M2 8h20M5 4h14a2 2 0 012 2v13a2 2 0 01-2 2H5a2 2 0 01-2-2V6a2 2 0 012-2z" stroke="currentColor" strokeWidth={1.5} strokeLinecap="round" strokeLinejoin="round" />
@@ -87,7 +87,7 @@ function CalendarButtons({ bookingId, data, hora, expertNome }: {
           href={outlookUrl}
           target="_blank"
           rel="noopener noreferrer"
-          className="flex items-center justify-center gap-1.5 border border-gray-200 rounded-xl py-2.5 text-xs font-medium text-gray-700 hover:bg-gray-50 transition-colors"
+          className="flex items-center justify-center gap-1.5 border border-gray-200 rounded-md py-2.5 text-xs font-medium text-gray-700 hover:bg-gray-50 transition-colors"
         >
           <svg viewBox="0 0 24 24" className="w-4 h-4 flex-shrink-0" fill="none">
             <rect x="2" y="4" width="20" height="16" rx="2" stroke="currentColor" strokeWidth={1.5} />
@@ -97,7 +97,7 @@ function CalendarButtons({ bookingId, data, hora, expertNome }: {
         </a>
         <button
           onClick={downloadIcs}
-          className="flex items-center justify-center gap-1.5 border border-gray-200 rounded-xl py-2.5 text-xs font-medium text-gray-700 hover:bg-gray-50 transition-colors"
+          className="flex items-center justify-center gap-1.5 border border-gray-200 rounded-md py-2.5 text-xs font-medium text-gray-700 hover:bg-gray-50 transition-colors"
         >
           <svg viewBox="0 0 24 24" className="w-4 h-4 flex-shrink-0" fill="none">
             <path d="M12 15V3m0 12l-4-4m4 4l4-4M2 17v2a2 2 0 002 2h16a2 2 0 002-2v-2" stroke="currentColor" strokeWidth={1.5} strokeLinecap="round" strokeLinejoin="round" />
@@ -150,11 +150,11 @@ export function ConfirmacaoFlow() {
         </div>
 
         {/* Card de detalhes */}
-        <div className="bg-white rounded-3xl border border-gray-200 overflow-hidden mb-6">
+        <div className="bg-white rounded-xl border border-gray-200 overflow-hidden mb-6">
           {/* Header com mentor */}
           {expert && (
             <div className="flex items-center gap-4 p-6 border-b border-gray-100">
-              <div className="relative w-14 h-14 rounded-2xl overflow-hidden flex-shrink-0">
+              <div className="relative w-14 h-14 rounded-lg overflow-hidden flex-shrink-0">
                 <Image
                   src={`/mentors/${expert.slug}/profile.webp`}
                   alt={expert.nome}
@@ -173,16 +173,16 @@ export function ConfirmacaoFlow() {
           {/* Detalhes da sessão */}
           <div className="p-6 space-y-4">
             <div className="grid grid-cols-3 gap-4 text-center">
-              <div className="bg-gray-50 rounded-2xl p-4">
+              <div className="bg-gray-50 rounded-lg p-4">
                 <p className="text-xs text-gray-400 mb-1">Data</p>
                 <p className="font-bold text-gray-900 text-sm leading-tight">{dataFormatada}</p>
               </div>
-              <div className="bg-gray-50 rounded-2xl p-4">
+              <div className="bg-gray-50 rounded-lg p-4">
                 <p className="text-xs text-gray-400 mb-1">Horário</p>
                 <p className="font-bold text-gray-900 text-sm">{mockHora}</p>
                 <p className="text-xs text-gray-400">Brasília</p>
               </div>
-              <div className="bg-gray-50 rounded-2xl p-4">
+              <div className="bg-gray-50 rounded-lg p-4">
                 <p className="text-xs text-gray-400 mb-1">Duração</p>
                 <p className="font-bold text-gray-900 text-sm">{mockDuracao} min</p>
               </div>
@@ -204,7 +204,7 @@ export function ConfirmacaoFlow() {
 
         {/* Adicionar ao calendário */}
         {expert && (
-          <div className="bg-white rounded-3xl border border-gray-200 p-6 mb-6">
+          <div className="bg-white rounded-xl border border-gray-200 p-6 mb-6">
             <CalendarButtons
               bookingId={bookingId}
               data={mockData}
@@ -215,7 +215,7 @@ export function ConfirmacaoFlow() {
         )}
 
         {/* Próximos passos */}
-        <div className="bg-white rounded-3xl border border-gray-200 p-6 mb-8">
+        <div className="bg-white rounded-xl border border-gray-200 p-6 mb-8">
           <h2 className="font-bold text-gray-900 mb-4">Próximos passos</h2>
           <div className="space-y-4">
             <div className="flex items-start gap-3">
@@ -252,14 +252,14 @@ export function ConfirmacaoFlow() {
         <div className="flex flex-col gap-3">
           <Link
             href={`/sala/${bookingId}`}
-            className="flex items-center justify-center gap-2 w-full py-4 rounded-2xl bg-gray-900 text-white font-semibold text-sm hover:bg-gray-800 transition-colors"
+            className="flex items-center justify-center gap-2 w-full py-4 rounded-lg bg-gray-900 text-white font-semibold text-sm hover:bg-gray-800 transition-colors"
           >
             <IconVideo className="w-4 h-4" />
             Entrar na sala de vídeo
           </Link>
           <Link
             href="/explorar"
-            className="flex items-center justify-center gap-2 w-full py-4 rounded-2xl border-2 border-gray-200 text-gray-700 font-semibold text-sm hover:bg-gray-50 transition-colors"
+            className="flex items-center justify-center gap-2 w-full py-4 rounded-lg border-2 border-gray-200 text-gray-700 font-semibold text-sm hover:bg-gray-50 transition-colors"
           >
             <IconCalendar className="w-4 h-4" />
             Ver minha agenda
