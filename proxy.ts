@@ -1,5 +1,25 @@
 import { type NextRequest, NextResponse } from "next/server";
 
+// ── Basic Auth (staging gate) ──────────────────────────────────────────────
+const BA_USER = process.env.BASIC_AUTH_USER ?? "";
+const BA_PASS = process.env.BASIC_AUTH_PASS ?? "";
+
+function requireBasicAuth(request: NextRequest): NextResponse | null {
+  if (!BA_USER || !BA_PASS) return null; // disabled if env vars not set
+  const auth = request.headers.get("authorization") ?? "";
+  if (auth.startsWith("Basic ")) {
+    const decoded = atob(auth.slice(6));
+    const colon = decoded.indexOf(":");
+    const user = decoded.slice(0, colon);
+    const pass = decoded.slice(colon + 1);
+    if (user === BA_USER && pass === BA_PASS) return null; // ok
+  }
+  return new NextResponse("Acesso restrito", {
+    status: 401,
+    headers: { "WWW-Authenticate": 'Basic realm="Loop Talk"' },
+  });
+}
+
 // ── Phase flag ─────────────────────────────────────────────────────────────
 // One central check. No component should branch on LAUNCH_PHASE.
 const LAUNCH_PHASE = process.env.LAUNCH_PHASE === "post" ? "post" : "pre";
@@ -19,6 +39,9 @@ const PROTEGIDAS = [
 ];
 
 export function proxy(request: NextRequest) {
+  const authResponse = requireBasicAuth(request);
+  if (authResponse) return authResponse;
+
   const { pathname } = request.nextUrl;
 
   // ── PRE-LAUNCH: only waitlist surface is public ──────────────────────────
