@@ -585,7 +585,7 @@ function StepPerfil({
   slugStatus: SlugStatus;
   setSlugStatus: (s: SlugStatus) => void;
 }) {
-  const timerRef = useRef<ReturnType<typeof setTimeout>>();
+  const timerRef = useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
 
   const checkSlug = useCallback(async (slug: string) => {
     if (slug.length < 2) { setSlugStatus("idle"); return; }

@@ -79,7 +79,6 @@ export default function Explorar() {
                   background: "#FFFFFF",
                   borderColor: "#E9EAEB",
                   color: "#272518",
-                  focusRingColor: "#EAEA68",
                 }}
               />
             </div>
