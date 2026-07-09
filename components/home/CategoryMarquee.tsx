@@ -26,7 +26,7 @@ const CATEGORIES: { label: string; icon: React.ReactNode }[] = [
     ),
   },
   {
-    label: "Saúde e Bem-Estar",
+    label: "Saúde e Bem Estar",
     icon: (
       <svg width="24" height="24" viewBox="0 0 42.8 43.5" fill="none">
         <g stroke="#272618" strokeWidth="2" strokeMiterlimit="10">
@@ -69,7 +69,7 @@ const CATEGORIES: { label: string; icon: React.ReactNode }[] = [
     ),
   },
   {
-    label: "Moda e Lifestyle",
+    label: "Estilo de Vida",
     icon: (
       <svg width="24" height="24" viewBox="0 0 48.9 48.5" fill="#272618">
         <path d="M24.7,2.8l21.4,21.4-21.4,21.4L3.3,24.2,24.7,2.8M24.7,0L.5,24.2l24.2,24.2,24.2-24.2L24.7,0h0Z"/>
@@ -94,24 +94,6 @@ const CATEGORIES: { label: string; icon: React.ReactNode }[] = [
       <svg width="24" height="24" viewBox="0 0 60 40" fill="#272618">
         <path d="M20,2c9.9,0,18,8.1,18,18s-8.1,18-18,18S2,29.9,2,20,10.1,2,20,2M20,0C9,0,0,9,0,20s9,20,20,20,20-9,20-20S31,0,20,0h0Z"/>
         <path d="M40,2c9.9,0,18,8.1,18,18s-8.1,18-18,18-18-8.1-18-18S30.1,2,40,2M40,0c-11,0-20,9-20,20s9,20,20,20,20-9,20-20S51,0,40,0h0Z"/>
-      </svg>
-    ),
-  },
-  {
-    label: "Casa e Arquitetura",
-    icon: (
-      <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
-        <path d="M3 21h18M5 21V9l7-6 7 6v12" stroke="#272618" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
-        <rect x="10" y="14" width="4" height="7" rx="0.5" stroke="#272618" strokeWidth="1.5"/>
-      </svg>
-    ),
-  },
-  {
-    label: "Arte e Design",
-    icon: (
-      <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
-        <circle cx="12" cy="12" r="9" stroke="#272618" strokeWidth="1.5"/>
-        <circle cx="12" cy="12" r="3" fill="#272618"/>
       </svg>
     ),
   },

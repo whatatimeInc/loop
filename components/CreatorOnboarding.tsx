@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useRef, useCallback } from "react";
+import { useState, useEffect, useRef, useCallback } from "react";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
 import Link from "next/link";
@@ -986,7 +986,7 @@ function StepSucesso({ state }: { state: WizardState }) {
         </button>
 
         <Link
-          href="/dashboard/pagamento"
+          href="/dashboard/pagamentos"
           style={{
             display: "flex", alignItems: "center", justifyContent: "center",
             width: "100%", padding: "12px 20px", borderRadius: 8,
@@ -1026,6 +1026,20 @@ export function CreatorOnboarding() {
 
   const isSuccess = step === 4;
 
+  // Pre-fill name from Supabase auth user metadata on mount
+  useEffect(() => {
+    createClient().auth.getUser().then(({ data: { user } }) => {
+      if (!user) return;
+      const meta = user.user_metadata ?? {};
+      const firstName = (meta.name ?? meta.given_name ?? meta.full_name?.split(" ")[0] ?? "").trim();
+      const lastName  = (meta.last_name ?? meta.family_name ?? meta.full_name?.split(" ").slice(1).join(" ") ?? "").trim();
+      if (firstName || lastName) {
+        const slug = slugify(`${firstName} ${lastName}`);
+        setState(prev => ({ ...prev, firstName, lastName, slug }));
+      }
+    });
+  }, []);
+
   function patch(p: Partial<WizardState>) {
     setState(prev => ({ ...prev, ...p }));
   }
@@ -1063,7 +1077,7 @@ export function CreatorOnboarding() {
       const sb = createClient();
 
       // Upload avatar if user chose one
-      let avatarUrl = state.avatarPreview;
+      let avatarUrl: string | null = null;
       if (state.avatarFile) {
         const { data: { user } } = await sb.auth.getUser();
         if (user) {
@@ -1072,10 +1086,9 @@ export function CreatorOnboarding() {
           const { error: upErr } = await sb.storage
             .from("avatars")
             .upload(path, state.avatarFile, { upsert: true });
-          if (!upErr) {
-            const { data: { publicUrl } } = sb.storage.from("avatars").getPublicUrl(path);
-            avatarUrl = publicUrl;
-          }
+          if (upErr) throw new Error(`Falha no upload da foto: ${upErr.message}`);
+          const { data: { publicUrl } } = sb.storage.from("avatars").getPublicUrl(path);
+          avatarUrl = publicUrl;
         }
       }
 

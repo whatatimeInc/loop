@@ -7,7 +7,7 @@ export default async function DashboardPerfilPage() {
 
   const { data: profile } = await supabase
     .from("profiles")
-    .select("username, headline, bio, photo_url")
+    .select("username, name, last_name, headline, bio, photo_url")
     .eq("id", user!.id)
     .single();
 
@@ -25,6 +25,8 @@ export default async function DashboardPerfilPage() {
       <PerfilForm
         userId={user!.id}
         username={profile?.username ?? null}
+        firstName={profile?.name ?? null}
+        lastName={profile?.last_name ?? null}
         initialData={{
           headline: profile?.headline ?? "",
           bio: profile?.bio ?? "",

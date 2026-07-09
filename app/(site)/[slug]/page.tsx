@@ -7,6 +7,8 @@ import { MobileCreatorLayout } from "@/components/MobileCreatorLayout";
 import { IconStar } from "@/components/icons";
 import { createClient } from "@/lib/supabase/server";
 import { CategoryIcon } from "@/components/CategoryIcon";
+import { type Categoria } from "@/lib/mockExperts";
+import { ShareButton } from "./ShareButton";
 
 type Props = { params: Promise<{ slug: string }> };
 
@@ -17,6 +19,12 @@ type SessionType = {
   price_brl: number;
 };
 
+type SocialLink = {
+  platform: string;
+  url: string;
+  sort_order: number;
+};
+
 type RealProfile = {
   id: string;
   name: string | null;
@@ -25,7 +33,9 @@ type RealProfile = {
   headline: string | null;
   bio: string | null;
   photo_url: string | null;
+  area: string | null;
   sessionTypes: SessionType[];
+  socialLinks: SocialLink[];
 };
 
 export async function generateMetadata({ params }: Props) {
@@ -128,6 +138,32 @@ function SocialCircle({ href, label, children }: { href: string; label: string; 
 
 // ─── real profile page ────────────────────────────────────────────────────────
 
+const AREA_LABEL: Record<string, Categoria> = {
+  career_business:   "Carreira e Negócios",
+  lifestyle_fashion: "Estilo de Vida",
+  health_wellness:   "Saúde e Bem Estar",
+  technology:        "Tecnologia",
+  creativity:        "Criatividade",
+  gastronomy:        "Gastronomia",
+};
+
+function SocialIconByPlatform({ platform }: { platform: string }) {
+  if (platform === "instagram") return <InstagramIcon />;
+  if (platform === "linkedin")  return <LinkedInIcon />;
+  if (platform === "youtube")   return <YouTubeIcon />;
+  if (platform === "tiktok")    return <TikTokIcon />;
+  if (platform === "twitter")   return (
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+      <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z" />
+    </svg>
+  );
+  return (
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.5} strokeLinecap="round">
+      <circle cx="12" cy="12" r="10" /><path d="M2 12h20M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z" />
+    </svg>
+  );
+}
+
 function RealCreatorPage({ profile }: { profile: RealProfile }) {
   const name = [profile.name, profile.last_name].filter(Boolean).join(" ");
   const initials = [profile.name, profile.last_name]
@@ -137,10 +173,90 @@ function RealCreatorPage({ profile }: { profile: RealProfile }) {
     .slice(0, 2);
 
   const cheapest = profile.sessionTypes[0];
-  const cheapestPrice = cheapest ? (cheapest.price_brl / 100).toLocaleString("pt-BR", { minimumFractionDigits: 2 }) : null;
+  const cheapestPrice = cheapest
+    ? (cheapest.price_brl / 100).toLocaleString("pt-BR", { minimumFractionDigits: 2 })
+    : null;
+
+  const areaLabel = profile.area ? (AREA_LABEL[profile.area] ?? null) : null;
+
+  const chipStyle: React.CSSProperties = {
+    background: "rgba(255,255,255,0.40)",
+    backdropFilter: "blur(20px)",
+    WebkitBackdropFilter: "blur(20px)",
+    borderRadius: 4, padding: "8px 12px",
+    fontSize: 12, fontWeight: 600, color: "#272618",
+    boxShadow: "0px 1px 2px rgba(10,13,18,0.05)",
+    display: "inline-flex", alignItems: "center", gap: 4,
+  };
+
+  const socialRow = profile.socialLinks.length > 0 && (
+    <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
+      {profile.socialLinks.map((l) => (
+        <SocialCircle key={l.platform} href={l.url} label={l.platform}>
+          <SocialIconByPlatform platform={l.platform} />
+        </SocialCircle>
+      ))}
+    </div>
+  );
 
   return (
-    <div style={{ background: "#F4F2EB", minHeight: "100vh" }}>
+    <>
+    {/* ── MOBILE ────────────────────────────────────────────────────────────── */}
+    <div className="md:hidden" style={{ background: "#F4F2EB", paddingBottom: 96 }}>
+      <div style={{ padding: "96px 16px 16px", display: "flex", flexDirection: "column", gap: 24 }}>
+
+        {/* Hero photo */}
+        <div style={{ width: "100%", height: 500, borderRadius: 12, overflow: "hidden", position: "relative", background: "#E0DDC1" }}>
+          {profile.photo_url ? (
+            <Image src={profile.photo_url} alt={name} fill className="object-cover object-top" sizes="100vw" />
+          ) : (
+            <div style={{ width: "100%", height: "100%", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 72, fontWeight: 700, color: "#272518", background: "#EAEA68" }}>
+              {initials}
+            </div>
+          )}
+          {/* Gradient overlay */}
+          <div style={{ position: "absolute", inset: 0, background: "linear-gradient(180deg, rgba(255,255,255,0) 55%, rgba(255,255,255,0.38) 75%, rgba(255,255,255,0.80) 100%)" }} />
+          {/* Bottom frosted section */}
+          <div style={{ position: "absolute", left: 0, right: 0, top: 310, paddingTop: 58, paddingBottom: 32, backdropFilter: "blur(40px)", WebkitBackdropFilter: "blur(40px)", WebkitMaskImage: "linear-gradient(180deg, transparent 0%, black 22%)", maskImage: "linear-gradient(180deg, transparent 0%, black 22%)", display: "flex", flexDirection: "column", alignItems: "center", gap: 12 }}>
+            {areaLabel && <span style={chipStyle}><CategoryIcon categoria={areaLabel} />{areaLabel}</span>}
+            <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 8, paddingLeft: 16, paddingRight: 16 }}>
+              <h1 style={{ fontFamily: "var(--font-host-grotesk)", fontSize: 30, fontWeight: 300, color: "#181D27", lineHeight: "32px", textAlign: "center", margin: 0 }}>
+                {name || profile.username}
+              </h1>
+              {profile.headline && (
+                <p style={{ fontSize: 12, color: "#181D27", lineHeight: "16px", textAlign: "center", margin: 0 }}>{profile.headline}</p>
+              )}
+            </div>
+          </div>
+        </div>
+
+        {/* Sobre + social */}
+        {profile.bio && (
+          <div style={{ borderTop: "1px solid #DAD9D5", paddingTop: 24, display: "flex", flexDirection: "column", gap: 24 }}>
+            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start" }}>
+              <h2 style={{ fontSize: 24, fontWeight: 400, color: "#272618", lineHeight: "32px", margin: 0 }}>Sobre</h2>
+              {socialRow}
+            </div>
+            <p style={{ fontSize: 14, color: "#626053", lineHeight: "20px", margin: 0 }}>{profile.bio}</p>
+          </div>
+        )}
+      </div>
+
+      {/* Fixed bottom CTA */}
+      <div style={{ position: "fixed", bottom: 0, left: 0, right: 0, zIndex: 50, padding: "17px 16px 16px", background: "rgba(255,255,255,0.50)", backdropFilter: "blur(20px)", WebkitBackdropFilter: "blur(20px)" }}>
+        <div style={{ display: "flex", gap: 10 }}>
+          {profile.sessionTypes.length > 0 && (
+            <div style={{ flex: 1, display: "flex", alignItems: "center", justifyContent: "center", height: 56, background: "#EAEA68", borderRadius: 8, fontSize: 16, fontWeight: 600, color: "#272618", cursor: "pointer" }}>
+              Agendar Loop.Talk
+            </div>
+          )}
+          <ShareButton slug={profile.username ?? ""} name={name} />
+        </div>
+      </div>
+    </div>
+
+    {/* ── DESKTOP ───────────────────────────────────────────────────────────── */}
+    <div className="hidden md:block" style={{ background: "#F4F2EB", minHeight: "100vh" }}>
       <div style={{ maxWidth: 1194, margin: "0 auto", padding: "112px 24px 80px" }}>
 
         {/* Hero grid */}
@@ -148,27 +264,37 @@ function RealCreatorPage({ profile }: { profile: RealProfile }) {
 
           {/* Col 1: info */}
           <div style={{ display: "flex", flexDirection: "column", gap: 24, paddingTop: 68 }}>
-            <h1 style={{ fontSize: 48, fontWeight: 300, color: "#272518", lineHeight: "48px", margin: 0 }}>
+
+            {/* Category chip */}
+            {areaLabel && (
+              <div style={{ display: "inline-flex", alignSelf: "flex-start" }}>
+                <span style={chipStyle}>
+                  <CategoryIcon categoria={areaLabel} />
+                  {areaLabel}
+                </span>
+              </div>
+            )}
+
+            <h1 style={{ fontSize: 48, fontWeight: 300, color: "#272518", lineHeight: "52px", margin: 0 }}>
               {name || profile.username}
             </h1>
+
             {profile.headline && (
               <p style={{ fontSize: 16, fontWeight: 500, color: "#272518", margin: 0 }}>
                 {profile.headline}
               </p>
             )}
-            {profile.bio && (
-              <p style={{ fontSize: 14, color: "#626053", lineHeight: "20px", margin: 0 }}>
-                {profile.bio}
-              </p>
+
+            {/* Social links */}
+            {profile.socialLinks.length > 0 && (
+              <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
+                {profile.socialLinks.map((l) => (
+                  <SocialCircle key={l.platform} href={l.url} label={l.platform}>
+                    <SocialIconByPlatform platform={l.platform} />
+                  </SocialCircle>
+                ))}
+              </div>
             )}
-            <div style={{ fontSize: 14, color: "#626053", lineHeight: "20px" }}>
-              <p style={{ color: "#272518", fontWeight: 500, margin: "0 0 6px" }}>O que esperar:</p>
-              <ul style={{ margin: 0, padding: 0, listStyle: "none", display: "flex", flexDirection: "column", gap: 4 }}>
-                <li>Sessão 100% focada na sua dúvida ou desafio</li>
-                <li>Feedback direto e acionável, sem rodeios</li>
-                <li>Acesso à experiência real, não a teoria</li>
-              </ul>
-            </div>
           </div>
 
           {/* Col 2: photo */}
@@ -184,69 +310,70 @@ function RealCreatorPage({ profile }: { profile: RealProfile }) {
 
           {/* Col 3: booking panel */}
           <div style={{ position: "sticky", top: 96 }}>
-            <div style={{ background: "#fff", borderRadius: 10, border: "1px solid #E0DDC1", padding: "32px 24px", display: "flex", flexDirection: "column", gap: 20 }}>
-              <div>
-                <p style={{ fontSize: 12, color: "#626053", margin: "0 0 4px" }}>A partir de</p>
-                <p style={{ fontSize: 32, fontWeight: 700, color: "#272518", margin: 0 }}>
-                  {cheapestPrice ? `R$ ${cheapestPrice}` : "—"}
+            <div style={{
+              background: "#F4F2EB", borderRadius: 12, border: "1px solid #DAD9D5",
+              padding: "40px 24px", minHeight: 460,
+              display: "flex", flexDirection: "column", justifyContent: "space-between", gap: 32,
+            }}>
+              {/* Top: logo + name */}
+              <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 8 }}>
+                <img src="/logo.svg" alt="Loop.Talk" style={{ height: 20, display: "block" }} />
+                <p style={{ fontSize: 30, fontWeight: 400, color: "#181D27", lineHeight: "38px", textAlign: "center", margin: 0 }}>
+                  {name || profile.username}
                 </p>
               </div>
 
-              {profile.sessionTypes.length > 0 ? (
-                <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
-                  {profile.sessionTypes.map((st) => (
-                    <div
-                      key={st.id}
-                      style={{ padding: "12px 16px", borderRadius: 8, border: "1px solid #E0DDC1", display: "flex", justifyContent: "space-between", alignItems: "center" }}
-                    >
-                      <div>
-                        <p style={{ fontSize: 13, fontWeight: 600, color: "#272518", margin: 0 }}>
-                          {st.label || `Sessão ${st.duration_minutes} min`}
-                        </p>
-                        <p style={{ fontSize: 12, color: "#626053", margin: "2px 0 0" }}>{st.duration_minutes} minutos</p>
-                      </div>
-                      <p style={{ fontSize: 14, fontWeight: 700, color: "#272518", margin: 0 }}>
-                        R$ {(st.price_brl / 100).toLocaleString("pt-BR", { minimumFractionDigits: 2 })}
-                      </p>
+              {/* Bottom: session tiles + CTA + share link */}
+              <div style={{ display: "flex", flexDirection: "column", gap: 24 }}>
+                {profile.sessionTypes.length > 0 ? (
+                  <div style={{ display: "flex", flexDirection: "column", gap: 24 }}>
+                    {/* 3 tiles */}
+                    <div style={{ display: "flex", gap: 8 }}>
+                      {profile.sessionTypes.map((st, i) => {
+                        const isHighlighted = i === profile.sessionTypes.length - 1;
+                        return (
+                          <div key={st.id} style={{
+                            flex: 1, height: 72, borderRadius: 4, padding: "0 12px",
+                            background: isHighlighted ? "#EAEA68" : "#FFFFFF",
+                            display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center",
+                          }}>
+                            <span style={{ fontSize: 16, fontWeight: 400, color: "#272618", lineHeight: "24px" }}>
+                              {st.label || `${st.duration_minutes} min`}
+                            </span>
+                            <span style={{ fontSize: 12, fontWeight: 400, color: "#807F71", lineHeight: "16px" }}>
+                              R$ {(st.price_brl / 100).toLocaleString("pt-BR", { minimumFractionDigits: 2 })}
+                            </span>
+                          </div>
+                        );
+                      })}
                     </div>
-                  ))}
-                </div>
-              ) : (
-                <p style={{ fontSize: 13, color: "#626053", margin: 0 }}>Nenhuma sessão disponível no momento.</p>
-              )}
+                    {/* CTA */}
+                    <div style={{ display: "flex", alignItems: "center", justifyContent: "center", padding: "12px 20px", borderRadius: 8, background: "#272618", color: "#FCFBF8", fontSize: 16, fontWeight: 600, cursor: "pointer" }}>
+                      Agendar Loop.Talk
+                    </div>
+                  </div>
+                ) : (
+                  <p style={{ fontSize: 13, color: "#626053", margin: 0, textAlign: "center" }}>Nenhuma sessão disponível no momento.</p>
+                )}
 
-              {profile.sessionTypes.length > 0 && (
-                <div
-                  style={{
-                    display: "flex",
-                    alignItems: "center",
-                    justifyContent: "center",
-                    padding: "14px",
-                    borderRadius: 8,
-                    background: "#272518",
-                    color: "#FCFBF8",
-                    fontSize: 15,
-                    fontWeight: 600,
-                    cursor: "pointer",
-                  }}
-                >
-                  Agendar sessão
-                </div>
-              )}
+                {/* Share link */}
+                <ShareButton slug={profile.username ?? ""} name={name} variant="text" />
+              </div>
             </div>
           </div>
         </div>
 
-        {/* Bio section */}
+        {/* Sobre */}
         {profile.bio && (
-          <div style={{ maxWidth: 829, borderTop: "1px solid #E0DDC1", paddingTop: 24, marginTop: 32 }}>
-            <h2 style={{ fontSize: 24, fontWeight: 400, color: "#272518", lineHeight: "32px", marginBottom: 12 }}>Sobre</h2>
-            <p style={{ fontSize: 14, color: "#626053", lineHeight: "20px" }}>{profile.bio}</p>
+          <div style={{ maxWidth: 829, borderTop: "1px solid #E0DDC1", paddingTop: 24, marginTop: 32, display: "flex", flexDirection: "column", gap: 8 }}>
+            <h2 style={{ fontSize: 24, fontWeight: 400, color: "#272518", lineHeight: "32px", margin: 0 }}>Sobre</h2>
+            <p style={{ fontSize: 14, color: "#626053", lineHeight: "20px", margin: 0 }}>{profile.bio}</p>
           </div>
         )}
 
       </div>
     </div>
+    </>
   );
 }
 
@@ -258,20 +385,31 @@ export default async function CreatorPage({ params }: Props) {
   const supabase = await createClient();
   const { data: profileRow } = await supabase
     .from("profiles")
-    .select("id, name, last_name, username, headline, bio, photo_url")
+    .select("id, name, last_name, username, headline, bio, photo_url, area")
     .eq("username", slug)
     .eq("host_profile_activated", true)
     .single();
 
   if (profileRow) {
-    const { data: sessionTypes } = await supabase
-      .from("session_types")
-      .select("id, label, duration_minutes, price_brl")
-      .eq("host_id", profileRow.id)
-      .eq("active", true)
-      .order("price_brl");
+    const [{ data: sessionTypes }, { data: socialLinks }] = await Promise.all([
+      supabase
+        .from("session_types")
+        .select("id, label, duration_minutes, price_brl")
+        .eq("host_id", profileRow.id)
+        .eq("active", true)
+        .order("price_brl"),
+      supabase
+        .from("social_links")
+        .select("platform, url, sort_order")
+        .eq("profile_id", profileRow.id)
+        .order("sort_order"),
+    ]);
 
-    const realProfile: RealProfile = { ...profileRow, sessionTypes: sessionTypes ?? [] };
+    const realProfile: RealProfile = {
+      ...profileRow,
+      sessionTypes: sessionTypes ?? [],
+      socialLinks: socialLinks ?? [],
+    };
     return <RealCreatorPage profile={realProfile} />;
   }
 

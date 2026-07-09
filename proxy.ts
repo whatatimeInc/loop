@@ -10,6 +10,7 @@ const WAITLIST_PREFIX = "/waitlist";
 // Routes that require auth in post-launch
 const PROTEGIDAS = [
   "/conta",
+  "/criar",
   "/dashboard",
   "/agenda",
   "/sala",
@@ -44,7 +45,9 @@ export function proxy(request: NextRequest) {
   }
 
   // ── POST-LAUNCH: auth-protected routes ──────────────────────────────────
-  const temSessao = request.cookies.getAll().some((c) => c.name.startsWith("sb-"));
+  const temSessao = request.cookies.getAll().some(
+    (c) => c.name.startsWith("sb-") && c.name.includes("-auth-token") && !c.name.includes("-code-verifier")
+  );
 
   const eProtegida = PROTEGIDAS.some(
     (p) => pathname === p || pathname.startsWith(p + "/")

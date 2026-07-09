@@ -79,6 +79,10 @@
   --foreground: var(--color-neutral-50);
 }
 
+html {
+  background: #F4F2EB;
+}
+
 body {
   background: var(--background);
   color: var(--foreground);

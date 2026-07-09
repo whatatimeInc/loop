@@ -1,5 +1,6 @@
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
+import { DashboardShell, type DashboardProfile } from "./DashboardShell";
 import { DashboardSidebar } from "./DashboardSidebar";
 import { DashboardHeader } from "./DashboardHeader";
 
@@ -11,34 +12,58 @@ export default async function DashboardLayout({
   const supabase = await createClient();
   const { data: { user } } = await supabase.auth.getUser();
 
-  if (!user) {
-    redirect("/login?redirect=/dashboard");
-  }
+  if (!user) redirect("/login?redirect=/dashboard");
 
-  const { data: profile } = await supabase
+  let { data: p } = await supabase
     .from("profiles")
-    .select("name, last_name, photo_url, username, host_profile_activated")
+    .select("id, name, last_name, username, photo_url, is_mentor, hourly_price, whatsapp, headline, pix_key, onboarding_completed")
     .eq("id", user.id)
     .single();
 
-  if (!profile?.host_profile_activated) {
-    redirect("/conta");
+  // Profile doesn't exist yet — create it from auth user data
+  if (!p) {
+    const email = user.email ?? "";
+    await supabase.from("profiles").upsert({
+      id: user.id,
+      email,
+      name: user.user_metadata?.name ?? email.split("@")[0],
+      last_name: user.user_metadata?.last_name ?? null,
+    });
+    const { data: created } = await supabase
+      .from("profiles")
+      .select("id, name, last_name, username, photo_url, is_mentor, hourly_price, whatsapp, headline, pix_key, onboarding_completed")
+      .eq("id", user.id)
+      .single();
+    p = created;
   }
 
+  if (!p) redirect("/login");
+
+  const profile: DashboardProfile = {
+    id: p.id,
+    name: p.name ?? null,
+    last_name: p.last_name ?? null,
+    username: p.username ?? null,
+    photo_url: p.photo_url ?? null,
+    is_mentor: p.is_mentor ?? false,
+    hourly_price: p.hourly_price ?? null,
+    whatsapp: p.whatsapp ?? null,
+    headline: p.headline ?? null,
+    pix_key: p.pix_key ?? null,
+    onboarding_completed: p.onboarding_completed ?? false,
+  };
+
   return (
-    <div style={{ display: "flex", minHeight: "100vh", background: "#FCFBF8" }}>
-      <DashboardSidebar username={profile?.username ?? null} />
-      <div style={{ flex: 1, display: "flex", flexDirection: "column", overflow: "auto" }}>
-        <DashboardHeader
-          name={profile?.name ?? null}
-          lastName={profile?.last_name ?? null}
-          photoUrl={profile?.photo_url ?? null}
-          userId={user.id}
-        />
-        <main style={{ flex: 1, padding: "32px 48px" }}>
-          {children}
-        </main>
+    <DashboardShell profile={profile}>
+      <div style={{ display: "flex", minHeight: "100vh", background: "#FCFBF8" }}>
+        <DashboardSidebar />
+        <div style={{ flex: 1, display: "flex", flexDirection: "column", overflow: "auto" }}>
+          <DashboardHeader />
+          <main style={{ flex: 1, padding: "32px 40px", maxWidth: 860 }}>
+            {children}
+          </main>
+        </div>
       </div>
-    </div>
+    </DashboardShell>
   );
 }

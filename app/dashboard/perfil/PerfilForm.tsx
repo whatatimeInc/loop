@@ -2,6 +2,10 @@
 
 import { useState } from "react";
 import { createClient } from "@/lib/supabase/client";
+import { FolderFrame } from "@/components/ui/FolderFrame";
+import { FloatingInput } from "@/components/ui/FloatingInput";
+import { FloatingTextarea } from "@/components/ui/FloatingTextarea";
+import { tokens } from "@/components/ui/tokens";
 
 type FormState = {
   headline: string;
@@ -12,13 +16,19 @@ type FormState = {
 export function PerfilForm({
   userId,
   username,
+  firstName,
+  lastName,
   initialData,
 }: {
   userId: string;
   username: string | null;
+  firstName: string | null;
+  lastName: string | null;
   initialData: FormState;
 }) {
   const [form, setForm] = useState<FormState>(initialData);
+  const [avatarFile, setAvatarFile] = useState<File | null>(null);
+  const [avatarPreview, setAvatarPreview] = useState<string | null>(null);
   const [saving, setSaving] = useState(false);
   const [saved, setSaved] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -28,18 +38,42 @@ export function PerfilForm({
     setSaved(false);
   }
 
+  function handlePhotoSelect(file: File) {
+    setAvatarFile(file);
+    setAvatarPreview(URL.createObjectURL(file));
+    setSaved(false);
+  }
+
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     setSaving(true);
     setError(null);
 
     const supabase = createClient();
+
+    let photoUrl = form.photo_url || null;
+
+    if (avatarFile) {
+      const ext = avatarFile.name.split(".").pop() ?? "jpg";
+      const path = `${userId}/avatar.${ext}`;
+      const { error: upErr } = await supabase.storage
+        .from("avatars")
+        .upload(path, avatarFile, { upsert: true });
+      if (upErr) {
+        setError(`Erro no upload da foto: ${upErr.message}`);
+        setSaving(false);
+        return;
+      }
+      const { data: { publicUrl } } = supabase.storage.from("avatars").getPublicUrl(path);
+      photoUrl = publicUrl;
+    }
+
     const { error: err } = await supabase
       .from("profiles")
       .update({
         headline: form.headline.trim() || null,
         bio: form.bio.trim() || null,
-        photo_url: form.photo_url.trim() || null,
+        photo_url: photoUrl,
       })
       .eq("id", userId);
 
@@ -47,114 +81,97 @@ export function PerfilForm({
     if (err) {
       setError("Erro ao salvar. Tente novamente.");
     } else {
+      setAvatarFile(null);
       setSaved(true);
     }
   }
 
-  const inputStyle = {
-    width: "100%",
-    padding: "10px 14px",
-    borderRadius: 8,
-    border: "1px solid #E4E2D9",
-    fontSize: 14,
-    color: "#272618",
-    background: "#fff",
-    fontFamily: "inherit",
-    outline: "none",
-    boxSizing: "border-box" as const,
-  };
-
-  const labelStyle = {
-    fontSize: 13,
-    fontWeight: 600,
-    color: "#272618",
-    display: "block",
-    marginBottom: 6,
-  };
-
   return (
-    <form onSubmit={handleSubmit} style={{ maxWidth: 560 }}>
-      {/* Username (readonly) */}
-      <div style={{ marginBottom: 24 }}>
-        <label style={labelStyle}>Nome de usuário</label>
-        <input
-          value={username ?? ""}
-          disabled
-          style={{ ...inputStyle, background: "#F4F2EB", color: "#626053", cursor: "not-allowed" }}
+    <form onSubmit={handleSubmit} style={{ maxWidth: 560, display: "flex", flexDirection: "column", gap: 24 }}>
+
+      {/* Foto de perfil */}
+      <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
+        <FolderFrame
+          photoUrl={avatarPreview ?? form.photo_url ?? null}
+          firstName={firstName ?? ""}
+          lastName={lastName ?? ""}
+          onPhotoSelect={handlePhotoSelect}
+          width={160}
         />
-        <p style={{ fontSize: 12, color: "#626053", marginTop: 4 }}>
+        <p style={{ fontSize: 12, color: tokens.muted, margin: 0 }}>
+          Clique no botão para trocar a foto.
+        </p>
+      </div>
+
+      {/* URL pública (bloqueada) */}
+      <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
+        <label style={{ fontSize: 12, fontWeight: 500, color: tokens.muted }}>URL pública</label>
+        <div style={{
+          display: "flex", alignItems: "center", overflow: "hidden",
+          borderRadius: 8, border: `1px solid ${tokens.borderSubtle}`,
+          background: tokens.bg, opacity: 0.7, cursor: "not-allowed",
+        }}>
+          <span style={{
+            padding: "12px 14px", background: "#F4F2EB", color: tokens.muted,
+            fontSize: 13, whiteSpace: "nowrap",
+            borderRight: `1px solid ${tokens.borderSubtle}`, flexShrink: 0,
+          }}>
+            loop.talk/
+          </span>
+          <input
+            value={username ?? ""}
+            disabled
+            style={{
+              flex: 1, padding: "12px 14px",
+              border: "none", background: "transparent",
+              fontSize: 14, color: tokens.muted,
+              outline: "none", fontFamily: "inherit", cursor: "not-allowed",
+            }}
+          />
+        </div>
+        <p style={{ fontSize: 12, color: tokens.muted, margin: 0 }}>
           Para alterar o username, entre em contato com o suporte.
         </p>
       </div>
 
-      {/* Headline */}
-      <div style={{ marginBottom: 24 }}>
-        <label style={labelStyle}>Headline</label>
-        <input
-          type="text"
-          value={form.headline}
-          onChange={(e) => set("headline", e.target.value)}
-          placeholder="Ex: Product Designer · Ajudo equipes a criar produtos melhores"
-          maxLength={100}
-          style={inputStyle}
-        />
-        <p style={{ fontSize: 12, color: "#626053", marginTop: 4 }}>
-          {form.headline.length}/100 caracteres
-        </p>
-      </div>
+      {/* Descrição (headline) */}
+      <FloatingInput
+        label="Descrição"
+        value={form.headline}
+        onChange={(v) => set("headline", v)}
+      />
 
-      {/* Bio */}
-      <div style={{ marginBottom: 24 }}>
-        <label style={labelStyle}>Bio</label>
-        <textarea
-          value={form.bio}
-          onChange={(e) => set("bio", e.target.value)}
-          placeholder="Conte sobre sua experiência, como você pode ajudar e o que as pessoas ganham ao conversar com você."
-          maxLength={600}
-          rows={5}
-          style={{ ...inputStyle, resize: "vertical", lineHeight: 1.5 }}
-        />
-        <p style={{ fontSize: 12, color: "#626053", marginTop: 4 }}>
-          {form.bio.length}/600 caracteres
-        </p>
-      </div>
-
-      {/* Photo URL */}
-      <div style={{ marginBottom: 32 }}>
-        <label style={labelStyle}>URL da foto de perfil</label>
-        <input
-          type="url"
-          value={form.photo_url}
-          onChange={(e) => set("photo_url", e.target.value)}
-          placeholder="https://..."
-          style={inputStyle}
-        />
-        <p style={{ fontSize: 12, color: "#626053", marginTop: 4 }}>
-          Use uma URL pública de imagem (JPG ou PNG). Upload direto em breve.
-        </p>
-      </div>
+      {/* Sobre (bio) */}
+      <FloatingTextarea
+        label="Sobre"
+        value={form.bio}
+        onChange={(v) => set("bio", v)}
+        rows={6}
+      />
 
       {error && (
-        <p style={{ fontSize: 13, color: "#c0392b", marginBottom: 16 }}>{error}</p>
+        <p style={{ fontSize: 13, color: "#c0392b", margin: 0 }}>{error}</p>
       )}
 
-      <button
-        type="submit"
-        disabled={saving}
-        style={{
-          padding: "12px 28px",
-          borderRadius: 8,
-          border: "none",
-          background: saving ? "#E4E2D9" : "#EAEA68",
-          color: "#272618",
-          fontSize: 14,
-          fontWeight: 600,
-          cursor: saving ? "not-allowed" : "pointer",
-          fontFamily: "inherit",
-        }}
-      >
-        {saving ? "Salvando…" : saved ? "Salvo ✓" : "Salvar alterações"}
-      </button>
+      <div>
+        <button
+          type="submit"
+          disabled={saving}
+          style={{
+            padding: "12px 28px",
+            borderRadius: 8,
+            border: "none",
+            background: saving ? tokens.borderSubtle : tokens.lime,
+            color: tokens.dark,
+            fontSize: 14,
+            fontWeight: 600,
+            cursor: saving ? "not-allowed" : "pointer",
+            fontFamily: "inherit",
+          }}
+        >
+          {saving ? "Salvando…" : saved ? "Salvo" : "Salvar alterações"}
+        </button>
+      </div>
     </form>
   );
 }

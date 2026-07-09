@@ -19,24 +19,90 @@ function GoogleIcon() {
   );
 }
 
+// ── Inline floating-label input ───────────────────────────────────────────────
+function InlineInput({
+  label,
+  type = "text",
+  value,
+  onChange,
+  error,
+  autoComplete,
+  autoFocus,
+}: {
+  label: string;
+  type?: string;
+  value: string;
+  onChange: (v: string) => void;
+  error?: string;
+  autoComplete?: string;
+  autoFocus?: boolean;
+}) {
+  const [focused, setFocused] = useState(false);
+  const floated = focused || value.length > 0;
+
+  return (
+    <div>
+      <div
+        style={{
+          position: "relative",
+          height: 52,
+          background: "#FCFBF8",
+          border: `1px solid ${error ? "#EB6A67" : focused ? "#272618" : "#DAD9D5"}`,
+          borderRadius: 8,
+          boxShadow: "0px 1px 2px rgba(10,13,18,0.05)",
+        }}
+      >
+        <label
+          style={{
+            position: "absolute",
+            left: 14,
+            pointerEvents: "none",
+            transition: "top 0.12s ease, font-size 0.12s ease, color 0.12s ease",
+            top: floated ? 9 : 17,
+            fontSize: floated ? 10 : 14,
+            fontWeight: floated ? 600 : 400,
+            color: floated ? "#626053" : "#AEADA4",
+            lineHeight: 1,
+          }}
+        >
+          {label}
+        </label>
+        <input
+          type={type}
+          value={value}
+          onChange={(e) => onChange(e.target.value)}
+          onFocus={() => setFocused(true)}
+          onBlur={() => setFocused(false)}
+          autoComplete={autoComplete}
+          autoFocus={autoFocus}
+          style={{
+            position: "absolute",
+            inset: 0,
+            width: "100%",
+            height: "100%",
+            padding: "20px 14px 8px",
+            border: "none",
+            background: "transparent",
+            outline: "none",
+            fontSize: 14,
+            color: "#272618",
+            fontFamily: "inherit",
+            boxSizing: "border-box",
+          }}
+        />
+      </div>
+      {error && (
+        <p style={{ fontSize: 12, color: "#EB6A67", marginTop: 4 }}>{error}</p>
+      )}
+    </div>
+  );
+}
+
 const cardStyle: React.CSSProperties = {
   background: "#FFFFFF",
   borderRadius: 16,
   border: "1px solid #E4E2D9",
   padding: "32px",
-};
-
-const inputStyle: React.CSSProperties = {
-  width: "100%",
-  padding: "12px 14px",
-  borderRadius: 8,
-  border: "1.5px solid #E4E2D9",
-  fontSize: 14,
-  color: "#272618",
-  background: "#FFFFFF",
-  outline: "none",
-  boxSizing: "border-box",
-  fontFamily: "inherit",
 };
 
 const primaryBtn: React.CSSProperties = {
@@ -94,7 +160,6 @@ export function LoginForm() {
       setLoading(false);
       setStep("password");
     } else {
-      // No password set → send magic link immediately
       await sendMagicLink("login");
     }
   }
@@ -150,7 +215,7 @@ export function LoginForm() {
     </div>
   );
 
-  // ── Link sent ──────────────────────────────────────────────────────────────
+  // ── Link sent ─────────────────────────────────────────────────────────────────
   if (step === "link-sent") {
     return (
       <Wrapper>
@@ -192,43 +257,36 @@ export function LoginForm() {
     );
   }
 
-  // ── Password step ──────────────────────────────────────────────────────────
+  // ── Password step ─────────────────────────────────────────────────────────────
   if (step === "password") {
     return (
       <Wrapper>
         <div style={cardStyle}>
-          <form onSubmit={handlePasswordLogin} style={{ display: "flex", flexDirection: "column", gap: 16 }}>
+          <form onSubmit={handlePasswordLogin} style={{ display: "flex", flexDirection: "column", gap: 14 }}>
             {/* Locked email row */}
-            <div>
-              <label style={{ display: "block", fontSize: 12, fontWeight: 600, color: "#626053", marginBottom: 6 }}>
-                E-mail
-              </label>
-              <div
-                style={{
-                  display: "flex",
-                  alignItems: "center",
-                  justifyContent: "space-between",
-                  padding: "12px 14px",
-                  borderRadius: 8,
-                  background: "#F4F2EB",
-                  border: "1.5px solid #E4E2D9",
-                }}
+            <div
+              style={{
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "space-between",
+                padding: "14px",
+                borderRadius: 8,
+                background: "#F4F2EB",
+                border: "1px solid #DAD9D5",
+              }}
+            >
+              <span style={{ fontSize: 14, color: "#272618" }}>{email}</span>
+              <button
+                type="button"
+                onClick={() => { setStep("email"); setPassword(""); setError(""); }}
+                style={{ ...ghostBtn, fontSize: 12, color: "#AEADA4" }}
               >
-                <span style={{ fontSize: 14, color: "#272618" }}>{email}</span>
-                <button
-                  type="button"
-                  onClick={() => { setStep("email"); setPassword(""); setError(""); }}
-                  style={{ ...ghostBtn, fontSize: 12, color: "#AEADA4" }}
-                >
-                  Alterar
-                </button>
-              </div>
+                Alterar
+              </button>
             </div>
 
-            {/* Password field */}
             <div>
-              <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 6 }}>
-                <label style={{ fontSize: 12, fontWeight: 600, color: "#626053" }}>Senha</label>
+              <div style={{ display: "flex", justifyContent: "flex-end", marginBottom: 6 }}>
                 <button
                   type="button"
                   onClick={() => sendMagicLink("forgot")}
@@ -237,20 +295,16 @@ export function LoginForm() {
                   Esqueci minha senha
                 </button>
               </div>
-              <input
+              <InlineInput
+                label="Senha"
                 type="password"
                 value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                placeholder="Sua senha"
+                onChange={setPassword}
                 autoComplete="current-password"
                 autoFocus
-                style={inputStyle}
+                error={error || undefined}
               />
             </div>
-
-            {error && (
-              <p style={{ fontSize: 13, color: "#D93B3B", margin: 0 }}>{error}</p>
-            )}
 
             <button
               type="submit"
@@ -274,11 +328,10 @@ export function LoginForm() {
     );
   }
 
-  // ── Email step (default) ───────────────────────────────────────────────────
+  // ── Email step (default) ──────────────────────────────────────────────────────
   return (
     <Wrapper>
       <div style={cardStyle}>
-        {/* Google */}
         <button
           onClick={handleGoogle}
           disabled={googleLoading}
@@ -306,22 +359,16 @@ export function LoginForm() {
 
         {divider}
 
-        <form onSubmit={handleEmailContinue} style={{ display: "flex", flexDirection: "column", gap: 16 }}>
-          <div>
-            <label style={{ display: "block", fontSize: 12, fontWeight: 600, color: "#626053", marginBottom: 6 }}>
-              E-mail
-            </label>
-            <input
-              type="email"
-              value={email}
-              onChange={(e) => { setEmail(e.target.value); setError(""); }}
-              placeholder="voce@email.com"
-              autoComplete="email"
-              autoFocus
-              style={{ ...inputStyle, borderColor: error ? "#D93B3B" : "#E4E2D9" }}
-            />
-            {error && <p style={{ fontSize: 12, color: "#D93B3B", marginTop: 4 }}>{error}</p>}
-          </div>
+        <form onSubmit={handleEmailContinue} style={{ display: "flex", flexDirection: "column", gap: 14 }}>
+          <InlineInput
+            label="E-mail"
+            type="email"
+            value={email}
+            onChange={(v) => { setEmail(v); setError(""); }}
+            autoComplete="email"
+            autoFocus
+            error={error || undefined}
+          />
 
           <button
             type="submit"
@@ -356,10 +403,10 @@ function Wrapper({ children }: { children: React.ReactNode }) {
       }}
     >
       <div style={{ maxWidth: 400, width: "100%" }}>
-        <div style={{ textAlign: "center", marginBottom: 32 }}>
+        <div style={{ display: "flex", flexDirection: "column", alignItems: "center", marginBottom: 32 }}>
           <Logo size="header" />
-          <p style={{ fontSize: 14, color: "#626053", marginTop: 8 }}>
-            Bem-vindo de volta
+          <p style={{ fontSize: 14, color: "#626053", marginTop: 10 }}>
+            Boas vindas de volta
           </p>
         </div>
         {children}

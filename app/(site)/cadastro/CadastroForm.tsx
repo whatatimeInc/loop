@@ -2,54 +2,85 @@
 
 import { useState } from "react";
 import Link from "next/link";
-import { useSearchParams } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
 import { Logo } from "@/components/Logo";
 
-function Field({
+// ── Inline floating-label input ───────────────────────────────────────────────
+function InlineInput({
   label,
   type = "text",
   value,
   onChange,
-  placeholder,
   error,
-  autoComplete,
   helper,
+  autoComplete,
+  autoFocus,
 }: {
   label: string;
   type?: string;
   value: string;
   onChange: (v: string) => void;
-  placeholder?: string;
   error?: string;
-  autoComplete?: string;
   helper?: string;
+  autoComplete?: string;
+  autoFocus?: boolean;
 }) {
+  const [focused, setFocused] = useState(false);
+  const floated = focused || value.length > 0;
+
   return (
     <div>
-      <label style={{ display: "block", fontSize: 12, fontWeight: 600, color: "#626053", marginBottom: 6 }}>
-        {label}
-      </label>
-      <input
-        type={type}
-        value={value}
-        onChange={(e) => onChange(e.target.value)}
-        placeholder={placeholder}
-        autoComplete={autoComplete}
+      <div
         style={{
-          width: "100%",
-          padding: "12px 14px",
+          position: "relative",
+          height: 52,
+          background: "#FCFBF8",
+          border: `1px solid ${error ? "#EB6A67" : focused ? "#272618" : "#DAD9D5"}`,
           borderRadius: 8,
-          border: `1.5px solid ${error ? "#D93B3B" : "#E4E2D9"}`,
-          fontSize: 14,
-          color: "#272618",
-          background: "#FFFFFF",
-          outline: "none",
-          boxSizing: "border-box",
-          fontFamily: "inherit",
+          boxShadow: "0px 1px 2px rgba(10,13,18,0.05)",
         }}
-      />
-      {error && <p style={{ fontSize: 12, color: "#D93B3B", marginTop: 4 }}>{error}</p>}
+      >
+        <label
+          style={{
+            position: "absolute",
+            left: 14,
+            pointerEvents: "none",
+            transition: "top 0.12s ease, font-size 0.12s ease, color 0.12s ease",
+            top: floated ? 9 : 17,
+            fontSize: floated ? 10 : 14,
+            fontWeight: floated ? 600 : 400,
+            color: floated ? "#626053" : "#AEADA4",
+            lineHeight: 1,
+          }}
+        >
+          {label}
+        </label>
+        <input
+          type={type}
+          value={value}
+          onChange={(e) => onChange(e.target.value)}
+          onFocus={() => setFocused(true)}
+          onBlur={() => setFocused(false)}
+          autoComplete={autoComplete}
+          autoFocus={autoFocus}
+          style={{
+            position: "absolute",
+            inset: 0,
+            width: "100%",
+            height: "100%",
+            padding: "20px 14px 8px",
+            border: "none",
+            background: "transparent",
+            outline: "none",
+            fontSize: 14,
+            color: "#272618",
+            fontFamily: "inherit",
+            boxSizing: "border-box",
+          }}
+        />
+      </div>
+      {error && <p style={{ fontSize: 12, color: "#EB6A67", marginTop: 4 }}>{error}</p>}
       {helper && !error && <p style={{ fontSize: 12, color: "#AEADA4", marginTop: 4 }}>{helper}</p>}
     </div>
   );
@@ -70,8 +101,9 @@ type Step = "form" | "link-sent";
 
 export function CadastroForm() {
   const searchParams = useSearchParams();
-  const redirect = searchParams.get("redirect") ?? "/conta";
+  const redirect = searchParams.get("redirect") ?? "/criar";
 
+  const router = useRouter();
   const [step, setStep] = useState<Step>("form");
   const [name, setName] = useState("");
   const [lastName, setLastName] = useState("");
@@ -98,12 +130,10 @@ export function CadastroForm() {
     setLoading(true);
 
     const supabase = createClient();
-
     let authError: string | null = null;
 
     if (password) {
-      // User provided a password: use signUp — Supabase sends confirmation email automatically
-      const { error } = await supabase.auth.signUp({
+      const { data, error } = await supabase.auth.signUp({
         email,
         password,
         options: {
@@ -112,8 +142,13 @@ export function CadastroForm() {
         },
       });
       if (error) authError = error.message;
+      else if (data.session) {
+        // email confirmation disabled — session created immediately
+        setLoading(false);
+        router.push(redirect);
+        return;
+      }
     } else {
-      // No password: magic link flow
       const { error } = await supabase.auth.signInWithOtp({
         email,
         options: {
@@ -125,12 +160,7 @@ export function CadastroForm() {
     }
 
     setLoading(false);
-
-    if (authError) {
-      setErrors({ geral: authError });
-      return;
-    }
-
+    if (authError) { setErrors({ geral: authError }); return; }
     setStep("link-sent");
   }
 
@@ -145,6 +175,7 @@ export function CadastroForm() {
     });
   }
 
+  // ── Link sent ──────────────────────────────────────────────────────────────────
   if (step === "link-sent") {
     return (
       <div
@@ -158,7 +189,7 @@ export function CadastroForm() {
         }}
       >
         <div style={{ maxWidth: 400, width: "100%", textAlign: "center" }}>
-          <div style={{ marginBottom: 32 }}>
+          <div style={{ display: "flex", flexDirection: "column", alignItems: "center", marginBottom: 32 }}>
             <Logo size="header" />
           </div>
           <div
@@ -186,15 +217,7 @@ export function CadastroForm() {
                 <polyline points="22,6 12,13 2,6" />
               </svg>
             </div>
-            <h2
-              style={{
-                fontSize: 20,
-                fontWeight: 500,
-                color: "#272618",
-                margin: "0 0 12px",
-                fontFamily: "var(--font-host-grotesk)",
-              }}
-            >
+            <h2 style={{ fontSize: 20, fontWeight: 500, color: "#272618", margin: "0 0 12px", fontFamily: "var(--font-host-grotesk)" }}>
               Verifique seu e-mail
             </h2>
             <p style={{ fontSize: 14, color: "#626053", lineHeight: 1.6, margin: 0 }}>
@@ -226,6 +249,7 @@ export function CadastroForm() {
     );
   }
 
+  // ── Form ───────────────────────────────────────────────────────────────────────
   return (
     <div
       style={{
@@ -238,9 +262,9 @@ export function CadastroForm() {
       }}
     >
       <div style={{ maxWidth: 400, width: "100%" }}>
-        <div style={{ textAlign: "center", marginBottom: 32 }}>
+        <div style={{ display: "flex", flexDirection: "column", alignItems: "center", marginBottom: 32 }}>
           <Logo size="header" />
-          <p style={{ fontSize: 14, color: "#626053", marginTop: 8 }}>
+          <p style={{ fontSize: 14, color: "#626053", marginTop: 10 }}>
             Crie sua conta gratuitamente
           </p>
         </div>
@@ -279,56 +303,46 @@ export function CadastroForm() {
             Continuar com Google
           </button>
 
-          <div
-            style={{
-              display: "flex",
-              alignItems: "center",
-              gap: 12,
-              margin: "20px 0",
-            }}
-          >
+          <div style={{ display: "flex", alignItems: "center", gap: 12, margin: "20px 0" }}>
             <div style={{ flex: 1, height: 1, background: "#E4E2D9" }} />
             <span style={{ fontSize: 12, color: "#AEADA4" }}>ou</span>
             <div style={{ flex: 1, height: 1, background: "#E4E2D9" }} />
           </div>
 
-          <form onSubmit={handleSubmit} style={{ display: "flex", flexDirection: "column", gap: 16 }}>
-            <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12 }}>
-              <Field
+          <form onSubmit={handleSubmit} style={{ display: "flex", flexDirection: "column", gap: 12 }}>
+            <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 10 }}>
+              <InlineInput
                 label="Nome"
                 value={name}
                 onChange={setName}
-                placeholder="Seu nome"
                 error={errors.name}
                 autoComplete="given-name"
+                autoFocus
               />
-              <Field
+              <InlineInput
                 label="Sobrenome"
                 value={lastName}
                 onChange={setLastName}
-                placeholder="Seu sobrenome"
                 error={errors.lastName}
                 autoComplete="family-name"
               />
             </div>
-            <Field
+            <InlineInput
               label="E-mail"
               type="email"
               value={email}
               onChange={setEmail}
-              placeholder="voce@email.com"
               error={errors.email}
               autoComplete="email"
             />
-            <Field
+            <InlineInput
               label="Senha (opcional)"
               type="password"
               value={password}
               onChange={setPassword}
-              placeholder="Mín. 8 caracteres"
               error={errors.password}
-              autoComplete="new-password"
               helper="Você também pode entrar pelo link enviado no e-mail."
+              autoComplete="new-password"
             />
 
             {errors.geral && (
@@ -336,17 +350,17 @@ export function CadastroForm() {
                 style={{
                   padding: "12px 14px",
                   borderRadius: 8,
-                  background: "#FEF2F2",
-                  border: "1px solid #FCA5A5",
+                  background: "rgba(235,106,103,0.08)",
+                  border: "1px solid rgba(235,106,103,0.3)",
                   fontSize: 13,
-                  color: "#D93B3B",
+                  color: "#EB6A67",
                 }}
               >
                 {errors.geral}
               </div>
             )}
 
-            <p style={{ fontSize: 12, color: "#AEADA4", lineHeight: 1.5, margin: 0 }}>
+            <p style={{ fontSize: 12, color: "#AEADA4", lineHeight: 1.5, margin: "4px 0 0" }}>
               Ao criar sua conta você concorda com os{" "}
               <Link href="/termos" style={{ color: "#626053" }}>Termos de Uso</Link>{" "}
               e a{" "}
@@ -367,6 +381,7 @@ export function CadastroForm() {
                 cursor: loading ? "not-allowed" : "pointer",
                 opacity: loading ? 0.6 : 1,
                 fontFamily: "inherit",
+                marginTop: 4,
               }}
             >
               {loading ? "Criando conta..." : "Criar conta"}
@@ -376,10 +391,7 @@ export function CadastroForm() {
 
         <p style={{ textAlign: "center", fontSize: 14, color: "#626053", marginTop: 20 }}>
           Já tem conta?{" "}
-          <Link
-            href="/login"
-            style={{ fontWeight: 600, color: "#272618", textDecoration: "none" }}
-          >
+          <Link href="/login" style={{ fontWeight: 600, color: "#272618", textDecoration: "none" }}>
             Entrar
           </Link>
         </p>
