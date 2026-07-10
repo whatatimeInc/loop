@@ -5,7 +5,7 @@ import { useParams, useRouter } from "next/navigation";
 import Image from "next/image";
 import { motion, AnimatePresence } from "framer-motion";
 import { experts } from "@/lib/mockExperts";
-import { IconStar } from "@/components/icons";
+import { StarSolid } from "iconoir-react";
 
 // ─── rótulos por nota ─────────────────────────────────────────────────────────
 
@@ -43,7 +43,7 @@ function Estrelas({ valor, onChange }: { valor: number; onChange: (n: number) =>
           onClick={() => onChange(n)}
           className="transition-transform hover:scale-110 active:scale-95"
         >
-          <IconStar
+          <StarSolid
             className={`w-10 h-10 transition-colors ${
               n <= ativo ? "text-amber-400" : "text-gray-200"
             }`}
@@ -267,7 +267,7 @@ function StepObrigado({ expert, notaMentor, router }: {
         ))}
         <div className="absolute inset-0 flex items-center justify-center">
           <div className="w-20 h-20 rounded-full bg-lime flex items-center justify-center">
-            <IconStar className="w-9 h-9 text-dark" />
+            <StarSolid className="w-9 h-9 text-dark" />
           </div>
         </div>
       </div>

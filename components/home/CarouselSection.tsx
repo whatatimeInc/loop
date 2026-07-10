@@ -5,7 +5,7 @@ import Link from "next/link";
 import { motion, useInView, cubicBezier } from "framer-motion";
 import { useRef } from "react";
 import { experts } from "@/lib/mockExperts";
-import { IconCheck } from "@/components/icons";
+import { Check } from "iconoir-react";
 
 const ease = cubicBezier(0.22, 1, 0.36, 1);
 
@@ -74,7 +74,7 @@ function CreatorCard({ expert, index }: { expert: typeof experts[0]; index: numb
               {expert.nome}
             </p>
             <span className="flex-shrink-0 w-6 h-6 rounded-full bg-lime flex items-center justify-center">
-              <IconCheck className="w-3.5 h-3.5 text-dark" />
+              <Check className="w-3.5 h-3.5 text-dark" />
             </span>
           </div>
 

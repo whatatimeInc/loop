@@ -4,8 +4,8 @@ import { useState } from "react";
 import { experts, categorias, Categoria } from "@/lib/mockExperts";
 import { ExpertCard } from "@/components/ExpertCard";
 import Link from "next/link";
+import { Search } from "iconoir-react";
 import {
-  IconSearch,
   IconCategoriaCarreira,
   IconCategoriaSaude,
   IconCategoriaCasa,
@@ -68,7 +68,7 @@ export default function Explorar() {
             onSubmit={(e) => e.preventDefault()}
           >
             <div className="relative" style={{ width: 320 }}>
-              <IconSearch className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 pointer-events-none" style={{ color: "#807F71" }} />
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 pointer-events-none" style={{ color: "#807F71" }} />
               <input
                 type="text"
                 placeholder="Buscar mentor"
@@ -87,7 +87,7 @@ export default function Explorar() {
               className="h-11 px-5 rounded flex items-center gap-2 text-sm font-semibold transition-opacity hover:opacity-80"
               style={{ background: "#EAEA68", color: "#272518" }}
             >
-              <IconSearch className="w-4 h-4" />
+              <Search className="w-4 h-4" />
               Buscar
             </button>
           </form>

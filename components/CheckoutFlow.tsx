@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
 import Image from "next/image";
 import { experts } from "@/lib/mockExperts";
-import { IconCopy, IconCheck } from "@/components/icons";
+import { Copy, Check } from "iconoir-react";
 import { Button } from "@/components/ui/Button";
 
 // ─── helpers ──────────────────────────────────────────────────────────────────
@@ -121,18 +121,18 @@ function PainelPix({ preco }: { preco: number }) {
             className="flex-shrink-0 flex items-center gap-1.5 bg-lime hover:bg-lime-dark text-dark text-xs font-semibold px-3 py-1.5 rounded transition-colors"
           >
             {copiado ? (
-              <><IconCheck className="w-3.5 h-3.5" /> Copiado</>
+              <><Check className="w-3.5 h-3.5" /> Copiado</>
             ) : (
-              <><IconCopy className="w-3.5 h-3.5" /> Copiar</>
+              <><Copy className="w-3.5 h-3.5" /> Copiar</>
             )}
           </button>
         </div>
       </div>
 
       <div className="bg-gray-50 rounded-md px-4 py-3 text-xs text-gray-500 space-y-1">
-        <p className="flex items-center gap-2"><IconCheck className="w-3.5 h-3.5 text-lime flex-shrink-0" /> Confirmação instantânea após o pagamento</p>
-        <p className="flex items-center gap-2"><IconCheck className="w-3.5 h-3.5 text-lime flex-shrink-0" /> Você recebe confirmação por e-mail em segundos</p>
-        <p className="flex items-center gap-2"><IconCheck className="w-3.5 h-3.5 text-lime flex-shrink-0" /> 100% seguro — processado via Pagar.me</p>
+        <p className="flex items-center gap-2"><Check className="w-3.5 h-3.5 text-lime flex-shrink-0" /> Confirmação instantânea após o pagamento</p>
+        <p className="flex items-center gap-2"><Check className="w-3.5 h-3.5 text-lime flex-shrink-0" /> Você recebe confirmação por e-mail em segundos</p>
+        <p className="flex items-center gap-2"><Check className="w-3.5 h-3.5 text-lime flex-shrink-0" /> 100% seguro — processado via Pagar.me</p>
       </div>
 
       <p className="text-center text-xs text-gray-400">
@@ -261,7 +261,7 @@ function PainelBoleto({ preco }: { preco: number }) {
             onClick={copiar}
             className="flex items-center gap-1.5 border border-gray-200 text-gray-700 text-xs font-medium px-3 py-1.5 rounded hover:bg-gray-50 transition-colors"
           >
-            {copiado ? <><IconCheck className="w-3.5 h-3.5 text-lime" /> Copiado</> : <><IconCopy className="w-3.5 h-3.5" /> Copiar código</>}
+            {copiado ? <><Check className="w-3.5 h-3.5 text-lime" /> Copiado</> : <><Copy className="w-3.5 h-3.5" /> Copiar código</>}
           </button>
           <button className="flex items-center gap-1.5 bg-gray-900 text-white text-xs font-medium px-3 py-1.5 rounded hover:bg-gray-800 transition-colors">
             Baixar boleto
@@ -379,15 +379,15 @@ export function CheckoutFlow() {
             {/* Garantia */}
             <div className="bg-gray-50 rounded-md px-4 py-3 text-xs text-gray-500 space-y-1">
               <p className="flex items-center gap-2">
-                <IconCheck className="w-3.5 h-3.5 text-lime flex-shrink-0" />
+                <Check className="w-3.5 h-3.5 text-lime flex-shrink-0" />
                 Se o mentor cancelar, reembolso 100% imediato
               </p>
               <p className="flex items-center gap-2">
-                <IconCheck className="w-3.5 h-3.5 text-lime flex-shrink-0" />
+                <Check className="w-3.5 h-3.5 text-lime flex-shrink-0" />
                 Cancelamento grátis até 12h antes
               </p>
               <p className="flex items-center gap-2">
-                <IconCheck className="w-3.5 h-3.5 text-lime flex-shrink-0" />
+                <Check className="w-3.5 h-3.5 text-lime flex-shrink-0" />
                 Suporte humano disponível
               </p>
             </div>

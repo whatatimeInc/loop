@@ -1,5 +1,5 @@
 import { LinkButton } from "@/components/ui/Button";
-import { IconCheck, IconArrow } from "@/components/icons";
+import { Check, ArrowRight } from "iconoir-react";
 
 const beneficios = [
   {
@@ -118,7 +118,7 @@ export default function SejaMentor() {
             {beneficios.map((b) => (
               <div key={b.titulo} className="bg-gray-800/60 rounded-lg p-6">
                 <div className="w-6 h-6 rounded-full bg-lime flex items-center justify-center mb-4">
-                  <IconCheck className="w-3.5 h-3.5 text-dark" />
+                  <Check className="w-3.5 h-3.5 text-dark" />
                 </div>
                 <h3 className="font-semibold mb-2">{b.titulo}</h3>
                 <p className="text-gray-400 text-sm leading-relaxed">{b.desc}</p>
@@ -189,7 +189,7 @@ export default function SejaMentor() {
         </p>
         <LinkButton href="/criar" variant="primary" size="lg">
           Criar meu perfil agora
-          <IconArrow className="w-4 h-4 ml-2" />
+          <ArrowRight className="w-4 h-4 ml-2" />
         </LinkButton>
         <p className="text-gray-500 text-xs mt-4">
           Leva menos de 2 minutos. Sem cartão de crédito.

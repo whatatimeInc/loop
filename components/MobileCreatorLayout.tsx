@@ -3,7 +3,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import { Expert } from "@/lib/mockExperts";
-import { IconStar } from "@/components/icons";
+import { StarSolid } from "iconoir-react";
 import { CategoryIcon } from "@/components/CategoryIcon";
 
 const avaliacoesMock = [
@@ -168,7 +168,7 @@ export function MobileCreatorLayout({ expert }: { expert: Expert }) {
         <div style={{ display: "flex", justifyContent: "center", alignItems: "center", gap: 24 }}>
           <div style={{ display: "flex", flexDirection: "column", alignItems: "flex-start", gap: 4 }}>
             <div style={{ display: "flex", alignItems: "center", gap: 4 }}>
-              <IconStar className="w-4 h-4" style={{ color: "#272618" }} />
+              <StarSolid className="w-4 h-4" style={{ color: "#272618" }} />
               <span style={{ fontSize: 20, color: "#272618", lineHeight: "24px" }}>{expert.rating.toFixed(1)}</span>
             </div>
             <span style={{ fontSize: 14, color: "#272618" }}>{avaliacoesMock.length * 10} avaliações</span>
@@ -211,7 +211,7 @@ export function MobileCreatorLayout({ expert }: { expert: Expert }) {
                     <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
                       <span style={{ fontSize: 16, fontWeight: 700, color: "#272618" }}>{av.nome}</span>
                       <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-                        <IconStar className="w-5 h-5" style={{ color: "#272618" }} />
+                        <StarSolid className="w-5 h-5" style={{ color: "#272618" }} />
                         <span style={{ fontSize: 16, fontWeight: 700, color: "#272618" }}>{av.nota}.0</span>
                       </div>
                     </div>

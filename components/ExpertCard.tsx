@@ -1,7 +1,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import { Expert } from "@/lib/mockExperts";
-import { IconCheck } from "@/components/icons";
+import { Check } from "iconoir-react";
 
 function formatPrice(preco: number) {
   return preco.toLocaleString("pt-BR", { minimumFractionDigits: 2 });
@@ -71,7 +71,7 @@ export function ExpertCard({ expert, fixedWidth = false }: ExpertCardProps) {
               {expert.nome}
             </p>
             <span className="flex-shrink-0 w-6 h-6 rounded-full bg-lime flex items-center justify-center">
-              <IconCheck className="w-3.5 h-3.5 text-dark" />
+              <Check className="w-3.5 h-3.5 text-dark" />
             </span>
           </div>
 

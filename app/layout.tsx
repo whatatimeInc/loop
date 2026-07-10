@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Inter, Host_Grotesk } from "next/font/google";
 import localFont from "next/font/local";
+import { IconoirProvider } from "iconoir-react";
 import "./globals.css";
 
 const inter = Inter({
@@ -33,7 +34,9 @@ export default function RootLayout({
   return (
     <html lang="pt-BR">
       <body className={`${inter.variable} ${hostGrotesk.variable} ${nerfos.variable}`}>
-        {children}
+        <IconoirProvider iconProps={{ color: "currentColor", strokeWidth: 1.5, width: "1em", height: "1em" }}>
+          {children}
+        </IconoirProvider>
       </body>
     </html>
   );

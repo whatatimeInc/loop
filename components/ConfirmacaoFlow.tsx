@@ -4,7 +4,7 @@ import { useParams } from "next/navigation";
 import Link from "next/link";
 import Image from "next/image";
 import { experts } from "@/lib/mockExperts";
-import { IconCheck, IconCalendar, IconVideo } from "@/components/icons";
+import { Check, Calendar, VideoCamera } from "iconoir-react";
 
 const MESES = ["Janeiro", "Fevereiro", "Março", "Abril", "Maio", "Junho", "Julho", "Agosto", "Setembro", "Outubro", "Novembro", "Dezembro"];
 
@@ -140,7 +140,7 @@ export function ConfirmacaoFlow() {
         <div className="flex flex-col items-center text-center mb-10">
           <div className="w-20 h-20 rounded-full bg-lime/20 flex items-center justify-center mb-5">
             <div className="w-12 h-12 rounded-full bg-lime flex items-center justify-center">
-              <IconCheck className="w-6 h-6 text-dark" />
+              <Check className="w-6 h-6 text-dark" />
             </div>
           </div>
           <h1 className="text-3xl font-bold text-gray-900 mb-2">Sessão confirmada!</h1>
@@ -254,14 +254,14 @@ export function ConfirmacaoFlow() {
             href={`/sala/${bookingId}`}
             className="flex items-center justify-center gap-2 w-full py-4 rounded-lg bg-gray-900 text-white font-semibold text-sm hover:bg-gray-800 transition-colors"
           >
-            <IconVideo className="w-4 h-4" />
+            <VideoCamera className="w-4 h-4" />
             Entrar na sala de vídeo
           </Link>
           <Link
             href="/explorar"
             className="flex items-center justify-center gap-2 w-full py-4 rounded-lg border-2 border-gray-200 text-gray-700 font-semibold text-sm hover:bg-gray-50 transition-colors"
           >
-            <IconCalendar className="w-4 h-4" />
+            <Calendar className="w-4 h-4" />
             Ver minha agenda
           </Link>
         </div>

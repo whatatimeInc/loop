@@ -4,7 +4,7 @@ import { notFound } from "next/navigation";
 import { experts } from "@/lib/mockExperts";
 import { BookingSidebar } from "@/components/BookingSidebar";
 import { MobileCreatorLayout } from "@/components/MobileCreatorLayout";
-import { IconStar } from "@/components/icons";
+import { StarSolid } from "iconoir-react";
 import { createClient } from "@/lib/supabase/server";
 import { CategoryIcon } from "@/components/CategoryIcon";
 import { type Categoria } from "@/lib/mockExperts";
@@ -515,7 +515,7 @@ export default async function CreatorPage({ params }: Props) {
           <div style={{ display: "flex", alignItems: "flex-start", gap: 56 }}>
             <div style={{ display: "flex", flexDirection: "column", gap: 4 }}>
               <div style={{ display: "flex", alignItems: "center", gap: 4 }}>
-                <IconStar className="w-4 h-4" style={{ color: "#181D27" }} />
+                <StarSolid className="w-4 h-4" style={{ color: "#181D27" }} />
                 <span style={{ fontSize: 20, color: "#181D27", lineHeight: "24px" }}>
                   {expert.rating.toFixed(1)}
                 </span>
@@ -601,7 +601,7 @@ export default async function CreatorPage({ params }: Props) {
                         )}
                       </div>
                       <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-                        <IconStar className="w-5 h-5" style={{ color: "#272618" }} />
+                        <StarSolid className="w-5 h-5" style={{ color: "#272618" }} />
                         <span style={{ fontSize: 16, fontWeight: 700, color: "#272618" }}>{av.nota}.0</span>
                       </div>
                     </div>

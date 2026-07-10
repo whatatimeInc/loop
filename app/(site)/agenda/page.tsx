@@ -5,7 +5,7 @@ import Link from "next/link";
 import Image from "next/image";
 import { motion, AnimatePresence } from "framer-motion";
 import { experts } from "@/lib/mockExperts";
-import { IconCalendar, IconVideo, IconStar } from "@/components/icons";
+import { Calendar, VideoCamera, StarSolid } from "iconoir-react";
 
 // ─── tipos e mock ─────────────────────────────────────────────────────────────
 
@@ -143,7 +143,7 @@ function CardSessao({ sessao }: { sessao: Sessao }) {
           <p className="text-xs text-gray-400 mb-2">{expert.categoria}</p>
           <div className="flex items-center gap-3 text-xs text-gray-500">
             <span className="flex items-center gap-1">
-              <IconCalendar className="w-3.5 h-3.5 flex-shrink-0" />
+              <Calendar className="w-3.5 h-3.5 flex-shrink-0" />
               {formatData(sessao.data)}
             </span>
             <span>{formatHora(sessao.data)}</span>
@@ -164,7 +164,7 @@ function CardSessao({ sessao }: { sessao: Sessao }) {
                 href={`/sala/${sessao.bookingId}`}
                 className="flex items-center gap-1.5 px-3 py-1.5 rounded-md bg-gray-900 text-white text-xs font-semibold hover:bg-gray-800 transition-colors"
               >
-                <IconVideo className="w-3.5 h-3.5" />
+                <VideoCamera className="w-3.5 h-3.5" />
                 Entrar
               </Link>
             </>
@@ -174,14 +174,14 @@ function CardSessao({ sessao }: { sessao: Sessao }) {
               href={`/avaliar/${sessao.bookingId}`}
               className="flex items-center gap-1.5 px-3 py-1.5 rounded-md border border-gray-200 text-gray-600 text-xs font-medium hover:bg-gray-50 transition-colors"
             >
-              <IconStar className="w-3.5 h-3.5 text-amber-400" />
+              <StarSolid className="w-3.5 h-3.5 text-amber-400" />
               Avaliar
             </Link>
           )}
           {sessao.status === "concluida" && sessao.nota !== undefined && (
             <div className="flex items-center gap-1">
               {[1, 2, 3, 4, 5].map((n) => (
-                <IconStar key={n} className={`w-3.5 h-3.5 ${n <= sessao.nota! ? "text-amber-400" : "text-gray-200"}`} />
+                <StarSolid key={n} className={`w-3.5 h-3.5 ${n <= sessao.nota! ? "text-amber-400" : "text-gray-200"}`} />
               ))}
             </div>
           )}
@@ -221,9 +221,9 @@ function Empty({ tab }: { tab: "proximas" | "historico" }) {
     <div className="flex flex-col items-center py-16 text-center">
       <div className="w-16 h-16 rounded-full bg-gray-100 flex items-center justify-center mb-4">
         {tab === "proximas" ? (
-          <IconCalendar className="w-7 h-7 text-gray-300" />
+          <Calendar className="w-7 h-7 text-gray-300" />
         ) : (
-          <IconStar className="w-7 h-7 text-gray-300" />
+          <StarSolid className="w-7 h-7 text-gray-300" />
         )}
       </div>
       <p className="font-semibold text-gray-500 mb-1">

@@ -4,7 +4,7 @@ import { useState } from "react";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import { motion } from "framer-motion";
-import { IconCheck } from "@/components/icons";
+import { Check } from "iconoir-react";
 import { createClient } from "@/lib/supabase/client";
 
 // ─── ícone Google ─────────────────────────────────────────────────────────────
@@ -292,7 +292,7 @@ export function AuthForm({ mode }: { mode: Mode }) {
             >
               {sucesso ? (
                 <>
-                  <IconCheck className="w-4 h-4 text-lime" />
+                  <Check className="w-4 h-4 text-lime" />
                   {isLogin ? "Entrando..." : "Conta criada!"}
                 </>
               ) : loading ? (
