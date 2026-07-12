@@ -138,7 +138,7 @@ export default function Home() {
               objectFit: "cover",
               zIndex: 0,
             }}
-            src="/hero.mp4"
+            src="/hero-categories.mp4"
           />
           <div
             style={{
