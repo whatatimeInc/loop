@@ -96,3 +96,29 @@ body {
 .scrollbar-hide::-webkit-scrollbar {
   display: none;
 }
+
+/* Hero framed — full viewport minus uniform margin, with svh fallback */
+.hero-framed {
+  height: calc(100vh - 24px);
+  height: calc(100svh - 24px);
+}
+@media (max-width: 767px) {
+  .hero-framed {
+    height: calc(100vh - 16px);
+    height: calc(100svh - 16px);
+  }
+}
+
+/* CTA button hover states */
+.btn-lime {
+  transition: background-color 0.18s ease;
+}
+.btn-lime:hover {
+  background-color: #D8D85A !important;
+}
+.btn-dark {
+  transition: background-color 0.18s ease;
+}
+.btn-dark:hover {
+  background-color: #373525 !important;
+}

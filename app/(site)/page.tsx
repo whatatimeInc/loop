@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import { CategoryMarquee } from "@/components/home/CategoryMarquee";
 import { HowItWorksSection } from "@/components/home/HowItWorksSection";
@@ -16,6 +16,40 @@ function useIsMobile() {
   return isMobile;
 }
 
+function useFadeIn(delay = 0) {
+  const ref = useRef<HTMLElement>(null);
+  const [visible, setVisible] = useState(false);
+
+  useEffect(() => {
+    const el = ref.current;
+    if (!el) return;
+    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
+      setVisible(true);
+      return;
+    }
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting) {
+          setVisible(true);
+          observer.disconnect();
+        }
+      },
+      { threshold: 0.08 }
+    );
+    observer.observe(el);
+    return () => observer.disconnect();
+  }, []);
+
+  return {
+    ref,
+    style: {
+      opacity: visible ? 1 : 0,
+      transform: visible ? "translateY(0)" : "translateY(28px)",
+      transition: `opacity 0.65s ease ${delay}ms, transform 0.65s ease ${delay}ms`,
+    } as React.CSSProperties,
+  };
+}
+
 function ArrowIcon() {
   return (
     <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -23,7 +57,6 @@ function ArrowIcon() {
     </svg>
   );
 }
-
 
 function MobileBottomCTA() {
   return (
@@ -42,6 +75,7 @@ function MobileBottomCTA() {
     >
       <Link
         href="/cadastro"
+        className="btn-lime"
         style={{
           display: "flex",
           alignItems: "center",
@@ -67,26 +101,27 @@ function MobileBottomCTA() {
 
 export default function Home() {
   const isMobile = useIsMobile();
+  const taglineFade = useFadeIn();
+  const howItWorksFade = useFadeIn(60);
+  const acessoFade = useFadeIn();
+  const ctaFade = useFadeIn();
 
   return (
     <main style={{ background: "#F4F2EB", paddingBottom: isMobile ? 80 : 0 }}>
 
-      {/* ── Hero ─────────────────────────────────────────────────────────── */}
-      <section style={{ padding: isMobile ? "80px 16px 16px" : "96px 24px 24px" }}>
+      {/* ── Hero — viewport-height com moldura arredondada ──────────────── */}
+      <section style={{ padding: isMobile ? 8 : 12 }}>
         <div
           style={{
             position: "relative",
             width: "100%",
-            maxWidth: 1200,
-            margin: "0 auto",
-            height: isMobile ? 500 : 720,
-            borderRadius: isMobile ? 12 : 16,
-            overflow: "hidden",
+            height: isMobile ? "calc(100svh - 16px)" : "calc(100svh - 24px)",
             background: "#1C1B14",
+            borderRadius: isMobile ? 16 : 22,
+            overflow: "hidden",
             display: "flex",
             flexDirection: "column",
             justifyContent: "flex-end",
-            padding: isMobile ? "16px 16px 24px" : "32px 32px 40px",
           }}
         >
           <video
@@ -94,6 +129,7 @@ export default function Home() {
             muted
             loop
             playsInline
+            poster="/bento-hero.jpg"
             style={{
               position: "absolute",
               inset: 0,
@@ -109,36 +145,54 @@ export default function Home() {
               position: "absolute",
               inset: 0,
               zIndex: 1,
-              background: "rgba(0,0,0,0.40)",
+              background: "linear-gradient(180deg, rgba(0,0,0,0.10) 0%, rgba(0,0,0,0.58) 100%)",
             }}
           />
-          <div style={{ position: "relative", zIndex: 2, display: "flex", flexDirection: "column", gap: isMobile ? 16 : 24, maxWidth: 404 }}>
+          <div
+            style={{
+              position: "relative",
+              zIndex: 2,
+              display: "flex",
+              flexDirection: "column",
+              gap: isMobile ? 16 : 24,
+              maxWidth: isMobile ? 400 : 680,
+              padding: isMobile ? "24px 24px 40px" : "48px 64px 72px",
+            }}
+          >
             <div style={{ display: "flex", flexDirection: "column", gap: isMobile ? 12 : 16 }}>
               <h1
                 style={{
-                  fontSize: isMobile ? 24 : 30,
+                  fontSize: "clamp(28px, 3vw + 8px, 60px)",
                   fontWeight: 500,
                   color: "#FCFBF8",
-                  lineHeight: isMobile ? "30px" : "32px",
+                  lineHeight: 1.1,
                   margin: 0,
                   fontFamily: "var(--font-host-grotesk)",
                 }}
               >
                 Algumas conversas não têm preço. As suas têm.
               </h1>
-              <p style={{ fontSize: isMobile ? 14 : 16, color: "#FCFBF8", lineHeight: isMobile ? "20px" : "24px", margin: 0 }}>
+              <p
+                style={{
+                  fontSize: "clamp(15px, 1.2vw + 4px, 18px)",
+                  color: "rgba(252,251,248,0.85)",
+                  lineHeight: 1.55,
+                  margin: 0,
+                }}
+              >
                 A plataforma para te conectar com sua audiência valorizando seu tempo.
               </p>
             </div>
             {!isMobile && (
               <Link
                 href="/cadastro"
+                className="btn-lime"
                 style={{
                   display: "inline-flex",
                   alignItems: "center",
                   justifyContent: "center",
                   gap: 8,
-                  padding: "12px 20px",
+                  padding: "12px 24px",
                   background: "#EAEA68",
                   borderRadius: 8,
                   fontSize: 16,
@@ -147,6 +201,7 @@ export default function Home() {
                   textDecoration: "none",
                   maxWidth: 320,
                   boxShadow: "0px 1px 2px rgba(10,13,18,0.05)",
+                  alignSelf: "flex-start",
                 }}
               >
                 Criar Loop.Talk
@@ -158,7 +213,14 @@ export default function Home() {
       </section>
 
       {/* ── Tagline ──────────────────────────────────────────────────────── */}
-      <section style={{ padding: isMobile ? "48px 24px" : "64px 32px", textAlign: "center" }}>
+      <section
+        ref={taglineFade.ref}
+        style={{
+          padding: isMobile ? "56px 24px" : "80px 32px",
+          textAlign: "center",
+          ...taglineFade.style,
+        }}
+      >
         <p
           style={{
             fontSize: isMobile ? 28 : 48,
@@ -176,15 +238,39 @@ export default function Home() {
       </section>
 
       {/* ── Como funciona ────────────────────────────────────────────────── */}
-      <section style={{ padding: isMobile ? "0" : "0 24px" }}>
+      <section
+        ref={howItWorksFade.ref}
+        style={{
+          padding: isMobile ? "0" : "0 24px",
+          ...howItWorksFade.style,
+        }}
+      >
         <div style={{ maxWidth: 1200, margin: "0 auto" }}>
           <HowItWorksSection isMobile={isMobile} />
         </div>
       </section>
 
       {/* ── Acesso real + marquee ─────────────────────────────────────────── */}
-      <section style={{ padding: isMobile ? "64px 0 0" : "96px 0 0", textAlign: "center", overflow: "hidden" }}>
-        <div style={{ maxWidth: 1200, margin: "0 auto", padding: isMobile ? "0 24px" : "0 32px", display: "flex", flexDirection: "column", gap: 12, alignItems: "center" }}>
+      <section
+        ref={acessoFade.ref}
+        style={{
+          padding: isMobile ? "64px 0 0" : "96px 0 0",
+          textAlign: "center",
+          overflow: "hidden",
+          ...acessoFade.style,
+        }}
+      >
+        <div
+          style={{
+            maxWidth: 1200,
+            margin: "0 auto",
+            padding: isMobile ? "0 24px" : "0 32px",
+            display: "flex",
+            flexDirection: "column",
+            gap: 12,
+            alignItems: "center",
+          }}
+        >
           <h2
             style={{
               fontSize: isMobile ? 28 : 48,
@@ -201,12 +287,17 @@ export default function Home() {
             Compartilhe conhecimento via 1:1 com sua audiência.
           </p>
         </div>
-        {/* Marquee: full-bleed, outside the maxWidth constraint */}
         <CategoryMarquee />
       </section>
 
       {/* ── CTA Banner ───────────────────────────────────────────────────── */}
-      <section style={{ padding: isMobile ? "40px 16px" : "64px 24px" }}>
+      <section
+        ref={ctaFade.ref}
+        style={{
+          padding: isMobile ? "40px 16px" : "64px 24px",
+          ...ctaFade.style,
+        }}
+      >
         <div
           style={{
             background: "#EAEA68",
@@ -240,6 +331,7 @@ export default function Home() {
           </div>
           <Link
             href="/cadastro"
+            className="btn-dark"
             style={{
               display: "inline-flex",
               alignItems: "center",

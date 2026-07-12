@@ -460,11 +460,11 @@ const cardStyle: React.CSSProperties = {
   background: T.card,
   border: `0.5px solid ${T.border}`,
   borderRadius: 14,
-  padding: "22px 20px 26px",
+  padding: "32px 24px 36px",
   display: "flex",
   flexDirection: "column",
   alignItems: "center",
-  minHeight: 340,
+  minHeight: 460,
 };
 
 const illustrationWrap: React.CSSProperties = {
@@ -473,7 +473,7 @@ const illustrationWrap: React.CSSProperties = {
   display: "flex",
   alignItems: "center",
   justifyContent: "center",
-  paddingTop: 12,
+  paddingTop: 20,
 };
 
 function CardHeader({ title, subtitle }: { title: string; subtitle: string }) {
@@ -484,7 +484,7 @@ function CardHeader({ title, subtitle }: { title: string; subtitle: string }) {
           fontSize: 18,
           fontWeight: 500,
           color: T.dark,
-          margin: "0 0 6px",
+          margin: "0 0 8px",
           textAlign: "center",
           fontFamily: "var(--font-host-grotesk)",
         }}
@@ -493,12 +493,12 @@ function CardHeader({ title, subtitle }: { title: string; subtitle: string }) {
       </p>
       <p
         style={{
-          fontSize: 12,
-          lineHeight: 1.5,
+          fontSize: 14,
+          lineHeight: 1.55,
           color: T.muted,
           margin: 0,
           textAlign: "center",
-          maxWidth: 190,
+          maxWidth: 200,
         }}
       >
         {subtitle}
@@ -545,7 +545,7 @@ export function HowItWorksSection({ isMobile }: { isMobile: boolean }) {
     return (
       <>
         <style dangerouslySetInnerHTML={{ __html: ANIMATION_CSS }} />
-        <div ref={sectionRef} style={{ background: T.sectionBg, borderRadius: 16, padding: "16px 0 16px" }}>
+        <div ref={sectionRef} style={{ background: T.sectionBg, borderRadius: 16, padding: "20px 0 20px" }}>
           <style>{`
             .how-cards-carousel {
               display: flex;
@@ -561,14 +561,30 @@ export function HowItWorksSection({ isMobile }: { isMobile: boolean }) {
             .how-carousel-card { flex: 0 0 80%; scroll-snap-align: start; }
           `}</style>
           <div className="how-cards-carousel">
-            {cards.map(({ title, subtitle, illustration }) => (
+            {cards.map(({ title, subtitle, illustration }, i) => (
               <div
                 key={title}
                 className="how-carousel-card"
-                style={{ ...cardStyle, minHeight: 0, overflow: "hidden", minWidth: 0 }}
+                style={{ ...cardStyle, minHeight: 380, overflow: "hidden", minWidth: 0 }}
               >
                 <CardHeader title={title} subtitle={subtitle} />
-                <div style={illustrationWrap}>{illustration}</div>
+                <div
+                  style={
+                    i === 0
+                      ? {
+                          ...illustrationWrap,
+                          background: "rgba(224,221,193,0.28)",
+                          borderRadius: 12,
+                          backdropFilter: "blur(8px)",
+                          WebkitBackdropFilter: "blur(8px)",
+                          border: `0.5px solid rgba(224,221,193,0.55)`,
+                          marginTop: 20,
+                        }
+                      : illustrationWrap
+                  }
+                >
+                  {illustration}
+                </div>
               </div>
             ))}
           </div>
@@ -585,20 +601,35 @@ export function HowItWorksSection({ isMobile }: { isMobile: boolean }) {
         style={{
           background: T.sectionBg,
           borderRadius: 16,
-          padding: 20,
+          padding: 28,
         }}
       >
         <div
           style={{
             display: "grid",
             gridTemplateColumns: "repeat(3, minmax(0, 1fr))",
-            gap: 14,
+            gap: 20,
           }}
         >
-          {cards.map(({ title, subtitle, illustration }) => (
+          {cards.map(({ title, subtitle, illustration }, i) => (
             <div key={title} style={cardStyle}>
               <CardHeader title={title} subtitle={subtitle} />
-              <div style={illustrationWrap}>{illustration}</div>
+              <div
+                style={
+                  i === 0
+                    ? {
+                        ...illustrationWrap,
+                        background: "rgba(224,221,193,0.28)",
+                        borderRadius: 12,
+                        backdropFilter: "blur(8px)",
+                        WebkitBackdropFilter: "blur(8px)",
+                        border: `0.5px solid rgba(224,221,193,0.55)`,
+                      }
+                    : illustrationWrap
+                }
+              >
+                {illustration}
+              </div>
             </div>
           ))}
         </div>
