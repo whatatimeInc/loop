@@ -122,7 +122,7 @@ export function Footer() {
           {/* Left: logo + tagline + CTA */}
           <div style={{ display: "flex", flexDirection: "column", gap: 40 }}>
             <div style={{ display: "flex", flexDirection: "column", gap: 16, alignItems: "flex-start" }}>
-              <Logo size="footer" light />
+              <Logo size="footer" lime />
               <p style={{ fontSize: 16, color: "#AEADA4", lineHeight: "24px", margin: 0, maxWidth: 340 }}>
                 A plataforma para te conectar com sua audiência valorizando seu tempo.
               </p>

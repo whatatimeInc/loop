@@ -223,6 +223,18 @@ export default function Home() {
       >
         <p
           style={{
+            fontSize: 14,
+            fontWeight: 600,
+            color: "#272618",
+            letterSpacing: "0.04em",
+            margin: "0 auto 16px",
+            fontFamily: "var(--font-sans)",
+          }}
+        >
+          COMO FUNCIONA
+        </p>
+        <p
+          style={{
             fontSize: isMobile ? 28 : 48,
             fontWeight: 500,
             color: "#272618",
@@ -315,10 +327,10 @@ export default function Home() {
           <div style={{ display: "flex", flexDirection: "column", gap: 12, flex: 1 }}>
             <h2
               style={{
-                fontSize: isMobile ? 22 : 30,
-                fontWeight: 300,
+                fontSize: isMobile ? 22 : 48,
+                fontWeight: 500,
                 color: "#272518",
-                lineHeight: isMobile ? "28px" : "32px",
+                lineHeight: isMobile ? "28px" : "52.8px",
                 margin: 0,
                 fontFamily: "var(--font-host-grotesk)",
               }}
