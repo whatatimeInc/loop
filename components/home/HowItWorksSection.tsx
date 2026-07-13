@@ -481,8 +481,8 @@ function CardHeader({ title, subtitle }: { title: string; subtitle: string }) {
     <>
       <p
         style={{
-          fontSize: 18,
-          fontWeight: 500,
+          fontSize: 24,
+          fontWeight: 300,
           color: T.dark,
           margin: "0 0 8px",
           textAlign: "center",
@@ -568,21 +568,7 @@ export function HowItWorksSection({ isMobile }: { isMobile: boolean }) {
                 style={{ ...cardStyle, minHeight: 380, overflow: "hidden", minWidth: 0 }}
               >
                 <CardHeader title={title} subtitle={subtitle} />
-                <div
-                  style={
-                    i === 0
-                      ? {
-                          ...illustrationWrap,
-                          background: "rgba(224,221,193,0.28)",
-                          borderRadius: 12,
-                          backdropFilter: "blur(8px)",
-                          WebkitBackdropFilter: "blur(8px)",
-                          border: `0.5px solid rgba(224,221,193,0.55)`,
-                          marginTop: 20,
-                        }
-                      : illustrationWrap
-                  }
-                >
+                <div style={illustrationWrap}>
                   {illustration}
                 </div>
               </div>
@@ -611,23 +597,10 @@ export function HowItWorksSection({ isMobile }: { isMobile: boolean }) {
             gap: 20,
           }}
         >
-          {cards.map(({ title, subtitle, illustration }, i) => (
+          {cards.map(({ title, subtitle, illustration }) => (
             <div key={title} style={cardStyle}>
               <CardHeader title={title} subtitle={subtitle} />
-              <div
-                style={
-                  i === 0
-                    ? {
-                        ...illustrationWrap,
-                        background: "rgba(224,221,193,0.28)",
-                        borderRadius: 12,
-                        backdropFilter: "blur(8px)",
-                        WebkitBackdropFilter: "blur(8px)",
-                        border: `0.5px solid rgba(224,221,193,0.55)`,
-                      }
-                    : illustrationWrap
-                }
-              >
+              <div style={illustrationWrap}>
                 {illustration}
               </div>
             </div>

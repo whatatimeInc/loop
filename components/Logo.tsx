@@ -9,20 +9,25 @@ const heights: Record<LogoSize, number> = {
 
 interface LogoProps {
   size?: LogoSize;
-  /** Fundos escuros — inverte para branco */
+  /** Fundos escuros — branco puro #ffffff */
+  white?: boolean;
+  /** Fundos escuros — off-white quente #FCFBF8 */
   light?: boolean;
   /** Versão amarela (#EAEA68) para fundos escuros */
   lime?: boolean;
   className?: string;
 }
 
-export function Logo({ size = "header", light = false, lime = false, className = "" }: LogoProps) {
+export function Logo({ size = "header", white = false, light = false, lime = false, className = "" }: LogoProps) {
   const h = heights[size];
 
   let filter = "none";
   if (lime) {
     // black SVG → brand yellow #EAEA68
     filter = "brightness(0) saturate(100%) invert(96%) sepia(55%) saturate(400%) hue-rotate(5deg) brightness(103%)";
+  } else if (white) {
+    // black SVG → pure white #ffffff (brightness(0) first forces black, invert(1) forces white)
+    filter = "brightness(0) invert(1)";
   } else if (light) {
     // black SVG → warm off-white #FCFBF8
     filter = "invert(1) brightness(0.99) sepia(2%)";
