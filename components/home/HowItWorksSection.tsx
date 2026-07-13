@@ -1,6 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useRef, useState } from "react";
+import { ShareAndroid } from "iconoir-react";
 
 const PHOTO_URL = "/mentors/andre-do-amaral/profile.webp";
 
@@ -65,9 +66,31 @@ const ANIMATION_CSS = `
 // ── FolderFrame geometry (matches components/ui/FolderFrame.tsx) ───────────
 const CW = 193;
 const CH = 234;
-const FOLDER_W = 158;
-const FOLDER_H = Math.round((FOLDER_W * CH) / CW); // ≈ 192
-const LIFT_PAD = 20; // headroom above the animated cards for the lift
+const FOLDER_W = 220;
+const FOLDER_H = Math.round((FOLDER_W * CH) / CW); // ≈ 267
+const LIFT_PAD = 28; // headroom above the animated cards for the lift
+
+// Generates the folder face clip-path in element pixel space for any fw×fh
+// (base path was defined for 158×192; scale coordinates proportionally)
+function folderFacePath(fw: number, fh: number): string {
+  const sx = fw / 158;
+  const sy = fh / 192;
+  const x = (v: number) => (v * sx).toFixed(2);
+  const y = (v: number) => (v * sy).toFixed(2);
+  return (
+    `path("M${x(132.84)} ${y(192)}H${x(8.55)}` +
+    `C${x(4.20)} ${y(192)} ${x(0.68)} ${y(188.49)} ${x(0.68)} ${y(184.16)}` +
+    `V${y(70.22)}` +
+    `C${x(0.68)} ${y(65.91)} ${x(4.20)} ${y(62.36)} ${x(8.55)} ${y(62.36)}` +
+    `H${x(42.18)}` +
+    `C${x(44.98)} ${y(62.36)} ${x(47.72)} ${y(63.35)} ${x(49.88)} ${y(65.17)}` +
+    `C${x(60.78)} ${y(74.31)} ${x(95.55)} ${y(102.73)} ${x(95.55)} ${y(102.73)}` +
+    `L${x(138.10)} ${y(140.72)}` +
+    `C${x(139.76)} ${y(142.24)} ${x(140.81)} ${y(144.37)} ${x(140.81)} ${y(146.60)}` +
+    `V${y(184.16)}` +
+    `C${x(140.81)} ${y(188.49)} ${x(137.29)} ${y(192)} ${x(132.94)} ${y(192)}Z")`
+  );
+}
 
 // ── Card 1: Folder illustration with animation ────────────────────────────────
 function FolderIllustration({ playing }: { playing: boolean }) {
@@ -98,101 +121,141 @@ function FolderIllustration({ playing }: { playing: boolean }) {
           height: FOLDER_H,
         }}
       >
-        {/* Yellow decoration (fans right) */}
-        <div
-          className={`how-fanA${p}`}
-          style={{ position: "absolute", inset: 0 }}
-        >
-          <svg
-            width={FOLDER_W}
-            height={FOLDER_H}
-            viewBox={`0 0 ${CW} ${CH}`}
-            fill="none"
+        {/* Containment wrapper: clips rotating decoratives to folder bounds at all animation frames */}
+        <div style={{ position: "absolute", inset: 0, clipPath: "inset(0)", overflow: "hidden" }}>
+          {/* Yellow decoration (fans right) */}
+          <div
+            className={`how-fanA${p}`}
             style={{ position: "absolute", inset: 0 }}
-            aria-hidden="true"
           >
-            <path
-              d="M165.525 55.3413L108.388 47.6067C101.833 46.7193 95.7992 51.3063 94.9106 57.852L84.4432 134.959C83.5546 141.505 88.148 147.531 94.7029 148.418L151.84 156.152C158.394 157.04 164.429 152.453 165.317 145.907L175.785 68.7999C176.673 62.2542 172.08 56.2286 165.525 55.3413Z"
-              fill={T.lime}
-            />
-          </svg>
-        </div>
+            <svg
+              width={FOLDER_W}
+              height={FOLDER_H}
+              viewBox={`0 0 ${CW} ${CH}`}
+              fill="none"
+              style={{ position: "absolute", inset: 0 }}
+              aria-hidden="true"
+            >
+              <path
+                d="M165.525 55.3413L108.388 47.6067C101.833 46.7193 95.7992 51.3063 94.9106 57.852L84.4432 134.959C83.5546 141.505 88.148 147.531 94.7029 148.418L151.84 156.152C158.394 157.04 164.429 152.453 165.317 145.907L175.785 68.7999C176.673 62.2542 172.08 56.2286 165.525 55.3413Z"
+                fill={T.lime}
+              />
+            </svg>
+          </div>
 
-        {/* Beige decoration (fans left) */}
-        <div
-          className={`how-fanB${p}`}
-          style={{ position: "absolute", inset: 0 }}
-        >
-          <svg
-            width={FOLDER_W}
-            height={FOLDER_H}
-            viewBox={`0 0 ${CW} ${CH}`}
-            fill="none"
+          {/* Beige decoration (fans left) */}
+          <div
+            className={`how-fanB${p}`}
             style={{ position: "absolute", inset: 0 }}
-            aria-hidden="true"
           >
-            <path
-              d="M180.669 89.2264L117.691 70.884C111.341 69.0345 104.692 72.6758 102.84 79.0171L80.5429 155.357C78.6907 161.698 82.3372 168.338 88.6874 170.188L151.665 188.53C158.015 190.38 164.665 186.739 166.517 180.397L188.814 104.057C190.666 97.716 187.019 91.076 180.669 89.2264Z"
-              fill={T.decoBeige}
-            />
-          </svg>
-        </div>
+            <svg
+              width={FOLDER_W}
+              height={FOLDER_H}
+              viewBox={`0 0 ${CW} ${CH}`}
+              fill="none"
+              style={{ position: "absolute", inset: 0 }}
+              aria-hidden="true"
+            >
+              <path
+                d="M180.669 89.2264L117.691 70.884C111.341 69.0345 104.692 72.6758 102.84 79.0171L80.5429 155.357C78.6907 161.698 82.3372 168.338 88.6874 170.188L151.665 188.53C158.015 190.38 164.665 186.739 166.517 180.397L188.814 104.057C190.666 97.716 187.019 91.076 180.669 89.2264Z"
+                fill={T.decoBeige}
+              />
+            </svg>
+          </div>
 
-        {/* Mentor photo */}
-        {/* eslint-disable-next-line @next/next/no-img-element */}
-        <img
-          src={PHOTO_URL}
-          alt="Mentor"
-          style={{
-            position: "absolute",
-            left: photoLeft,
-            top: 0,
-            width: photoWidth,
-            height: photoHeight,
-            objectFit: "cover",
-            borderRadius: photoRadius,
-          }}
-        />
+          {/* Mentor photo */}
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img
+            src={PHOTO_URL}
+            alt="Mentor"
+            style={{
+              position: "absolute",
+              left: photoLeft,
+              top: 0,
+              width: photoWidth,
+              height: photoHeight,
+              objectFit: "cover",
+              borderRadius: photoRadius,
+            }}
+          />
+        </div>
       </div>
 
-      {/* ── Folder face — static, overlaps animated content ── */}
-      <svg
-        width={FOLDER_W}
-        height={FOLDER_H}
-        viewBox={`0 0 ${CW} ${CH}`}
-        fill="none"
+      {/* ── Folder face — frosted glass ── */}
+      {/* Single div: backdrop-filter blurs the parent stacking context (photo + cards behind it).
+          filter: drop-shadow is on the same element so it doesn't wrap and isolate backdrop-filter.
+          clip-path is applied before filter, so drop-shadow follows the chanfered shape. */}
+      <div
         style={{
           position: "absolute",
           top: LIFT_PAD,
           left: 0,
+          width: FOLDER_W,
+          height: FOLDER_H,
           zIndex: 2,
           pointerEvents: "none",
+          clipPath: folderFacePath(FOLDER_W, FOLDER_H),
+          background:
+            "linear-gradient(135deg, rgba(180,176,140,0.34) 0%, rgba(140,136,104,0.20) 46%, rgba(120,116,86,0.30) 100%), rgba(120,117,88,0.42)",
+          backdropFilter: "blur(16px) saturate(1.1)",
+          WebkitBackdropFilter: "blur(16px) saturate(1.1)",
+          filter: "drop-shadow(0px 10px 26px rgba(39,38,24,0.30))",
+          boxShadow:
+            "inset 1px 1px 0 rgba(255,255,255,0.42), inset -1px -1px 0 rgba(120,116,86,0.28)",
         }}
-        aria-hidden="true"
-      >
-        <path
-          d="M162.236 233.998H10.4345C5.13181 233.998 0.833984 229.719 0.833984 224.44V85.5577C0.833984 80.2786 5.13181 76 10.4345 76H51.4857C54.9235 76 58.251 77.2042 60.8839 79.4041C74.2235 90.5459 116.682 125.219 116.682 125.219L168.635 171.494C170.67 173.307 171.834 175.899 171.834 178.618V224.442C171.834 229.721 167.536 234 162.233 234L162.236 233.998Z"
-          fill="#272618"
-        />
-      </svg>
+      />
 
-      {/* ── Name in Nerfos — static ── */}
+      {/* ── Share icon (connected-nodes) — upper-left of glass ── */}
       <span
         style={{
           position: "absolute",
-          left: (16 / CW) * FOLDER_W,
-          top: LIFT_PAD + (188 / CH) * FOLDER_H,
+          left: Math.round((12 / 158) * FOLDER_W),
+          top: LIFT_PAD + Math.round((85 / 192) * FOLDER_H),
           zIndex: 3,
-          fontFamily: "Nerfos, cursive",
-          color: "#FCFBF8",
-          fontSize: FOLDER_W * (20 / 220),
-          lineHeight: 1,
+          color: "#EDEBDD",
           pointerEvents: "none",
-          whiteSpace: "nowrap",
+          display: "flex",
+        }}
+        aria-hidden="true"
+      >
+        <ShareAndroid width={18} height={18} strokeWidth={1.5} />
+      </span>
+
+      {/* ── "Loop.Talk" label + name in Nerfos ── */}
+      <div
+        style={{
+          position: "absolute",
+          left: Math.round((16 / CW) * FOLDER_W),
+          top: LIFT_PAD + FOLDER_H - Math.round((58 / 192) * FOLDER_H),
+          zIndex: 3,
+          pointerEvents: "none",
         }}
       >
-        André do Amaral
-      </span>
+        <p
+          style={{
+            color: "#F3F1E6",
+            fontSize: 12,
+            fontFamily: "var(--font-sans), Inter, sans-serif",
+            fontWeight: 600,
+            lineHeight: "17px",
+            letterSpacing: ".2px",
+            margin: "0 0 5px",
+          }}
+        >
+          Loop.Talk
+        </p>
+        <p
+          style={{
+            fontFamily: "Nerfos, cursive",
+            color: "#F3F1E6",
+            fontSize: 24,
+            lineHeight: 1,
+            margin: 0,
+          }}
+        >
+          André do Amaral
+        </p>
+      </div>
     </div>
   );
 }
