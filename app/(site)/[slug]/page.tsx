@@ -257,85 +257,99 @@ function RealCreatorPage({ profile }: { profile: RealProfile }) {
 
     {/* ── DESKTOP ───────────────────────────────────────────────────────────── */}
     <div className="hidden md:block" style={{ background: "#F4F2EB", minHeight: "100vh" }}>
-      <div style={{ maxWidth: 1194, margin: "0 auto", padding: "112px 24px 80px" }}>
+      <div style={{ maxWidth: 960, margin: "0 auto", padding: "112px 12px 80px" }}>
 
-        {/* Hero grid */}
-        <div style={{ display: "grid", gridTemplateColumns: "336px 1fr 335px", gap: 32, alignItems: "start" }}>
+        {/* ══ HERO: 2 colunas ══════════════════════════════════════════════════ */}
+        <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 24, alignItems: "start" }}>
 
-          {/* Col 1: info */}
-          <div style={{ display: "flex", flexDirection: "column", gap: 24, paddingTop: 68 }}>
-
-            {/* Category chip */}
-            {areaLabel && (
-              <div style={{ display: "inline-flex", alignSelf: "flex-start" }}>
-                <span style={chipStyle}>
-                  <CategoryIcon categoria={areaLabel} />
-                  {areaLabel}
-                </span>
-              </div>
-            )}
-
-            <h1 style={{ fontSize: 48, fontWeight: 300, color: "#272518", lineHeight: "52px", margin: 0 }}>
-              {name || profile.username}
-            </h1>
-
-            {profile.headline && (
-              <p style={{ fontSize: 16, fontWeight: 500, color: "#272518", margin: 0 }}>
-                {profile.headline}
-              </p>
-            )}
-
-            {/* Social links */}
-            {profile.socialLinks.length > 0 && (
-              <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
-                {profile.socialLinks.map((l) => (
-                  <SocialCircle key={l.platform} href={l.url} label={l.platform}>
-                    <SocialIconByPlatform platform={l.platform} />
-                  </SocialCircle>
-                ))}
-              </div>
-            )}
-          </div>
-
-          {/* Col 2: photo */}
-          <div style={{ borderRadius: 12, overflow: "hidden", aspectRatio: "456/557", background: "#E0DDC1", position: "relative" }}>
+          {/* Col esquerda: foto com overlay de vidro */}
+          <div style={{ position: "relative", borderRadius: 12, overflow: "hidden", height: 557, background: "#E0DDC1" }}>
             {profile.photo_url ? (
-              <Image src={profile.photo_url} alt={name} fill className="object-cover object-top" sizes="456px" />
+              <Image src={profile.photo_url} alt={name} fill priority className="object-cover object-top" sizes="456px" />
             ) : (
               <div style={{ width: "100%", height: "100%", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 72, fontWeight: 700, color: "#272518", background: "#EAEA68" }}>
                 {initials}
               </div>
             )}
+
+            {/* Botão compartilhar — glass, canto superior direito */}
+            <div style={{ position: "absolute", top: 16, right: 16, zIndex: 10 }}>
+              <ShareButton slug={profile.username ?? ""} name={name} variant="glass" />
+            </div>
+
+            {/* Gradiente de base */}
+            <div style={{ position: "absolute", inset: 0, background: "linear-gradient(180deg, rgba(255,255,255,0) 56%, rgba(255,255,255,0.38) 76%, rgba(255,255,255,0.80) 100%)" }} />
+
+            {/* Painel frosted glass */}
+            <div style={{
+              position: "absolute", left: 0, right: 0, bottom: 0, top: "52%",
+              backdropFilter: "blur(40px)", WebkitBackdropFilter: "blur(40px)",
+              WebkitMaskImage: "linear-gradient(180deg, transparent 0%, black 22%)",
+              maskImage: "linear-gradient(180deg, transparent 0%, black 22%)",
+              display: "flex", flexDirection: "column", alignItems: "center",
+              justifyContent: "flex-end", gap: 8, paddingBottom: 28,
+            }}>
+              {areaLabel && (
+                <span style={chipStyle}>
+                  <CategoryIcon categoria={areaLabel} />
+                  {areaLabel}
+                </span>
+              )}
+              <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 6, paddingLeft: 24, paddingRight: 24 }}>
+                <h1 style={{ fontFamily: "var(--font-host-grotesk)", fontSize: 30, fontWeight: 300, color: "#181D27", lineHeight: "32px", textAlign: "center", margin: 0 }}>
+                  {name || profile.username}
+                </h1>
+                {profile.headline && (
+                  <p style={{ fontSize: 14, fontWeight: 400, color: "#181D27", lineHeight: "20px", textAlign: "center", margin: 0 }}>
+                    {profile.headline}
+                  </p>
+                )}
+              </div>
+            </div>
           </div>
 
-          {/* Col 3: booking panel */}
+          {/* Col direita: card de agendamento */}
           <div style={{ position: "sticky", top: 96 }}>
             <div style={{
-              background: "#F4F2EB", borderRadius: 12, border: "1px solid #DAD9D5",
-              padding: "40px 24px", minHeight: 460,
-              display: "flex", flexDirection: "column", justifyContent: "space-between", gap: 32,
+              background: "#F4F2EB", borderRadius: 12, outline: "1px solid #DAD9D5", outlineOffset: -1,
+              padding: "40px 24px", height: 557, boxSizing: "border-box",
+              display: "flex", flexDirection: "column", justifyContent: "space-between", gap: 24,
             }}>
-              {/* Top: logo + name */}
-              <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 8 }}>
-                <img src="/logo.svg" alt="Loop.Talk" style={{ height: 20, display: "block" }} />
-                <p style={{ fontSize: 30, fontWeight: 400, color: "#181D27", lineHeight: "38px", textAlign: "center", margin: 0 }}>
-                  {name || profile.username}
-                </p>
+              {/* Logo + nome + social */}
+              <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 12 }}>
+                <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 8 }}>
+                  <img src="/logo.svg" alt="Loop.Talk" style={{ height: 20, display: "block" }} />
+                  <p style={{ fontSize: 30, fontWeight: 400, color: "#181D27", lineHeight: "38px", textAlign: "center", margin: 0 }}>
+                    {name || profile.username}
+                  </p>
+                </div>
+                {profile.socialLinks.length > 0 && (
+                  <div style={{ display: "flex", gap: 8 }}>
+                    {profile.socialLinks.map((l) => (
+                      <a key={l.platform} href={l.url} aria-label={l.platform} style={{
+                        width: 32, height: 32, background: "#E0DDC1", borderRadius: "50%",
+                        display: "flex", alignItems: "center", justifyContent: "center",
+                        textDecoration: "none", color: "#272618", flexShrink: 0,
+                      }}>
+                        <SocialIconByPlatform platform={l.platform} />
+                      </a>
+                    ))}
+                  </div>
+                )}
               </div>
 
-              {/* Bottom: session tiles + CTA + share link */}
+              {/* Session tiles + CTA + share */}
               <div style={{ display: "flex", flexDirection: "column", gap: 24 }}>
                 {profile.sessionTypes.length > 0 ? (
                   <div style={{ display: "flex", flexDirection: "column", gap: 24 }}>
-                    {/* 3 tiles */}
                     <div style={{ display: "flex", gap: 8 }}>
                       {profile.sessionTypes.map((st, i) => {
                         const isHighlighted = i === profile.sessionTypes.length - 1;
                         return (
                           <div key={st.id} style={{
-                            flex: 1, height: 72, borderRadius: 4, padding: "0 12px",
+                            flex: 1, height: 72, borderRadius: 4,
                             background: isHighlighted ? "#EAEA68" : "#FFFFFF",
-                            display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center",
+                            display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", gap: 4,
                           }}>
                             <span style={{ fontSize: 16, fontWeight: 400, color: "#272618", lineHeight: "24px" }}>
                               {st.label || `${st.duration_minutes} min`}
@@ -347,7 +361,6 @@ function RealCreatorPage({ profile }: { profile: RealProfile }) {
                         );
                       })}
                     </div>
-                    {/* CTA */}
                     <div style={{ display: "flex", alignItems: "center", justifyContent: "center", padding: "12px 20px", borderRadius: 8, background: "#272618", color: "#FCFBF8", fontSize: 16, fontWeight: 600, cursor: "pointer" }}>
                       Agendar Loop.Talk
                     </div>
@@ -355,8 +368,6 @@ function RealCreatorPage({ profile }: { profile: RealProfile }) {
                 ) : (
                   <p style={{ fontSize: 13, color: "#626053", margin: 0, textAlign: "center" }}>Nenhuma sessão disponível no momento.</p>
                 )}
-
-                {/* Share link */}
                 <ShareButton slug={profile.username ?? ""} name={name} variant="text" />
               </div>
             </div>
@@ -365,7 +376,7 @@ function RealCreatorPage({ profile }: { profile: RealProfile }) {
 
         {/* Sobre */}
         {profile.bio && (
-          <div style={{ maxWidth: 829, borderTop: "1px solid #E0DDC1", paddingTop: 24, marginTop: 32, display: "flex", flexDirection: "column", gap: 8 }}>
+          <div style={{ borderTop: "1px solid #DAD9D5", paddingTop: 24, marginTop: 24, display: "flex", flexDirection: "column", gap: 8 }}>
             <h2 style={{ fontSize: 24, fontWeight: 400, color: "#272518", lineHeight: "32px", margin: 0 }}>Sobre</h2>
             <p style={{ fontSize: 14, color: "#626053", lineHeight: "20px", margin: 0 }}>{profile.bio}</p>
           </div>
@@ -425,66 +436,13 @@ export default async function CreatorPage({ params }: Props) {
 
       {/* ═══ DESKTOP ══════════════════════════════════════════════════════════ */}
       <div className="hidden md:block min-h-screen" style={{ background: "#F4F2EB" }}>
-      <div className="max-w-[1194px] mx-auto px-6 pt-28 pb-20">
+      <div style={{ maxWidth: 960, margin: "0 auto", padding: "112px 12px 80px" }}>
 
-        {/* ══ HERO: 3 colunas ══════════════════════════════════════════════════ */}
-        <div
-          style={{
-            display: "grid",
-            gridTemplateColumns: "336px 1fr 335px",
-            gap: 32,
-            alignItems: "start",
-          }}
-        >
+        {/* ══ HERO: 2 colunas (foto + agendamento) ════════════════════════════ */}
+        <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 24, alignItems: "start" }}>
 
-          {/* ── Col 1: info do creator ── */}
-          <div style={{ display: "flex", flexDirection: "column", gap: 32, paddingTop: 68 }}>
-
-            {/* Category pill */}
-            <div style={{ display: "inline-flex", alignSelf: "flex-start" }}>
-              <span style={{
-                background: "rgba(255,255,255,0.40)",
-                backdropFilter: "blur(20px)",
-                WebkitBackdropFilter: "blur(20px)",
-                borderRadius: 4,
-                padding: "8px 12px",
-                fontSize: 12,
-                fontWeight: 600,
-                color: "#272618",
-                boxShadow: "0px 1px 2px rgba(10,13,18,0.05)",
-                display: "inline-flex",
-                alignItems: "center",
-                gap: 4,
-              }}>
-                <CategoryIcon categoria={expert.categoria} />
-                {expert.categoria}
-              </span>
-            </div>
-
-            {/* Nome + tagline */}
-            <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
-              <h1 style={{ fontFamily: "Host Grotesk, sans-serif", fontSize: 48, fontWeight: 300, color: "#272618", lineHeight: "52.8px", margin: 0 }}>
-                {expert.nome}
-              </h1>
-              <p style={{ fontSize: 14, color: "#272618", lineHeight: "20px", margin: 0 }}>
-                {expert.bio}
-              </p>
-            </div>
-
-            {/* Redes sociais */}
-            <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
-              <SocialCircle href={expert.social.instagram ?? "#"} label="Instagram"><InstagramIcon /></SocialCircle>
-              <SocialCircle href={expert.social.linkedin ?? "#"} label="LinkedIn"><LinkedInIcon /></SocialCircle>
-              <SocialCircle href="#" label="YouTube"><YouTubeIcon /></SocialCircle>
-              <SocialCircle href="#" label="TikTok"><TikTokIcon /></SocialCircle>
-            </div>
-          </div>
-
-          {/* ── Col 2: foto principal ── */}
-          <div
-            className="relative overflow-hidden"
-            style={{ borderRadius: 12, aspectRatio: "456/557" }}
-          >
+          {/* ── Col esquerda: foto com overlay de vidro ── */}
+          <div style={{ position: "relative", borderRadius: 12, overflow: "hidden", height: 557, background: "#E0DDC1" }}>
             <Image
               src={`/mentors/${expert.slug}/profile.webp`}
               alt={expert.nome}
@@ -493,10 +451,46 @@ export default async function CreatorPage({ params }: Props) {
               className="object-cover object-top"
               sizes="456px"
             />
+
+            {/* Botão compartilhar — glass, canto superior direito */}
+            <div style={{ position: "absolute", top: 16, right: 16, zIndex: 10 }}>
+              <ShareButton slug={expert.slug} name={expert.nome} variant="glass" />
+            </div>
+
+            {/* Gradiente de clareamento sobre a foto */}
+            <div style={{ position: "absolute", inset: 0, background: "linear-gradient(180deg, transparent 60%, rgba(255,255,255,0.38) 76%, rgba(255,255,255,0.82) 100%)" }} />
+
+            {/* Painel frosted glass — base da foto */}
+            <div style={{
+              position: "absolute", left: 0, right: 0, bottom: 0, top: "60%",
+              backdropFilter: "blur(40px)", WebkitBackdropFilter: "blur(40px)",
+              WebkitMaskImage: "linear-gradient(180deg, transparent 0%, black 22%)",
+              maskImage: "linear-gradient(180deg, transparent 0%, black 22%)",
+              display: "flex", flexDirection: "column", alignItems: "center",
+              justifyContent: "flex-end", gap: 8, paddingBottom: 28,
+            }}>
+              {/* Chip de área */}
+              <span style={{
+                background: "rgba(255,255,255,0.40)", backdropFilter: "blur(20px)", WebkitBackdropFilter: "blur(20px)",
+                borderRadius: 4, padding: "8px 12px", fontSize: 12, fontWeight: 600, color: "#272618",
+                boxShadow: "0px 1px 2px rgba(10,13,18,0.05)", display: "inline-flex", alignItems: "center", gap: 4,
+              }}>
+                <CategoryIcon categoria={expert.categoria} />
+                {expert.categoria}
+              </span>
+              <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 6, paddingLeft: 24, paddingRight: 24 }}>
+                <h1 style={{ fontFamily: "var(--font-host-grotesk)", fontSize: 30, fontWeight: 300, color: "#181D27", lineHeight: "32px", textAlign: "center", margin: 0 }}>
+                  {expert.nome}
+                </h1>
+                <p style={{ fontSize: 14, fontWeight: 400, color: "#181D27", lineHeight: "20px", textAlign: "center", margin: 0 }}>
+                  {expert.bio}
+                </p>
+              </div>
+            </div>
           </div>
 
-          {/* ── Col 3: booking sidebar ── */}
-          <div className="sticky top-24">
+          {/* ── Col direita: card de agendamento ── */}
+          <div style={{ position: "sticky", top: 96 }}>
             <BookingSidebar expert={expert} />
           </div>
 
@@ -538,7 +532,7 @@ export default async function CreatorPage({ params }: Props) {
 
           {expert.doacao && (
             <div style={{
-              width: 335,
+              width: 457,
               padding: 16,
               background: "#E0DDC1",
               borderRadius: 4,
@@ -555,7 +549,6 @@ export default async function CreatorPage({ params }: Props) {
 
         {/* ══ SOBRE + AVALIAÇÕES ═══════════════════════════════════════════════ */}
         <div style={{
-          maxWidth: 829,
           paddingTop: 24,
           paddingBottom: 24,
           marginTop: 8,
@@ -568,8 +561,8 @@ export default async function CreatorPage({ params }: Props) {
             <h2 style={{ fontSize: 24, fontWeight: 400, color: "#181D27", lineHeight: "32px", margin: 0 }}>
               Sobre
             </h2>
-            <p style={{ fontSize: 14, color: "#181D27", lineHeight: "18px", margin: 0 }}>
-              {expert.bio}
+            <p style={{ fontSize: 14, color: "#181D27", lineHeight: "20px", margin: 0 }}>
+              I am a designer building digital products. For the past 10+ years, I have worked with multi-disciplinary professionals shaping the future of brands and products around the world. My background is in Visual and User Interface with a deep understanding of User Experience. I&apos;ve led projects for different industries such as entertainment, fashion, retail and finance. I helped create great design teams and also coach young designers from different parts of the world. I have a great understanding of design culture and design processes. After we finished Move to Apple we decided to create our next product focused on the creative industry, approaching a problem that&apos;s common for anyone who wants to collect and browse inspiration that they find on the internet. We launched Savee in 2016, an ad-free platform that was designed to be simple and easy to use. We started with 60 beta users and currently we are more than 13.000 users that are constantly increasing and I am proud of what we are building. I believe in team-work and discipline in Design. Integrating great visual and interaction design is in my view the way to create well-crafted experiences that are consequentially responsible for meaningful products. My specialties are in User Interface Design, Motion Design &amp; Interactive Prototypes, my main focus is how we can use design to solve business challenges focused on the user experience.
             </p>
           </div>
 

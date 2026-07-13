@@ -26,8 +26,8 @@ export function ShareButton({
 }: {
   slug: string;
   name: string;
-  /** "icon" = circular button (mobile bar / col 1), "text" = link row (booking panel) */
-  variant?: "icon" | "text";
+  /** "icon" = opaque circle, "glass" = frosted glass circle (over photo), "text" = link row */
+  variant?: "icon" | "glass" | "text";
 }) {
   const [copied, setCopied] = useState(false);
 
@@ -44,6 +44,28 @@ export function ShareButton({
       setCopied(true);
       setTimeout(() => setCopied(false), 2000);
     }
+  }
+
+  if (variant === "glass") {
+    return (
+      <button
+        onClick={handleShare}
+        title={copied ? "Link copiado!" : "Compartilhar perfil"}
+        style={{
+          width: 40, height: 40, borderRadius: "50%",
+          background: "rgba(255,255,255,0.40)",
+          backdropFilter: "blur(15px)",
+          WebkitBackdropFilter: "blur(15px)",
+          border: "none",
+          color: copied ? "#5FAD8E" : "#272618",
+          display: "flex", alignItems: "center", justifyContent: "center",
+          cursor: "pointer", flexShrink: 0,
+          transition: "background 0.15s",
+        }}
+      >
+        {copied ? <CheckIcon size={16} /> : <ShareIcon size={16} />}
+      </button>
+    );
   }
 
   if (variant === "text") {
