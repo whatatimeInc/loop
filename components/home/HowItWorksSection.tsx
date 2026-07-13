@@ -476,7 +476,7 @@ const illustrationWrap: React.CSSProperties = {
   paddingTop: 20,
 };
 
-function CardHeader({ title, subtitle }: { title: string; subtitle: string }) {
+function CardHeader({ title, subtitle, isMobile }: { title: string; subtitle: string; isMobile?: boolean }) {
   return (
     <>
       <p
@@ -493,12 +493,12 @@ function CardHeader({ title, subtitle }: { title: string; subtitle: string }) {
       </p>
       <p
         style={{
-          fontSize: 14,
+          fontSize: isMobile ? 14 : 16,
           lineHeight: 1.55,
           color: T.muted,
           margin: 0,
           textAlign: "center",
-          maxWidth: 200,
+          maxWidth: 280,
         }}
       >
         {subtitle}
@@ -552,8 +552,9 @@ export function HowItWorksSection({ isMobile }: { isMobile: boolean }) {
               align-items: stretch;
               overflow-x: auto;
               scroll-snap-type: x mandatory;
+              scroll-padding-left: 24px;
               -webkit-overflow-scrolling: touch;
-              padding: 0 16px 4px;
+              padding: 0 24px 4px;
               gap: 12px;
               scrollbar-width: none;
             }
@@ -567,7 +568,7 @@ export function HowItWorksSection({ isMobile }: { isMobile: boolean }) {
                 className="how-carousel-card"
                 style={{ ...cardStyle, minHeight: 380, overflow: "hidden", minWidth: 0 }}
               >
-                <CardHeader title={title} subtitle={subtitle} />
+                <CardHeader title={title} subtitle={subtitle} isMobile={true} />
                 <div style={illustrationWrap}>
                   {illustration}
                 </div>

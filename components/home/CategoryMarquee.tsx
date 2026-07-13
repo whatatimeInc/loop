@@ -115,7 +115,7 @@ function Pill({ label, icon }: { label: string; icon: React.ReactNode }) {
       }}
     >
       <div style={{ display: "flex", alignItems: "center", flexShrink: 0 }}>{icon}</div>
-      <span style={{ color: "#272518", fontSize: 20, fontWeight: 400, lineHeight: "24px" }}>
+      <span style={{ color: "#272518", fontSize: 16, fontWeight: 400, lineHeight: "24px" }}>
         {label}
       </span>
     </div>

@@ -61,7 +61,7 @@ export function Footer() {
 
   if (isMobile) {
     return (
-      <footer style={{ padding: "0 16px 16px" }}>
+      <footer style={{ padding: "0 16px 96px" }}>
         <div style={{ background: "#272618", borderRadius: 12, padding: "40px 40px 0" }}>
 
           {/* Logo + tagline + CTA */}

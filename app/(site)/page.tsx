@@ -174,7 +174,7 @@ export default function Home() {
               </h1>
               <p
                 style={{
-                  fontSize: "clamp(15px, 1.2vw + 4px, 18px)",
+                  fontSize: isMobile ? 14 : 16,
                   color: "rgba(252,251,248,0.85)",
                   lineHeight: 1.55,
                   margin: 0,
@@ -295,7 +295,7 @@ export default function Home() {
           >
             Acesso real, presença real
           </h2>
-          <p style={{ fontSize: isMobile ? 16 : 20, color: "#272618", lineHeight: "24px", margin: 0 }}>
+          <p style={{ fontSize: isMobile ? 14 : 16, color: "#272618", lineHeight: "24px", margin: 0 }}>
             Compartilhe conhecimento via 1:1 com sua audiência.
           </p>
         </div>
@@ -337,7 +337,7 @@ export default function Home() {
             >
               Faça parte do Loop.Talk<br />e inspire pessoas.
             </h2>
-            <p style={{ fontSize: 15, color: "#272518", lineHeight: "22px", margin: 0 }}>
+            <p style={{ fontSize: isMobile ? 14 : 16, color: "#272518", lineHeight: "22px", margin: 0 }}>
               Conecte-se virtualmente, aconselhe e ganhe pelo seu tempo.
             </p>
           </div>
