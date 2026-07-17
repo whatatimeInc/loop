@@ -1,0 +1,703 @@
+<title>Loop.Talk · Sala — Protótipo</title>
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+:root {
+  --bg-dark:#1A1A1A; --bg-light:#F4F2EB; --accent:#EAEA68;
+  --text-dark:#181D27; --text-light:#F0EFEB; --muted:#807F71;
+  --border:#DAD9D5; --primary:#272618; --success:#68A279; --danger:#C0392B;
+  --av-bg:#373525; --av-fg:#FCFBF8;
+}
+html,body { height:100%; font-family:system-ui,-apple-system,'Segoe UI',sans-serif; overflow:hidden; background:#000; }
+
+/* Switcher */
+#switcher {
+  position:fixed; top:12px; left:50%; transform:translateX(-50%);
+  z-index:9999; display:flex; gap:3px;
+  background:rgba(8,8,8,0.88); backdrop-filter:blur(20px);
+  border:1px solid rgba(255,255,255,0.1); border-radius:100px;
+  padding:4px; white-space:nowrap; overflow-x:auto; max-width:calc(100vw - 24px);
+}
+#switcher::-webkit-scrollbar { display:none; }
+#switcher button {
+  padding:6px 13px; border-radius:100px; border:none; background:transparent;
+  color:rgba(255,255,255,0.45); font-size:11px; letter-spacing:0.2px;
+  cursor:pointer; font-family:inherit; flex-shrink:0; transition:all 0.15s;
+}
+#switcher button:hover { color:rgba(255,255,255,0.75); background:rgba(255,255,255,0.07); }
+#switcher button.active { background:var(--accent); color:var(--primary); font-weight:600; }
+
+/* Screens */
+.screen { display:none; width:100vw; height:100vh; overflow-y:auto; overflow-x:hidden; }
+.screen.active { display:block; }
+.screen-light { background:var(--bg-light); }
+.screen-dark  { background:var(--bg-dark); }
+
+/* Center layout */
+.center-wrap {
+  min-height:100vh; display:flex; flex-direction:column;
+  align-items:center; justify-content:center; padding:60px 24px 40px;
+}
+.stack { max-width:440px; width:100%; display:flex; flex-direction:column; gap:16px; }
+
+/* Cards */
+.card      { background:#fff; border:1px solid var(--border); border-radius:14px; padding:24px; }
+.card-dark { background:rgba(255,255,255,0.06); border:1px solid rgba(255,255,255,0.1); border-radius:14px; padding:24px; }
+
+/* Avatar — all use brand warm neutral */
+.av {
+  border-radius:50%; display:flex; align-items:center; justify-content:center;
+  font-weight:700; flex-shrink:0; background:var(--av-bg); color:var(--av-fg);
+}
+
+/* Buttons */
+.btn { border:none; border-radius:10px; font-family:inherit; cursor:pointer; width:100%; padding:13px 24px; font-size:15px; font-weight:700; transition:opacity 0.15s; }
+.btn-dk { background:var(--primary); color:#FCFBF8; }
+.btn-dk:hover { opacity:0.85; }
+.btn-yw { background:var(--accent); color:var(--primary); }
+.btn-yw:hover { opacity:0.9; }
+.btn-yw:disabled { opacity:0.35; cursor:not-allowed; }
+.btn-gh { background:transparent; border:1.5px solid var(--border); color:var(--primary); }
+.btn-gh:hover { border-color:var(--primary); }
+
+/* Mono timers */
+.mono { font-family:'SF Mono','Fira Code',ui-monospace,monospace; letter-spacing:-1px; }
+
+/* Separator */
+.sep { height:1px; background:var(--border); margin:6px 0; }
+
+/* ── NOT YET ── */
+.notyet-box { background:#fff; border:1px solid var(--border); border-radius:14px; padding:28px 32px; text-align:center; }
+.notyet-timer { font-size:52px; font-weight:700; color:var(--text-dark); line-height:1; }
+
+/* ── WAITING ── */
+.av-border { border:2px solid rgba(255,255,255,0.1); }
+.dot { width:8px; height:8px; border-radius:50%; flex-shrink:0; }
+.dot-ok  { background:var(--success); }
+.dot-err { background:var(--danger); }
+.note-ta { width:100%; background:rgba(255,255,255,0.06); border:1px solid rgba(255,255,255,0.1); border-radius:8px; padding:10px 12px; color:#F0EFEB; font-size:14px; resize:none; font-family:inherit; outline:none; }
+.note-ta::placeholder { color:rgba(255,255,255,0.3); }
+.btn-enter { border:none; border-radius:10px; font-family:inherit; cursor:pointer; width:100%; padding:15px 24px; font-size:16px; font-weight:700; background:var(--accent); color:var(--primary); transition:all 0.2s; }
+.btn-enter:disabled { background:rgba(255,255,255,0.08); color:var(--muted); cursor:not-allowed; }
+.wm { position:absolute; bottom:24px; left:24px; opacity:0.15; pointer-events:none; }
+
+/* ── IN CALL ── */
+#s-incall { position:relative; overflow:hidden; }
+.video-bg {
+  position:absolute; inset:0;
+  background:radial-gradient(ellipse at 42% 38%, #1f1c28 0%, #0D0D0D 60%);
+  display:flex; align-items:center; justify-content:center;
+}
+.remote-av { display:flex; flex-direction:column; align-items:center; gap:14px; }
+.remote-av-ring {
+  width:128px; height:128px; border-radius:50%; background:var(--av-bg);
+  display:flex; align-items:center; justify-content:center;
+  font-size:42px; font-weight:700; color:var(--av-fg);
+  border:2px solid rgba(255,255,255,0.09);
+}
+.remote-name { font-size:17px; font-weight:600; color:rgba(255,255,255,0.65); }
+.remote-sub  { font-size:12px; color:rgba(255,255,255,0.3); margin-top:-6px; }
+
+/* Top bar */
+.top-bar {
+  position:absolute; top:0; left:0; right:0; height:52px;
+  background:linear-gradient(180deg,rgba(0,0,0,0.5) 0%,transparent 100%);
+  display:grid; grid-template-columns:1fr auto 1fr; align-items:center;
+  padding:0 20px; z-index:10;
+  opacity:1; transition:opacity 0.3s ease;
+}
+.top-bar > .signal { justify-self:end; }
+.logo-call-svg { height:24px; width:auto; opacity:0.85; display:block; }
+.timer-wrap { display:flex; flex-direction:column; align-items:center; gap:2px; }
+.timer-sub  { font-size:11px; color:#807F71; }
+.timer-main { font-size:16px; font-weight:500; color:#FCFBF8; transition:color 0.4s; }
+@keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.6} }
+.timer-main.critical { animation:pulse 1.5s ease-in-out infinite; }
+.signal { display:flex; align-items:flex-end; gap:2px; }
+.sig-bar { width:3px; border-radius:1px; }
+
+/* PiP — 160×90 */
+.pip {
+  position:absolute; bottom:92px; right:16px;
+  width:160px; height:90px; border-radius:8px;
+  background:var(--av-bg); border:1px solid rgba(255,255,255,0.12);
+  display:flex; flex-direction:column; align-items:center; justify-content:center;
+  gap:4px; z-index:10;
+}
+.pip-init  { font-size:24px; font-weight:700; color:var(--av-fg); }
+.pip-label { font-size:10px; color:var(--muted); }
+
+/* Control bar */
+.ctrl-bar {
+  position:absolute; bottom:0; left:0; right:280px; height:76px;
+  background:rgba(0,0,0,0.68); border-top:1px solid rgba(255,255,255,0.06);
+  display:flex; align-items:center; justify-content:space-between;
+  padding:0 20px; z-index:10; backdrop-filter:blur(12px);
+  transition:right 0.25s;
+}
+.ctrl-bar.chat-closed { right:0; }
+.ctrl-group { display:flex; gap:8px; }
+
+/* Control buttons */
+.cb {
+  display:flex; flex-direction:column; align-items:center; justify-content:center; gap:4px;
+  width:72px; padding:8px 4px; border-radius:10px; border:none;
+  background:rgba(255,255,255,0.08); color:#F0EFEB;
+  cursor:pointer; font-family:inherit; transition:background 0.15s; flex-shrink:0;
+}
+.cb:hover  { background:rgba(255,255,255,0.13); }
+.cb.on     { background:rgba(192,57,43,0.28); color:#F87171; }
+.cb-icon   { line-height:1; position:relative; display:flex; align-items:center; justify-content:center; }
+.cb-lbl    { font-size:10px; color:rgba(255,255,255,0.4); }
+.badge {
+  position:absolute; top:-4px; right:-5px; width:14px; height:14px;
+  border-radius:50%; background:var(--danger); color:#fff;
+  font-size:8px; font-weight:700; display:flex; align-items:center; justify-content:center;
+}
+
+/* End call */
+.end-call {
+  display:flex; flex-direction:column; align-items:center; gap:4px;
+  padding:8px 18px; border-radius:10px; border:none;
+  background:#C0392B; color:#fff; cursor:pointer; font-family:inherit; transition:background 0.15s;
+}
+.end-call:hover { background:#A93226; }
+
+/* Chat */
+.chat-side {
+  position:absolute; top:0; right:0; bottom:0; width:280px;
+  background:#111; border-left:1px solid rgba(255,255,255,0.07);
+  display:flex; flex-direction:column; z-index:10;
+  transform:translateX(100%); transition:transform 0.25s;
+}
+.chat-side.open { transform:translateX(0); }
+.chat-hd { padding:14px 16px; border-bottom:1px solid rgba(255,255,255,0.07); display:flex; justify-content:space-between; align-items:center; }
+.chat-hd-t { font-size:13px; font-weight:600; color:#F0EFEB; }
+.chat-x { background:none; border:none; color:rgba(255,255,255,0.4); cursor:pointer; font-size:18px; line-height:1; font-family:inherit; }
+.chat-msgs { flex:1; overflow-y:auto; padding:12px; display:flex; flex-direction:column; gap:8px; }
+.cm { display:flex; flex-direction:column; }
+.cm.mine   { align-self:flex-end; align-items:flex-end; max-width:84%; }
+.cm.theirs { align-self:flex-start; max-width:84%; }
+.cm-sender { font-size:10px; color:rgba(255,255,255,0.35); margin-bottom:2px; }
+.cm-bubble { padding:8px 11px; font-size:13px; line-height:1.4; }
+.cm.mine   .cm-bubble { background:var(--accent); color:var(--primary); border-radius:12px 12px 2px 12px; }
+.cm.theirs .cm-bubble { background:rgba(255,255,255,0.1); color:#F0EFEB; border-radius:12px 12px 12px 2px; }
+.chat-in { padding:10px 12px; border-top:1px solid rgba(255,255,255,0.07); display:flex; gap:8px; }
+.chat-tf { flex:1; background:rgba(255,255,255,0.08); border:none; border-radius:8px; padding:8px 11px; color:#F0EFEB; font-size:13px; font-family:inherit; outline:none; }
+.chat-tf::placeholder { color:rgba(255,255,255,0.28); }
+.chat-send { padding:8px 14px; background:var(--accent); border:none; border-radius:8px; color:var(--primary); font-weight:700; cursor:pointer; font-family:inherit; font-size:13px; }
+
+/* Modals */
+.overlay { display:none; position:absolute; inset:0; background:rgba(0,0,0,0.7); z-index:50; align-items:center; justify-content:center; }
+.overlay.open { display:flex; }
+.modal { background:#1E1E1E; border-radius:16px; padding:28px 30px; max-width:310px; width:90%; }
+.modal-t { font-size:17px; font-weight:700; color:#F0EFEB; margin-bottom:8px; }
+.modal-b { font-size:14px; color:var(--muted); line-height:1.55; margin-bottom:22px; }
+.modal-acts { display:flex; gap:10px; }
+.m-cancel  { flex:1; padding:12px; background:transparent; border:1px solid rgba(255,255,255,0.18); border-radius:8px; color:#F0EFEB; cursor:pointer; font-family:inherit; font-size:14px; }
+.m-confirm { flex:1; padding:12px; background:var(--danger); border:none; border-radius:8px; color:#fff; font-weight:700; cursor:pointer; font-family:inherit; font-size:14px; }
+
+/* Time extension modal */
+.tempo-modal-card { background:#1E1E1E; border-radius:12px; padding:28px; max-width:360px; width:90%; }
+.tempo-pills { display:flex; gap:8px; margin-bottom:16px; }
+.tempo-pill {
+  flex:1; padding:8px 0; background:#373525; border:1px solid #514F41;
+  border-radius:999px; color:#FCFBF8; font-size:14px; font-family:inherit;
+  cursor:pointer; transition:all 0.15s;
+}
+.tempo-pill:hover { border-color:rgba(255,255,255,0.3); }
+.tempo-pill.sel { background:var(--accent); border-color:var(--accent); color:#272518; font-weight:700; }
+#tempo-confirm {
+  display:none; width:100%; height:44px; background:var(--accent); border:none;
+  border-radius:8px; color:#272618; font-size:15px; font-weight:700;
+  cursor:pointer; font-family:inherit; transition:opacity 0.15s;
+}
+#tempo-confirm:hover { opacity:0.88; }
+
+/* Toast */
+#toast {
+  display:none; position:absolute; top:60px; left:50%; transform:translateX(-50%);
+  background:#272618; color:#FCFBF8; border-radius:8px; padding:10px 18px;
+  font-size:13px; z-index:200; white-space:nowrap;
+  box-shadow:0 4px 16px rgba(0,0,0,0.4);
+}
+
+/* Post-call */
+.earn-row  { display:flex; justify-content:space-between; align-items:baseline; }
+.earn-lbl  { font-size:14px; color:var(--text-dark); }
+.earn-val  { font-size:14px; color:var(--text-dark); font-variant-numeric:tabular-nums; }
+.muted-t   { color:var(--muted) !important; }
+.bold-t    { font-size:16px !important; font-weight:700 !important; }
+.label-sm  { font-size:11px; color:var(--muted); text-transform:uppercase; letter-spacing:0.7px; font-weight:500; }
+.success-band { background:#EAF5EA; border:1px solid #A5D6A7; border-radius:12px; padding:15px 22px; text-align:center; font-size:15px; font-weight:600; color:#2E7D32; }
+.stars { display:flex; gap:6px; }
+.star  { font-size:36px; cursor:pointer; color:var(--border); line-height:1; user-select:none; transition:color 0.08s; }
+
+/* No-show */
+.ns-box { background:rgba(255,255,255,0.06); border:1px solid rgba(255,255,255,0.1); border-radius:14px; padding:24px; width:100%; text-align:center; }
+
+/* Connection lost */
+@keyframes spin { to { transform:rotate(360deg); } }
+.spinner { width:42px; height:42px; border:3px solid rgba(255,255,255,0.14); border-top-color:#F0EFEB; border-radius:50%; animation:spin 0.8s linear infinite; }
+
+@media (prefers-color-scheme:dark) {
+  .card  { background:#1E1E1E; border-color:rgba(255,255,255,0.08); }
+  .card .label-sm,.card .earn-lbl,.card .earn-val { color:#F0EFEB; }
+  .card .muted-t { color:var(--muted) !important; }
+  .card .sep     { background:rgba(255,255,255,0.1); }
+  .notyet-box    { background:#1E1E1E; border-color:rgba(255,255,255,0.08); }
+  .notyet-timer  { color:#F0EFEB; }
+  .screen-light  { background:#141414; }
+  .btn-gh   { border-color:rgba(255,255,255,0.18); color:#F0EFEB; }
+  .btn-dk   { background:var(--accent); color:#272618; }
+  .success-band  { background:rgba(46,125,50,0.2); border-color:rgba(165,214,167,0.3); }
+  .earn-lbl,.earn-val { color:#F0EFEB; }
+}
+</style>
+
+<!-- SVG icon defs (referenced by JS) -->
+<svg style="display:none">
+  <symbol id="ico-mic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3z"/>
+    <path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" y1="19" x2="12" y2="22"/><line x1="9" y1="22" x2="15" y2="22"/>
+  </symbol>
+  <symbol id="ico-mic-off" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+    <line x1="2" y1="2" x2="22" y2="22"/>
+    <path d="M18.89 13.23A7 7 0 0 0 19 12v-2M15 9.34V5a3 3 0 0 0-5.68-1.33M9 9v3a3 3 0 0 0 5.12 2.12"/>
+    <line x1="12" y1="19" x2="12" y2="22"/><line x1="9" y1="22" x2="15" y2="22"/>
+  </symbol>
+  <symbol id="ico-cam" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M23 7l-7 5 7 5V7z"/><rect x="1" y="5" width="15" height="14" rx="2"/>
+  </symbol>
+  <symbol id="ico-cam-off" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+    <line x1="1" y1="1" x2="23" y2="23"/>
+    <path d="M16 11.37A4 4 0 0 1 12.63 15H9.5M9 5H3a2 2 0 0 0-2 2v10a2 2 0 0 0 2 2h12c.34 0 .67-.05.97-.14M23 7l-7 5"/>
+  </symbol>
+  <symbol id="ico-screen" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+    <rect x="2" y="3" width="20" height="14" rx="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/>
+  </symbol>
+  <symbol id="ico-chat" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
+  </symbol>
+  <symbol id="ico-phone" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.69 12 19.79 19.79 0 0 1 1.62 3.38 2 2 0 0 1 3.59 1h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L8.09 8.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 22 16.92z"/>
+  </symbol>
+  <symbol id="ico-clock-plus" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+    <circle cx="12" cy="12" r="9"/><path d="M12 7v5l2.5 2.5"/><line x1="19" y1="17" x2="19" y2="22"/><line x1="16.5" y1="19.5" x2="21.5" y2="19.5"/>
+  </symbol>
+</svg>
+
+<!-- Switcher -->
+<div id="switcher">
+  <button data-s="not-yet"    class="active">Muito cedo</button>
+  <button data-s="waiting"               >Sala de espera</button>
+  <button data-s="incall"                >Em chamada</button>
+  <button data-s="post-mentor"           >Pós · Mentor</button>
+  <button data-s="post-guest"            >Pós · Guest</button>
+  <button data-s="ns-mentor"             >NS · Host</button>
+  <button data-s="ns-guest"              >NS · Guest</button>
+  <button data-s="conn-lost"             >Sem sinal</button>
+</div>
+
+<!-- ═══════════ SCREEN: NOT YET ═══════════ -->
+<div id="s-not-yet" class="screen screen-light active">
+  <div class="center-wrap">
+    <div class="stack" style="align-items:center;text-align:center;gap:20px;">
+      <div class="av" style="width:80px;height:80px;font-size:26px;">AR</div>
+      <div>
+        <div style="font-size:13px;color:var(--muted);margin-bottom:4px;">Sua sessão com</div>
+        <div style="font-size:23px;font-weight:700;color:var(--text-dark);">Ana Rodrigues</div>
+      </div>
+      <div class="notyet-box">
+        <div style="font-size:13px;color:var(--muted);margin-bottom:8px;">começa em</div>
+        <div class="notyet-timer mono" id="t-notyet">02:34:08</div>
+        <div style="height:14px;"></div>
+        <div style="font-size:13px;color:var(--muted);line-height:1.6;">O link ficará disponível <strong style="color:var(--text-dark);">10 minutos antes</strong> do início.</div>
+      </div>
+      <div style="font-size:13px;color:var(--muted);">Conversa de 45 min · Sex, 18 jul · 15h30 · BRT</div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════ SCREEN: WAITING ═══════════ -->
+<div id="s-waiting" class="screen screen-dark">
+  <div class="center-wrap" style="position:relative;">
+    <div style="max-width:420px;width:100%;display:flex;flex-direction:column;align-items:center;gap:22px;">
+      <div class="av av-border" style="width:80px;height:80px;font-size:26px;">AR</div>
+      <div style="text-align:center;">
+        <div style="font-size:12px;color:var(--muted);margin-bottom:4px;">Host</div>
+        <div style="font-size:20px;font-weight:700;color:#F0EFEB;">Ana Rodrigues</div>
+      </div>
+      <div class="card-dark" style="width:100%;">
+        <div style="font-size:14px;font-weight:600;color:#F0EFEB;margin-bottom:3px;">Conversa de 45 min</div>
+        <div style="font-size:13px;color:var(--muted);">Hoje · 15h30 · BRT</div>
+        <div style="height:18px;"></div>
+        <div style="text-align:center;">
+          <div style="font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:0.5px;margin-bottom:6px;">começa em</div>
+          <div class="mono" style="font-size:46px;font-weight:700;color:#F0EFEB;line-height:1;" id="t-waiting">00:08:42</div>
+        </div>
+        <div style="height:10px;"></div>
+        <div id="other-joined" style="font-size:13px;color:var(--success);text-align:center;display:none;">Ana já está na sala — você pode entrar agora.</div>
+      </div>
+      <div style="display:flex;gap:20px;">
+        <div style="display:flex;gap:7px;align-items:center;"><div class="dot dot-ok"></div><span style="font-size:13px;color:var(--muted);">Microfone ativo</span></div>
+        <div style="display:flex;gap:7px;align-items:center;"><div class="dot dot-ok"></div><span style="font-size:13px;color:var(--muted);">Câmera ativa</span></div>
+      </div>
+      <div style="width:100%;display:flex;flex-direction:column;gap:7px;">
+        <label style="font-size:12px;color:var(--muted);">Nota privada (só você vê)</label>
+        <textarea class="note-ta" rows="3" placeholder="Anotações para esta sessão..."></textarea>
+      </div>
+      <button class="btn-enter" id="btn-enter" onclick="go('incall')">Entrar na sala</button>
+    </div>
+    <div class="wm"><img src="/logo.svg" style="height:22px;width:auto;filter:brightness(0)invert(1);"></div>
+  </div>
+</div>
+
+<!-- ═══════════ SCREEN: IN CALL ═══════════ -->
+<div id="s-incall" class="screen">
+  <div class="video-bg">
+    <div class="remote-av">
+      <div class="remote-av-ring">AR</div>
+      <div class="remote-name">Ana Rodrigues</div>
+      <div class="remote-sub">Câmera desligada</div>
+    </div>
+  </div>
+
+  <!-- Top bar -->
+  <div class="top-bar" id="top-bar">
+    <svg class="logo-call-svg" viewBox="0 0 400 95.2" xmlns="http://www.w3.org/2000/svg" fill="#EAEA68">
+      <path d="M40.5,71.3c0-.8-.4-1.7-.9-2.3-1.8-2.1-5.2-2.1-7.7-1.8-1.2.1-2.4.3-3.7.5-2.7-.3-5.4-.2-8.1,0-2.6.2-5.2.5-7.7.9,0-.2-.2-.4-.2-.6,1.2-2.8.8-5.8,1-8.7,0-.6-.4-1.1-.9-1.4.2-2,.3-4.1.4-6.1.3-5.5.4-11.1.7-16.6.3-5.3.5-10.7.6-16,0-2.9.1-5.7-.2-8.6-.1-1.3-.3-2.5-.4-3.8,0-1.3-.2-2.5-.6-3.7-.2-.8-1.3-1.4-2.1-.8-1.4,1-2,2.5-2.4,4.1-.4-.9-.9-1.8-1.5-2.6,0,0,0,0,0-.1,0,0,0,0-.1,0-.1,0-.3-.1-.4-.2,0,0,0,0-.1,0-.3,0-.7,0-.9.1-1.4.8-2,2.4-2.3,3.8-.4,1.6-.6,3.3-.7,5-.4,4.8-1,9.6-1.2,14.5-.5,10.9-1.2,21.8-.4,32.7.2,2.2.2,4.6.7,6.9-.3,1.5-.6,2.9-.8,4.4-.4,2.5-.8,5.3.5,7.7,1.1,1.9,3,3.1,5,3.9,4.2,1.6,9,1.6,13.4,1.4,3.5-.1,6.8-.7,10-2.2,3-1.4,5.7-3.5,8.3-5.6.5-.4.5-1.1.4-1.7,0,0,0-.1,0-.2.9-.5,2.5-1.5,2.5-2.7ZM9.5,12.7c.2-.7.4-1.5.6-2.2.2-.7.3-1.3.5-2,0,.5,0,1.1.2,1.6.3,2.4.4,4.8.3,7.1,0,5-.3,10-.5,15,0,1.2,0,2.3-.1,3.5,0-.2,0-.4,0-.6-.3-2.9-.7-5.8-.9-8.7-.2-3,0-6.1,0-9.2,0-1.4,0-2.9,0-4.5ZM6.2,12c0-1.1.1-2.3.2-3.4.2.6.3,1.3.4,1.9,0,.3.1.7.1,1-.3,1-.6,1.9-.9,2.9,0-.8,0-1.6,0-2.4ZM4.7,13.9c.2-1.5.2-2.9.4-4.4.1-.7.3-1.9.6-2.8,0,.2.2.3.2.5-.3,1.6-.6,3.3-.8,5-.4,3.7-.7,7.3-1,11-.3,1.9-.5,3.8-.7,5.8.3-5,.6-10.1,1.2-15.1ZM4.7,77.6c-1.1-1-1.3-2.5-1.2-4,.4,1.6,1.8,2.7,3.3,3.3.3.8.5,1.6.8,2.4-1.1-.4-2.2-.9-3-1.6ZM8.2,59.6c0-1.5-.2-3-.6-4.5-.1-.7-.9-1.3-1.6-1.2-.1,0-.2,0-.3,0-.1-5.4.1-10.8.3-16.2.1-4.4.3-8.8.9-13.2,0,2.3.3,4.6.5,6.9.5,4.9,1,9.8,1.1,14.7,0,4.5,0,9-.3,13.4ZM21.5,80.1c-2.4.2-4.8.2-7.1.1-.9,0-1.9,0-2.8-.2,0-.2,0-.5-.2-.7-.2-.5-.4-1-.6-1.5,1.4.2,2.9.3,4.3.4,5.3.3,10.7-.6,15.9-1.9.1,0,.3,0,.4-.1-3,2-6.2,3.5-9.9,3.8ZM32,72.9c-2.5.7-5,1.2-7.5,1.6-4.8.8-9.8,1-14.6-.1,0,0-.2,0-.3,0-.1-.5-.3-1.1-.4-1.6.8-.1,1.7-.3,2.5-.4,1.7.9,3.9,1,5.8.8,3.3-.4,6.6-1.3,9.9-1.9,1.6.2,3.1.5,4.7,1,.5.2.8.3,1.2.5-.4.1-.8.2-1.2.3ZM36.7,71.1c-.2-.2-.3-.4-.5-.6,0,0,.1,0,.2,0,0,0,.1,0,.2,0,0,0,.2,0,.3.1,0,0,.1,0,.2,0,0,0-.2.1-.3.2Z"/>
+      <path d="M86.1,67.2c-.8,2.9-2.5,5.5-4.5,7.8-.6.9-1.3,1.8-2,2.7-2.5,3.1-5.2,5.9-9,7.3-1.3.5-2.7.8-4.1.8-2.1.7-4.4,1.2-6.5.6-1,0-1.7-.5-2.3-1.1-.1-.1-.3-.3-.4-.4-.4-.5-.8-1.2-1.1-1.8-1.2-2.2-2.4-4.4-3.4-6.7-.3-.7-.6-1.4-.8-2.2-.9-1.6-1.8-3.2-2.6-4.9-1.8-4-3-8.3-3.5-12.6-.5-1.8-1-3.5-1.3-5.4-1.3-7.3-1.1-15.3,3-21.8.4-.6.8-1.2,1.3-1.8,1.3-2.8,3.4-6.1,6-8.3,0,0,0-.2.1-.2.7-1.5,1.7-3.2,3.2-3.9,2-1,3.4.2,4.3,1.8,0,0,.1,0,.2,0,0,0,.1,0,.2,0,.8-.4,1.4-.3,2.2-.2,1.2.2,2.3.5,3.4,1,1.2.6,2.3,1.3,3.5,2,.9.4,1.7.9,2.4,1.4,1.2.9,2.3,1.9,3.3,3,1.5,1.4,2.9,2.9,4.1,4.6,1.8,2.7,3,5.9,3.6,9.1,0,.5.2,1,.2,1.5.2.6.3,1.2.4,1.7,1.7,7.7,1.7,16.1-.9,23.6.8.4,1.3,1.2,1,2.3ZM52.4,61.1c-.2-4.4-.3-8.9-.2-13.3-.1-.9-.2-1.8-.3-2.8-.4,4.7-.4,9.4.1,14,.1.7.3,1.4.4,2.1ZM69.9,52.2c-.1-1.3-.3-2.6-.5-3.9-.8-4.6-1.7-9.1-3.1-13.6-.7-2.2-1.6-4.2-2.6-6.2-.4-.8-.8-1.5-1.1-2.3-.3,0-.5,0-.8.1,0,0,0,.1,0,.2.2,1-.3,2.1-1.3,2.4-.5.1-1.2,0-1.7-.3-.5.7-.9,1.4-1.4,2.3-.1.3-.3.6-.4,1,.4.1.7.4.7.9-.3,5.5-.9,10.9-1.2,16.4.4,2.3,1,4.6,1.7,6.8.8,2.5,1.6,4.3,2.6,6.6,1.1,2.4,2.4,4.7,4.1,6.8,0,0,.2.2.2.2.1.1.2.3.4.4.2.2.4.5.6.7,0,0,.1.1.2.2,1.1-3.8,2.1-7.6,2.8-11.5.4-2.4.7-4.9.9-7.3ZM62.8,73.8c.1,0,.3,0,.4-.1-2.6-2.7-4.5-6.2-6-9.3-.2-.5-.4-.9-.6-1.4.3,3.2.9,6.3,1.6,9.4,0,.4.2.8.3,1.2.1,0,.3.2.4.2,1,.5,2.5.5,3.9,0ZM63.3,77.5c-.4.1-.9.2-1.3.2.1,0,.3.2.4.3.3-.2.6-.3.9-.5ZM75.4,69.6c-.2.3-.3.5-.5.8-.2.5-.4,1.1-.7,1.6.4-.8.8-1.6,1.2-2.4ZM74.5,37.2c.3,1,.5,2.1.7,3.1,0-.3,0-.6-.2-1-.1-.7-.3-1.4-.5-2.1ZM81.8,43.2c0-1.1-.1-2.1-.3-3.2-.2-.6-.3-1.1-.5-1.7.3,1.5.6,3,.8,4.4,0,.1,0,.3,0,.4Z"/>
+      <path d="M136.1,67.2c-.8,2.9-2.5,5.5-4.5,7.8-.6.9-1.3,1.8-2,2.7-2.5,3.1-5.2,5.9-9,7.3-1.3.5-2.7.8-4.1.8-2.1.7-4.4,1.2-6.5.6-1,0-1.7-.5-2.3-1.1-.1-.1-.3-.3-.4-.4-.4-.5-.8-1.2-1.1-1.8-1.2-2.2-2.4-4.4-3.4-6.7-.3-.7-.6-1.4-.8-2.2-.9-1.6-1.8-3.2-2.6-4.9-1.8-4-3-8.3-3.5-12.6-.5-1.8-1-3.5-1.3-5.4-1.3-7.3-1.1-15.3,3-21.8.4-.6.8-1.2,1.3-1.8,1.3-2.8,3.4-6.1,6-8.3,0,0,0-.2.1-.2.7-1.5,1.7-3.2,3.2-3.9,2-1,3.4.2,4.3,1.8,0,0,.1,0,.2,0,0,0,.1,0,.2,0,.8-.4,1.4-.3,2.2-.2,1.2.2,2.3.5,3.4,1,1.2.6,2.3,1.3,3.5,2,.9.4,1.7.9,2.4,1.4,1.2.9,2.3,1.9,3.3,3,1.5,1.4,2.9,2.9,4.1,4.6,1.8,2.7,3,5.9,3.6,9.1,0,.5.2,1,.2,1.5.2.6.3,1.2.4,1.7,1.7,7.7,1.7,16.1-.9,23.6.8.4,1.3,1.2,1,2.3ZM102.4,61.1c-.2-4.4-.3-8.9-.2-13.3-.1-.9-.2-1.8-.3-2.8-.4,4.7-.4,9.4.1,14,.1.7.3,1.4.4,2.1ZM119.9,52.2c-.1-1.3-.3-2.6-.5-3.9-.8-4.6-1.7-9.1-3.1-13.6-.7-2.2-1.6-4.2-2.6-6.2-.4-.8-.8-1.5-1.1-2.3-.3,0-.5,0-.8.1,0,0,0,.1,0,.2.2,1-.3,2.1-1.3,2.4-.5.1-1.2,0-1.7-.3-.5.7-.9,1.4-1.4,2.3-.1.3-.3.6-.4,1,.4.1.7.4.7.9-.3,5.5-.9,10.9-1.2,16.4.4,2.3,1,4.6,1.7,6.8.8,2.5,1.6,4.3,2.6,6.6,1.1,2.4,2.4,4.7,4.1,6.8,0,0,.2.2.2.2.1.1.2.3.4.4.2.2.4.5.6.7,0,0,.1.1.2.2,1.1-3.8,2.1-7.6,2.8-11.5.4-2.4.7-4.9.9-7.3ZM112.8,73.8c.1,0,.3,0,.4-.1-2.6-2.7-4.5-6.2-6-9.3-.2-.5-.4-.9-.6-1.4.3,3.2.9,6.3,1.6,9.4,0,.4.2.8.3,1.2.1,0,.3.2.4.2,1,.5,2.5.5,3.9,0ZM113.3,77.5c-.4.1-.9.2-1.3.2.1,0,.3.2.4.3.3-.2.6-.3.9-.5ZM125.3,69.6c-.2.3-.3.5-.5.8-.2.5-.4,1.1-.7,1.6.4-.8.8-1.6,1.2-2.4ZM124.4,37.2c.3,1,.5,2.1.7,3.1,0-.3,0-.6-.2-1-.1-.7-.3-1.4-.5-2.1ZM131.8,43.2c0-1.1-.1-2.1-.3-3.2-.2-.6-.3-1.1-.5-1.7.3,1.5.6,3,.8,4.4,0,.1,0,.3,0,.4Z"/>
+      <path d="M185.1,7.5c-1-1.3-2.4-2.4-3.9-3.1-1.1-1.3-2.4-2.3-4.1-2.6-1.4-.3-2.7,0-4,.5-2-.5-4.2-.2-6.1.5-3.4,1.2-5.6,3.9-7.5,6.9-.5.8-1,1.5-1.4,2.3-.2-.2-.5-.4-.8-.5,0-.3,0-.6,0-1,0-2.6-.4-5.4-2-7.6-.6-.9-2-.8-2.4.3,0,.2,0,.3-.1.5-3.6-.1-4.3,4.4-4.4,7.3,0,2,0,4.1-.1,6.1-.3,3.1-.7,6.3-.7,9.4,0,3.2,0,6.5,0,9.7,0,3.3-.3,6.6-.4,9.9,0,3.4,0,6.8,0,10.2-.6,4.2-1,8.3-1.1,12.5,0,2.6,0,5.2.3,7.7.2,2.3.5,4.5.5,6.8,0,1.8,0,3.8.9,5.5.9,1.9,3.2,3.4,5.2,2.3.6-.3,1.1-.8,1.5-1.4.5,0,1.1-.2,1.2-.8.3-1.2.4-2.4.4-3.6.3-1.7.5-3.4.7-5.1,1.1-9.6.7-19.2,0-28.8,0-1.4,0-2.8,0-4.3.8.9,1.7,1.7,2.9,2.1,1.7.6,3.4,0,4.9-.8.5-.3,1.1-.7,1.6-1.1,1.2.2,2.3.2,3.6-.1,3.8-1,6.6-4.4,8.6-7.6,2.3-3.5,4.3-7.3,5.6-11.3.7-2.3,1.3-4.7,1.8-7,.5-2.4.9-4.7,1.1-7.1.2-2.5-.3-4.7-1.9-6.6ZM153,80c0,.8-.1,1.7-.2,2.5-.3.6-.6,1.3-1,1.9-.2.3-.4.5-.6.8,0-.4,0-.8-.1-1.2,0-.1,0-.3,0-.4,0-2.2-.2-4.5-.4-6.7,0-2.7,0-5.4,0-8.2,0-1.5,0-3,0-4.6,0-.3,0-.5,0-.8,0,.4.2.8.2,1.2.5,3,1.1,5.9,1.6,8.9.3,2.2.7,4.4.5,6.6ZM153.2,65.2c-.5-2.8-1.1-5.7-1.8-8.5,0-.4.1-.8.2-1.2.4-2.6.8-5.2,1.3-7.8,0,1.5,0,3-.1,4.5,0,4.7.3,9.3.6,14,0-.4-.1-.7-.2-1.1ZM153.6,21.4c-.5.4-.7,1-.8,1.7-.5,4.7-1.3,9.4-2.2,14.1,0-1.8,0-3.7,0-5.5,0-1.7,0-3.5,0-5.2.2-2.1.4-4.1.6-6.2.4-3.4.6-6.8.8-10.2,0-.3-.2-.5-.5-.5,0-.1,0-.3,0-.4,0-.6.3-1.6.6-2,0,0,0,0,0,0,.2.1.4.2.6.3.1,1,.3,2,.5,2.9.3,2.6.2,5.3.4,8,0,.4,0,.7.1,1.1,0,.7-.2,1.4-.3,2.1ZM174.6,11.7c0,.1,0,.3,0,.4-.2,0-.4,0-.7.1.2-.2.4-.3.6-.5ZM161.2,11.9c1.5-2.5,3.3-5.1,6-6.4.6-.3,1.3-.5,2-.6-1.4,1.3-2.5,2.9-3.4,4.3,0,.1-.1.2-.2.4-1.5,1.4-2.8,3-3.9,4.8-1,1.5-1.8,3.1-2.5,4.8-.1-.6-.2-1.2-.4-1.8,0-.3-.1-.5-.2-.8.7-1.6,1.6-3.1,2.5-4.6ZM161.7,46.5c-1,.1-1.9-.7-2.5-1.5-1.2-1.7-1.8-4-1.9-6.1.2.3.3.7.5,1,.7,1.2,1.6,2.2,2.6,3,.6,1.3,1.6,2.3,2.8,3.1,0,0,0,0,0,0-.5.3-1,.5-1.5.5ZM176.5,17.3c-.3,2.2-1.1,4.4-2.1,6.4-.7,1.7-1.4,3.3-2.4,4.8-1,1.6-2.2,2.8-3.7,3.9-.6.6-1.2,1.1-2.1,1.3-.7.2-1.2,0-1.4-.5-.5-.3-.9-.9-.8-1.6,0-.1,0-.2,0-.3,0-.4,0-.7.2-1,.9-3.4,2.4-6.7,4.6-9.5,1.2-2,2.8-3.9,4.8-4.9.2-.2.5-.3.7-.5.9-.6,1.8.1,2,1,0,.3.1.6,0,.8ZM177.4,32.3h0c0,.2-.2.4-.3.5.5-1.1.9-2.1,1.3-3.2.2-.3.4-.6.6-1-.5,1.2-1,2.5-1.6,3.7Z"/>
+      <path d="M200.9,83.6c-.2.7-.5,1.3-.9,1.9-.4.9-1,1.6-1.8,2.2-.9.6-2,.8-3,.6-1-.2-1.7-.9-2.3-1.7-.5-.8-.7-1.7-.8-2.6-.2-1.7.3-3.4,1.4-4.7.7-.8,1.8-1.3,2.8-1.3.7,0,1.3.2,1.9.6.2,0,.5.2.7.4.6.5,1,1.1,1.3,1.8,0,0,0,0,0,0,.3.4.6.7.7,1.2.1.4,0,.9,0,1.4Z"/>
+      <path d="M257.6,14.7c-.4.9-1.2,1.2-2.1,1.4-.8.1-1.7,0-2.5,0-.1,0-.3,0-.4,0-1.3.4-2.6.5-4,.5-.2,0-.4,0-.6,0-3.5.4-7.1.1-10.5.2-.5,0-1.1,0-1.6,0-.8,2.6-.9,5.3-1.2,7.9-.3,2.7-.7,5.4-1,8.1,0,.4,0,.7,0,1.1-.1,1.5-.5,3-.7,4.5,0,.2,0,.4,0,.6,0,.3,0,.6-.1.9-.1,1.1-.2,2.2-.3,3.3-.4,5.8-.9,11.7-1.5,17.5,0,.1,0,.3,0,.4-.1,2.5-.5,5.1-.9,7.6-.6,4.2-1.2,8.4-1.9,12.6-.5,3.1-1.1,6.1-1.5,9.2-.3,2.1-.2,4.4-1.4,6.2-.2.3-.6.4-.8.1-.5-.5-.7-1.2-.8-1.9-.2.1-.4.3-.7.4-.5.2-1.1-.1-1.3-.5-.6-1.2-.9-2.4-1-3.8-.1-2.7.7-5.3,1.2-7.9.3-1.5.3-3,.3-4.5,0-1.6.4-3.1.6-4.6.5-3.1.8-6.3,1.1-9.5.3-3.2.9-6.3,1.5-9.4.6-3.1,1.3-6.1,1.6-9.2.3-3.1.6-6.2,1.1-9.3.4-3.2.9-6.3,1-9.6.1-2.9.3-5.8.8-8.6,0-.6.2-1.1.2-1.7-1-.1-2.1-.3-3.1-.4-3.6-.5-7.2-.5-10.7-.5-1.8,0-3.5,0-5.2,0-1.7-.2-3.4-.4-5.2-.3-.8,0-1.4-.7-1.4-1.4s.7-1.3,1.4-1.4c2-.3,4-.9,6.1-1.3,2.1-.4,4.2-.6,6.4-.9,1.8-.2,3.6-.4,5.4-.7,1.8-.3,3.5-.2,5.3,0,3.4.4,6.8,1.2,10.3,1.2,1.8,0,3.5-.4,5.3-.6,1.8-.2,3.5,0,5.2.5.6.2,1.3.3,1.9.5.9,0,1.7,0,2.6,0,1.1,0,2.3,0,3.1.8.8.7,1.2,1.8.8,2.8Z"/>
+      <path d="M283.3,61.9c0-2.4-.4-4.8-.7-7.2-.3-2.6-.7-5.1-1.1-7.7-.9-6.2-2-12.4-3.6-18.4.3-2,.3-4.1.1-6.1-.4-1.7-.9-3.4-1.3-5.1-.6-2.2-1.3-4.4-2-6.6-.2-.7-.5-1.3-.7-1.9-.6-.7-1.3-1.4-1.8-2.2,0-.4,0-.9,0-1.3.2-1.6.4-3.6-.8-4.8-.6-.6-1.8-.7-2.4,0-.2.3-.4.5-.6.8-.6-.3-1.3-.4-2-.2-1.2.4-1.9,1.4-2.3,2.5-.1.3-.2.6-.3,1-1.9,1.4-2.8,4.4-3.3,6.5-.4,1.7-.6,3.4-.8,5.2-.3,2.6-.7,5.1-1.2,7.6,0,.2,0,.4-.1.6-1.1,4.3-2,8.6-2.8,13-1.1,5.7-1.7,11.5-2.3,17.2,0,.3,0,.7,0,1-.2,1.6-.3,3.2-.4,4.9,0,.8-.1,1.6-.1,2.5,0,.8,0,1.6,0,2.3,0,.4-.1.8,0,1.2,0,.1,0,.3,0,.4,0,.5,0,1,0,1.4-.1,1.6-.2,3.1-.1,4.7,0,1.5.4,3.7,2.2,4.2,1.2.3,2.4-.7,3-1.7.6-.9.9-2,1.2-3,.6-2.4,1.3-4.7,1.9-7.1.9-3.8,1.7-7.7,2.2-11.5,1.5-.3,3-.6,4.5-.8.4.5,1,.8,1.8.7.6,0,1.2-.2,1.8-.3.5,2.8,1.2,5.6,2,8.4.7,2.3,1.4,4.5,2.3,6.7.7,1.7,1,3.9,2.5,5.2.9.8,2,.6,2.7-.4,2.4-3.4,2.7-7.8,2.7-11.8Z"/>
+      <path d="M333.3,71.3c0-.8-.4-1.7-.9-2.3-1.8-2.1-5.2-2.1-7.7-1.8-1.2.1-2.4.3-3.7.5-2.7-.3-5.4-.2-8.1,0-2.6.2-5.2.5-7.7.9,0-.2-.2-.4-.2-.6,1.2-2.8.8-5.8,1-8.7,0-.6-.4-1.1-.9-1.4.2-2,.3-4.1.4-6.1.3-5.5.4-11.1.7-16.6.3-5.3.5-10.7.6-16,0-2.9.1-5.7-.2-8.6-.1-1.3-.3-2.5-.4-3.8,0-1.3-.2-2.5-.6-3.7-.2-.8-1.3-1.4-2.1-.8-1.4,1-2,2.5-2.4,4.1-.4-.9-.9-1.8-1.5-2.6,0,0,0,0,0,0,0,0-.1,0-.1-.1,0,0,0,0-.1-.1,0,0,0,0,0,0,0,0,0,0,0,0-.4-.2-.9-.2-1.3,0-1.4.8-2,2.4-2.3,3.8-.4,1.6-.6,3.3-.7,5-.4,4.8-1,9.6-1.2,14.5-.5,10.9-1.2,21.8-.4,32.7.2,2.2.2,4.6.7,6.9-.3,1.5-.6,2.9-.8,4.4-.4,2.5-.8,5.3.5,7.7,1.1,1.9,3,3.1,5,3.9,4.2,1.6,9,1.6,13.4,1.4,3.5-.1,6.8-.7,10-2.2,3-1.4,5.7-3.5,8.3-5.6.5-.4.5-1.1.4-1.7,0,0,0-.1,0-.2.9-.5,2.5-1.5,2.5-2.7Z"/>
+      <path d="M400,76.9c0,.9-1,1.9-1.9,1.5-3-1.2-5.6-3-7.9-5.3-3.9-3.8-7-8.4-10.8-12.4-1.4-1.4-2.7-2.9-4.1-4.3-1.3-.9-2.6-1.8-4-2.7-.6-.4-1.3-.8-1.9-1.2-4.2,2.7-8.3,5.3-12.5,8.1-.2,2.8-.4,5.6-.6,8.4-.2,3-.4,6-1.2,8.9-.6,2.3-1.5,4.5-2.9,6.4-1,1.4-2.2,2.8-3.7,3.5-.6,1-1.3,1.9-2.1,2.8-.4.4-1.1.6-1.7.4-2.5-1-4.1-2.9-4.5-5.6-.1-1-.2-2-.2-3-.6-2.8-1.2-5.6-1.4-8.4-.2-3.2,0-6.4.3-9.6.3-3.2.5-6.5.6-9.7.3-6.4.5-12.9.8-19.3.3-6.1.5-12.2,1.2-18.2.7-5.7,2-11.3,4.8-16.4.3-.5,1.1-.9,1.6-.7,1,.4,2.1.7,3,1.3.8-.3,1.8.3,2,1.1.3.9.4,1.9.4,2.8.3-.6.6-1.1,1.1-1.6.5-.5,1.4-.7,2-.3,2,1.3,2.2,4.1,2.4,6.2.3,3.1.6,6.1.8,9.2.3,7.1-.1,14.1-.8,21.2,1.2-1.1,2.5-2.2,3.8-3.3,5.2-4.3,10.6-8.2,16.4-11.6,2.9-1.7,5.9-3.3,9-4.5,1.3-.5,2.7-.9,4.1-1.4,1.1-.4,2.5-.8,3.7-.4.8.3,1.3,1,1.1,1.9-.3,1.2-.7,2.3-1.3,3.4.5.2,1,.4,1.5.6.5.2.8.8.8,1.4-.2,3.7-1.9,6.8-4.4,9.5-2.2,2.4-4.8,4.2-7.5,6-3,2-6,3.9-9.1,5.9-1.2.8-2.5,1.6-3.7,2.4.6.6,1.2,1.1,1.8,1.7.8.8,1.6,1.7,2.4,2.5,0,0,0,0,.1,0,3.3,2.4,6.8,4.5,10,7.2,3,2.5,5.7,5.3,8.3,8.3,1.7,2,4,4.4,4.1,7.2Z"/>
+    </svg>
+    <div class="timer-wrap">
+      <span class="timer-sub">Conversa de 45 min</span>
+      <span class="timer-main mono" id="t-incall">45:00</span>
+    </div>
+    <div class="signal">
+      <div class="sig-bar" style="height:6px;background:var(--success);"></div>
+      <div class="sig-bar" style="height:10px;background:var(--success);"></div>
+      <div class="sig-bar" style="height:14px;background:var(--success);"></div>
+    </div>
+  </div>
+
+  <!-- Self-view PiP -->
+  <div class="pip">
+    <span class="pip-init">PS</span>
+    <span class="pip-label">Você</span>
+  </div>
+
+  <!-- Toast -->
+  <div id="toast">Tempo adicionado.</div>
+
+  <!-- Control bar -->
+  <div class="ctrl-bar chat-closed" id="ctrl-bar">
+    <div class="ctrl-group">
+      <!-- Mic -->
+      <button class="cb" id="cb-mic" onclick="ctlToggle('mic')">
+        <span class="cb-icon" id="ic-mic"><svg width="20" height="20"><use href="#ico-mic"/></svg></span>
+        <span class="cb-lbl" id="lb-mic">Silenciar</span>
+      </button>
+      <!-- Cam -->
+      <button class="cb" id="cb-cam" onclick="ctlToggle('cam')">
+        <span class="cb-icon" id="ic-cam"><svg width="20" height="20"><use href="#ico-cam"/></svg></span>
+        <span class="cb-lbl" id="lb-cam">Câmera</span>
+      </button>
+      <!-- Screen share -->
+      <button class="cb" id="cb-scr" onclick="ctlToggle('scr')">
+        <span class="cb-icon"><svg width="20" height="20"><use href="#ico-screen"/></svg></span>
+        <span class="cb-lbl">Tela</span>
+      </button>
+      <!-- Chat -->
+      <button class="cb" id="cb-chat" onclick="toggleChat()">
+        <span class="cb-icon" style="position:relative;">
+          <svg width="20" height="20"><use href="#ico-chat"/></svg>
+          <span class="badge" id="badge" style="display:none;">1</span>
+        </span>
+        <span class="cb-lbl">Chat</span>
+      </button>
+      <!-- +Tempo -->
+      <button class="cb" id="cb-tempo" onclick="openTempoModal()">
+        <span class="cb-icon"><svg width="20" height="20"><use href="#ico-clock-plus"/></svg></span>
+        <span class="cb-lbl">+Tempo</span>
+      </button>
+    </div>
+    <!-- Encerrar -->
+    <button class="end-call" onclick="document.getElementById('end-modal').classList.add('open')">
+      <span class="cb-icon"><svg width="20" height="20" style="transform:rotate(135deg)"><use href="#ico-phone"/></svg></span>
+      <span style="font-size:10px;">Encerrar</span>
+    </button>
+  </div>
+
+  <!-- Chat sidebar -->
+  <div class="chat-side" id="chat-side">
+    <div class="chat-hd">
+      <span class="chat-hd-t">Chat da sessão</span>
+      <button class="chat-x" onclick="toggleChat()">×</button>
+    </div>
+    <div class="chat-msgs" id="chat-msgs">
+      <div class="cm theirs"><span class="cm-sender">Ana Rodrigues</span><div class="cm-bubble">Olá! Pode me ouvir bem?</div></div>
+    </div>
+    <div class="chat-in">
+      <input class="chat-tf" id="chat-tf" placeholder="Mensagem..." onkeydown="if(event.key==='Enter')sendMsg()">
+      <button class="chat-send" onclick="sendMsg()">→</button>
+    </div>
+  </div>
+
+  <!-- End call modal -->
+  <div class="overlay" id="end-modal">
+    <div class="modal">
+      <div class="modal-t">Encerrar sessão?</div>
+      <div class="modal-b">Esta ação encerrará a chamada para todos os participantes.</div>
+      <div class="modal-acts">
+        <button class="m-cancel" onclick="document.getElementById('end-modal').classList.remove('open')">Continuar</button>
+        <button class="m-confirm" onclick="document.getElementById('end-modal').classList.remove('open');go('post-mentor')">Encerrar</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Time extension modal -->
+  <div class="overlay" id="tempo-modal" onclick="if(event.target===this)closeTempoModal()">
+    <div class="tempo-modal-card">
+      <div style="font-size:20px;font-weight:700;color:#F0EFEB;margin-bottom:6px;">Adicionar tempo?</div>
+      <div style="font-size:13px;color:var(--muted);margin-bottom:20px;line-height:1.5;">A sessão é um presente — sem cobrança adicional.</div>
+      <div class="tempo-pills">
+        <button class="tempo-pill" data-min="5"  onclick="selectTempo(5)">+5 min</button>
+        <button class="tempo-pill" data-min="10" onclick="selectTempo(10)">+10 min</button>
+        <button class="tempo-pill" data-min="15" onclick="selectTempo(15)">+15 min</button>
+      </div>
+      <button id="tempo-confirm" onclick="confirmTempo()">Confirmar</button>
+      <div style="text-align:center;margin-top:12px;">
+        <button onclick="closeTempoModal()" style="background:none;border:none;color:var(--muted);font-size:13px;cursor:pointer;font-family:inherit;">Não, obrigado</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════ SCREEN: POST · MENTOR ═══════════ -->
+<div id="s-post-mentor" class="screen screen-light">
+  <div class="center-wrap">
+    <div class="stack">
+      <div class="card">
+        <div style="display:flex;gap:14px;align-items:center;">
+          <div class="av" style="width:52px;height:52px;font-size:18px;">PS</div>
+          <div>
+            <div style="font-size:16px;font-weight:600;color:var(--text-dark);">Pedro Silva</div>
+            <div style="font-size:13px;color:var(--muted);margin-top:2px;">Você conversou por 43 minutos</div>
+          </div>
+        </div>
+      </div>
+      <div class="card">
+        <div class="label-sm" style="margin-bottom:14px;">Seus ganhos</div>
+        <div style="display:flex;flex-direction:column;gap:8px;">
+          <div class="earn-row"><span class="earn-lbl">Valor bruto</span><span class="earn-val">R$&nbsp;290,00</span></div>
+          <div class="earn-row"><span class="earn-lbl muted-t">Taxa da plataforma (20%)</span><span class="earn-val muted-t">−R$&nbsp;58,00</span></div>
+          <div class="sep"></div>
+          <div class="earn-row"><span class="earn-lbl bold-t">Valor líquido</span><span class="earn-val bold-t">R$&nbsp;232,00</span></div>
+          <div style="font-size:12px;color:var(--muted);margin-top:2px;">Repasse na próxima sexta · 25 jul</div>
+        </div>
+      </div>
+      <button class="btn btn-dk">Ir para o painel</button>
+      <button class="btn btn-gh">Compartilhar meu perfil</button>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════ SCREEN: POST · GUEST ═══════════ -->
+<div id="s-post-guest" class="screen screen-light">
+  <div class="center-wrap">
+    <div class="stack">
+      <div class="card">
+        <div style="display:flex;gap:14px;align-items:center;">
+          <div class="av" style="width:52px;height:52px;font-size:18px;">AR</div>
+          <div>
+            <div style="font-size:16px;font-weight:600;color:var(--text-dark);">Ana Rodrigues</div>
+            <div style="font-size:13px;color:var(--muted);margin-top:2px;">Você conversou por 43 minutos</div>
+          </div>
+        </div>
+      </div>
+      <div class="card" id="rating-card">
+        <div style="font-size:15px;font-weight:600;color:var(--text-dark);margin-bottom:14px;">Como foi a sessão?</div>
+        <div class="stars" id="stars">
+          <span class="star" onclick="rate(1)" onmouseenter="starHov(1)" onmouseleave="starOut()">★</span>
+          <span class="star" onclick="rate(2)" onmouseenter="starHov(2)" onmouseleave="starOut()">★</span>
+          <span class="star" onclick="rate(3)" onmouseenter="starHov(3)" onmouseleave="starOut()">★</span>
+          <span class="star" onclick="rate(4)" onmouseenter="starHov(4)" onmouseleave="starOut()">★</span>
+          <span class="star" onclick="rate(5)" onmouseenter="starHov(5)" onmouseleave="starOut()">★</span>
+        </div>
+        <div id="review-ta-wrap" style="display:none;margin-top:12px;">
+          <textarea id="review-ta" style="width:100%;border:1px solid var(--border);border-radius:8px;padding:10px 12px;font-size:14px;font-family:inherit;resize:none;outline:none;color:var(--text-dark);" rows="3" placeholder="Deixe um comentário (opcional)"></textarea>
+        </div>
+        <div style="height:14px;"></div>
+        <button class="btn btn-yw" id="btn-submit" disabled onclick="submitRev()">Enviar avaliação</button>
+        <div style="height:6px;"></div>
+        <button style="background:none;border:none;color:var(--muted);font-size:13px;cursor:pointer;font-family:inherit;width:100%;padding:4px;" onclick="skipRev()">Avaliar depois</button>
+      </div>
+      <div id="rev-done" style="display:none;flex-direction:column;gap:10px;">
+        <div class="success-band">Avaliação enviada. Obrigado!</div>
+        <button class="btn btn-dk">Agendar novamente com Ana</button>
+        <button class="btn btn-gh">Compartilhar Ana Rodrigues</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════ SCREEN: NS · HOST ═══════════ -->
+<div id="s-ns-mentor" class="screen screen-dark">
+  <div class="center-wrap">
+    <div style="max-width:370px;width:100%;display:flex;flex-direction:column;align-items:center;gap:22px;text-align:center;">
+      <div class="av av-border" style="width:80px;height:80px;font-size:26px;">AR</div>
+      <div>
+        <div style="font-size:18px;font-weight:600;color:#F0EFEB;margin-bottom:6px;">Seu host ainda não entrou</div>
+        <div style="font-size:14px;color:var(--muted);">Estamos aguardando. Imprevistos acontecem.</div>
+      </div>
+      <div class="ns-box">
+        <div style="font-size:13px;color:var(--muted);margin-bottom:6px;">Se ele não entrar em</div>
+        <div class="mono" style="font-size:46px;font-weight:700;color:#F0EFEB;line-height:1;" id="t-ns-m">11:22</div>
+        <div style="font-size:13px;color:var(--muted);margin-top:6px;">você receberá o reembolso total.</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════ SCREEN: NS · GUEST ═══════════ -->
+<div id="s-ns-guest" class="screen screen-dark">
+  <div class="center-wrap">
+    <div style="max-width:370px;width:100%;display:flex;flex-direction:column;align-items:center;gap:22px;text-align:center;">
+      <div class="av av-border" style="width:80px;height:80px;font-size:26px;">PS</div>
+      <div style="font-size:18px;font-weight:600;color:#F0EFEB;">Pedro Silva ainda não entrou</div>
+      <div class="ns-box">
+        <div style="font-size:13px;color:var(--muted);margin-bottom:6px;">Você pode encerrar como não comparecimento em</div>
+        <div class="mono" style="font-size:46px;font-weight:700;color:#F0EFEB;line-height:1;" id="t-ns-g">03:47</div>
+      </div>
+      <button style="width:100%;padding:13px;background:rgba(192,57,43,0.85);border:none;border-radius:10px;color:#fff;font-weight:700;font-size:15px;cursor:pointer;font-family:inherit;" onclick="this.textContent='No-show registrado.';this.disabled=true;">Encerrar como no-show</button>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════ SCREEN: SEM SINAL ═══════════ -->
+<div id="s-conn-lost" class="screen">
+  <div style="min-height:100vh;background:rgba(0,0,0,0.93);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:20px;color:#F0EFEB;">
+    <div class="spinner"></div>
+    <div style="font-size:18px;font-weight:600;">Reconectando...</div>
+    <div style="font-size:14px;color:rgba(255,255,255,0.4);text-align:center;line-height:1.6;">A chamada será retomada automaticamente.</div>
+    <button onclick="go('incall')" style="margin-top:8px;padding:10px 24px;background:transparent;border:1px solid rgba(255,255,255,0.22);border-radius:8px;color:#F0EFEB;font-size:14px;cursor:pointer;font-family:inherit;">Tentar novamente</button>
+  </div>
+</div>
+
+<script>
+// ── State ────────────────────────────────────────────────────────────────────
+let micOff=false, camOff=false, scrOn=false, chatOn=false, ratingVal=0, selectedTempo=null;
+let tNotyet=2*3600+34*60+8, tWaiting=8*60+42, tIncall=45*60, tNsM=11*60+22, tNsG=3*60+47;
+
+// ── Navigation ───────────────────────────────────────────────────────────────
+function go(id) {
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  document.querySelectorAll('#switcher button').forEach(b => b.classList.toggle('active', b.dataset.s===id));
+  document.getElementById('s-'+id).classList.add('active');
+}
+document.querySelectorAll('#switcher button').forEach(b => b.onclick=()=>go(b.dataset.s));
+
+// ── Timers ───────────────────────────────────────────────────────────────────
+function fmt2(n){return String(n).padStart(2,'0');}
+function fmtMM(s){return fmt2(Math.floor(s/60))+':'+fmt2(s%60);}
+function fmtHH(s){return fmt2(Math.floor(s/3600))+':'+fmt2(Math.floor(s%3600/60))+':'+fmt2(s%60);}
+
+setInterval(()=>{
+  if(tNotyet>0){tNotyet--;document.getElementById('t-notyet').textContent=fmtHH(tNotyet);}
+  if(tWaiting>0){tWaiting--;const el=document.getElementById('t-waiting');el.textContent=fmtMM(tWaiting);if(tWaiting===0){el.style.display='none';document.getElementById('btn-enter').disabled=false;document.getElementById('other-joined').style.display='block';}}
+  if(tIncall>0){tIncall--;const el=document.getElementById('t-incall');el.textContent=fmtMM(tIncall);if(tIncall<300){el.style.color='#EB6A67';el.classList.add('critical');el.classList.remove('warn');}else if(tIncall<600){el.style.color='#EAEA68';el.classList.add('warn');el.classList.remove('critical');}else{el.style.color='#FCFBF8';el.classList.remove('warn','critical');}}
+  if(tNsM>0){tNsM--;document.getElementById('t-ns-m').textContent=fmtMM(tNsM);}
+  if(tNsG>0){tNsG--;document.getElementById('t-ns-g').textContent=fmtMM(tNsG);}
+},1000);
+
+setTimeout(()=>{document.getElementById('badge').style.display='flex';},2500);
+
+// ── Top-bar auto-hide ─────────────────────────────────────────────────────────
+let topBarTimeout;
+const topBarEl=document.getElementById('top-bar');
+function resetTopBar(){
+  topBarEl.style.opacity='1';
+  clearTimeout(topBarTimeout);
+  topBarTimeout=setTimeout(()=>{topBarEl.style.opacity='0';},3000);
+}
+document.getElementById('s-incall').addEventListener('mousemove',resetTopBar);
+resetTopBar();
+
+// ── Controls ─────────────────────────────────────────────────────────────────
+function use(id){return `<svg width="20" height="20"><use href="#${id}"/></svg>`;}
+
+function ctlToggle(which){
+  if(which==='mic'){
+    micOff=!micOff;
+    document.getElementById('cb-mic').classList.toggle('on',micOff);
+    document.getElementById('ic-mic').innerHTML=use(micOff?'ico-mic-off':'ico-mic');
+    document.getElementById('lb-mic').textContent=micOff?'Ativar mic':'Silenciar';
+  } else if(which==='cam'){
+    camOff=!camOff;
+    document.getElementById('cb-cam').classList.toggle('on',camOff);
+    document.getElementById('ic-cam').innerHTML=use(camOff?'ico-cam-off':'ico-cam');
+    document.getElementById('lb-cam').textContent=camOff?'Ligar cam':'Câmera';
+  } else if(which==='scr'){
+    scrOn=!scrOn;
+    document.getElementById('cb-scr').classList.toggle('on',scrOn);
+  }
+}
+
+// ── Chat ─────────────────────────────────────────────────────────────────────
+function toggleChat(){
+  chatOn=!chatOn;
+  document.getElementById('chat-side').classList.toggle('open',chatOn);
+  document.getElementById('cb-chat').classList.toggle('on',chatOn);
+  document.getElementById('ctrl-bar').classList.toggle('chat-closed',!chatOn);
+  if(chatOn)document.getElementById('badge').style.display='none';
+}
+const replies=['Entendido!','Ótimo ponto.','Vou pensar nisso.','Pode continuar.','Concordo.'];
+function sendMsg(){
+  const tf=document.getElementById('chat-tf');
+  const txt=tf.value.trim();if(!txt)return;
+  const msgs=document.getElementById('chat-msgs');
+  msgs.innerHTML+=`<div class="cm mine"><div class="cm-bubble">${txt}</div></div>`;
+  tf.value='';msgs.scrollTop=msgs.scrollHeight;
+  setTimeout(()=>{
+    const r=replies[Math.floor(Math.random()*replies.length)];
+    msgs.innerHTML+=`<div class="cm theirs"><span class="cm-sender">Ana Rodrigues</span><div class="cm-bubble">${r}</div></div>`;
+    msgs.scrollTop=msgs.scrollHeight;
+    if(!chatOn)document.getElementById('badge').style.display='flex';
+  },1100);
+}
+document.getElementById('chat-tf').addEventListener('keydown',e=>{if(e.key==='Enter')sendMsg();});
+
+// ── Time extension ───────────────────────────────────────────────────────────
+function openTempoModal(){
+  selectedTempo=null;
+  document.querySelectorAll('.tempo-pill').forEach(p=>p.classList.remove('sel'));
+  document.getElementById('tempo-confirm').style.display='none';
+  document.getElementById('tempo-modal').classList.add('open');
+}
+function closeTempoModal(){document.getElementById('tempo-modal').classList.remove('open');}
+function selectTempo(mins){
+  selectedTempo=mins;
+  document.querySelectorAll('.tempo-pill').forEach(p=>p.classList.toggle('sel',parseInt(p.dataset.min)===mins));
+  document.getElementById('tempo-confirm').style.display='block';
+}
+function confirmTempo(){
+  closeTempoModal();
+  const t=document.getElementById('toast');
+  t.style.display='block';
+  setTimeout(()=>t.style.display='none',3000);
+}
+
+// ── Star rating ───────────────────────────────────────────────────────────────
+const stars=document.querySelectorAll('.star');
+function starHov(n){stars.forEach((s,i)=>s.style.color=i<n?'#F5C518':'var(--border)');}
+function starOut(){stars.forEach((s,i)=>s.style.color=i<ratingVal?'#F5C518':'var(--border)');}
+function rate(n){ratingVal=n;starOut();document.getElementById('review-ta-wrap').style.display='block';document.getElementById('btn-submit').disabled=false;}
+function submitRev(){document.getElementById('rating-card').style.display='none';document.getElementById('rev-done').style.display='flex';}
+function skipRev(){document.getElementById('rating-card').style.display='none';document.getElementById('rev-done').style.display='flex';}
+</script>

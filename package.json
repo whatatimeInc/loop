@@ -8,6 +8,7 @@
     "start": "next start"
   },
   "dependencies": {
+    "@daily-co/daily-react": "^0.25.3",
     "@prisma/client": "^7.8.0",
     "@supabase/ssr": "^0.10.3",
     "@supabase/supabase-js": "^2.105.4",
