@@ -4,6 +4,7 @@ import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import { CategoryMarquee } from "@/components/home/CategoryMarquee";
 import { HowItWorksSection } from "@/components/home/HowItWorksSection";
+import { ScrollPhrases } from "@/components/home/ScrollPhrases";
 
 function useIsMobile() {
   const [isMobile, setIsMobile] = useState(false);
@@ -101,7 +102,6 @@ function MobileBottomCTA() {
 
 export default function Home() {
   const isMobile = useIsMobile();
-  const taglineFade = useFadeIn();
   const howItWorksFade = useFadeIn(60);
   const acessoFade = useFadeIn();
   const ctaFade = useFadeIn();
@@ -116,138 +116,164 @@ export default function Home() {
             position: "relative",
             width: "100%",
             height: isMobile ? "calc(100svh - 16px)" : "calc(100svh - 24px)",
-            background: "#1C1B14",
             borderRadius: isMobile ? 16 : 22,
             overflow: "hidden",
+            // Mobile: column (text over video); Desktop: 2 equal columns
             display: "flex",
-            flexDirection: "column",
-            justifyContent: "flex-end",
+            flexDirection: isMobile ? "column" : "row",
+            background: isMobile ? "#1C1B14" : "#F6F4F2",
+            justifyContent: isMobile ? "flex-end" : undefined,
           }}
         >
-          <video
-            autoPlay
-            muted
-            loop
-            playsInline
-            poster="/bento-hero.jpg"
-            style={{
-              position: "absolute",
-              inset: 0,
-              width: "100%",
-              height: "100%",
-              objectFit: "cover",
-              zIndex: 0,
-            }}
-            src="/hero-categories.mp4"
-          />
-          <div
-            style={{
-              position: "absolute",
-              inset: 0,
-              zIndex: 1,
-              background: "linear-gradient(180deg, rgba(0,0,0,0.10) 0%, rgba(0,0,0,0.58) 100%)",
-            }}
-          />
-          <div
-            style={{
-              position: "relative",
-              zIndex: 2,
-              display: "flex",
-              flexDirection: "column",
-              gap: isMobile ? 16 : 24,
-              maxWidth: isMobile ? 400 : 680,
-              padding: isMobile ? "24px 24px 40px" : "48px 64px 72px",
-            }}
-          >
-            <div style={{ display: "flex", flexDirection: "column", gap: isMobile ? 12 : 16 }}>
-              <h1
+          {isMobile ? (
+            /* ── Mobile: full-bleed vídeo + texto sobreposto ─────────────── */
+            <>
+              <video
+                autoPlay muted loop playsInline
+                poster="/bento-hero.jpg"
+                src="/hero-categories.mp4"
                 style={{
-                  fontSize: "clamp(28px, 3vw + 8px, 60px)",
-                  fontWeight: 500,
-                  color: "#FCFBF8",
-                  lineHeight: 1.1,
-                  margin: 0,
-                  fontFamily: "var(--font-host-grotesk)",
+                  position: "absolute",
+                  inset: 0,
+                  width: "100%",
+                  height: "100%",
+                  objectFit: "cover",
+                  zIndex: 0,
+                }}
+              />
+              <div
+                style={{
+                  position: "absolute",
+                  inset: 0,
+                  zIndex: 1,
+                  background: "linear-gradient(180deg, rgba(0,0,0,0.10) 0%, rgba(0,0,0,0.58) 100%)",
+                }}
+              />
+              <div
+                style={{
+                  position: "relative",
+                  zIndex: 2,
+                  display: "flex",
+                  flexDirection: "column",
+                  gap: 16,
+                  maxWidth: 400,
+                  padding: "24px 24px 40px",
                 }}
               >
-                Algumas conversas não têm preço. As suas têm.
-              </h1>
-              <p
+                <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
+                  <h1
+                    style={{
+                      fontSize: "clamp(28px, 3vw + 8px, 60px)",
+                      fontWeight: 500,
+                      color: "#FCFBF8",
+                      lineHeight: 1.1,
+                      margin: 0,
+                      fontFamily: "var(--font-host-grotesk)",
+                    }}
+                  >
+                    Algumas conversas não têm preço. As suas têm.
+                  </h1>
+                  <p style={{ fontSize: 14, color: "rgba(252,251,248,0.85)", lineHeight: 1.55, margin: 0 }}>
+                    A plataforma para te conectar com sua audiência valorizando seu tempo.
+                  </p>
+                </div>
+              </div>
+            </>
+          ) : (
+            /* ── Desktop: 2 colunas 50/50 ──────────────────────────────── */
+            <>
+              {/* Coluna esquerda — texto + CTA — exatamente 50% */}
+              <div
                 style={{
-                  fontSize: isMobile ? 14 : 16,
-                  color: "rgba(252,251,248,0.85)",
-                  lineHeight: 1.55,
-                  margin: 0,
-                }}
-              >
-                A plataforma para te conectar com sua audiência valorizando seu tempo.
-              </p>
-            </div>
-            {!isMobile && (
-              <Link
-                href="/cadastro"
-                className="btn-lime"
-                style={{
-                  display: "inline-flex",
-                  alignItems: "center",
+                  flex: "0 0 50%",
+                  background: "#F6F4F2",
+                  display: "flex",
+                  flexDirection: "column",
                   justifyContent: "center",
-                  gap: 8,
-                  padding: "12px 24px",
-                  background: "#EAEA68",
-                  borderRadius: 8,
-                  fontSize: 16,
-                  fontWeight: 600,
-                  color: "#272618",
-                  textDecoration: "none",
-                  maxWidth: 320,
-                  boxShadow: "0px 1px 2px rgba(10,13,18,0.05)",
-                  alignSelf: "flex-start",
+                  alignItems: "center",
+                  padding: "64px 48px",
+                  minWidth: 0,
                 }}
               >
-                Criar Loop.Talk
-                <ArrowIcon />
-              </Link>
-            )}
-          </div>
+                {/* Bloco contido: headline + subtítulo + CTA */}
+                <div
+                  style={{
+                    display: "flex",
+                    flexDirection: "column",
+                    gap: 32,
+                    width: "100%",
+                    maxWidth: 460,
+                  }}
+                >
+                  <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
+                    <h1
+                      style={{
+                        fontSize: 40,
+                        fontWeight: 500,
+                        color: "#151918",
+                        lineHeight: "44px",
+                        margin: 0,
+                        fontFamily: "var(--font-host-grotesk)",
+                      }}
+                    >
+                      Algumas conversas não têm preço. As suas têm.
+                    </h1>
+                    <p
+                      style={{
+                        fontSize: 16,
+                        color: "rgba(21,25,24,0.55)",
+                        lineHeight: 1.55,
+                        margin: 0,
+                      }}
+                    >
+                      A plataforma para te conectar com sua audiência valorizando seu tempo.
+                    </p>
+                  </div>
+                  <Link
+                    href="/cadastro"
+                    className="btn-lime"
+                    style={{
+                      display: "flex",
+                      alignItems: "center",
+                      justifyContent: "center",
+                      gap: 8,
+                      padding: "14px 24px",
+                      background: "#EAEA68",
+                      borderRadius: 8,
+                      fontSize: 16,
+                      fontWeight: 600,
+                      color: "#151918",
+                      textDecoration: "none",
+                      boxShadow: "0px 1px 2px rgba(10,13,18,0.05)",
+                    }}
+                  >
+                    Criar Loop.Talk
+                    <ArrowIcon />
+                  </Link>
+                </div>
+              </div>
+
+              {/* Coluna direita — vídeo — exatamente 50% */}
+              <div style={{ flex: "0 0 50%", position: "relative", minWidth: 0 }}>
+                <video
+                  autoPlay muted loop playsInline
+                  src="/homepage-hero-423-2.mp4"
+                  style={{
+                    position: "absolute",
+                    inset: 0,
+                    width: "100%",
+                    height: "100%",
+                    objectFit: "cover",
+                  }}
+                />
+              </div>
+            </>
+          )}
         </div>
       </section>
 
-      {/* ── Tagline ──────────────────────────────────────────────────────── */}
-      <section
-        ref={taglineFade.ref}
-        style={{
-          padding: isMobile ? "56px 24px" : "80px 32px",
-          textAlign: "center",
-          ...taglineFade.style,
-        }}
-      >
-        <p
-          style={{
-            fontSize: 14,
-            fontWeight: 600,
-            color: "#272618",
-            letterSpacing: "0.04em",
-            margin: "0 auto 16px",
-            fontFamily: "var(--font-sans)",
-          }}
-        >
-          COMO FUNCIONA
-        </p>
-        <p
-          style={{
-            fontSize: isMobile ? 28 : 48,
-            fontWeight: 500,
-            color: "#272618",
-            lineHeight: 1.1,
-            margin: "0 auto",
-            maxWidth: 800,
-            fontFamily: "var(--font-host-grotesk)",
-          }}
-        >
-          Seu tempo tem valor.{" "}
-          <span style={{ display: "inline" }}>Agora tem um lugar para provar isso.</span>
-        </p>
-      </section>
+      {/* ── Scroll phrases ───────────────────────────────────────────────── */}
+      <ScrollPhrases />
 
       {/* ── Como funciona ────────────────────────────────────────────────── */}
       <section
