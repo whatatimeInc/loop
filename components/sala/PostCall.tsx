@@ -4,6 +4,7 @@ import { useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import type { SessionData, Persona } from "./types";
+import { tokens } from "@/components/ui/tokens";
 
 // ── shared helpers ─────────────────────────────────────────────────────────────
 
@@ -20,7 +21,7 @@ function Avatar({ profile, size = 64 }: {
   ) : (
     <div style={{
       width: size, height: size, borderRadius: "50%", flexShrink: 0,
-      background: "#EAEA68", display: "flex", alignItems: "center", justifyContent: "center",
+      background: tokens.lime, display: "flex", alignItems: "center", justifyContent: "center",
       fontSize: size * 0.35, fontWeight: 700, color: "#272618",
     }}>{initials}</div>
   );

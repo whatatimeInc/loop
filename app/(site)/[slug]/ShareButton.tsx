@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { tokens } from "@/components/ui/tokens";
 
 function ShareIcon({ size = 18 }: { size?: number }) {
   return (
@@ -94,7 +95,7 @@ export function ShareButton({
       style={{
         width: 44, height: 44, borderRadius: "50%",
         border: "1px solid #DAD9D5",
-        background: copied ? "#EAEA68" : "#FCFBF8",
+        background: copied ? tokens.lime : "#FCFBF8",
         color: "#272618",
         display: "flex", alignItems: "center", justifyContent: "center",
         cursor: "pointer", flexShrink: 0,

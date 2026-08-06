@@ -10,8 +10,8 @@
 
 @theme {
   /* ── brand ───────────────────────────────────────────────────── */
-  --color-yellow:        #EAEA68;   /* brand-primary */
-  --color-yellow-light:  #F8F68D;   /* brand-light */
+  --color-yellow:        #F8F586;   /* brand-primary */
+  --color-yellow-light:  #EAEA68;   /* brand-light / hover */
   --color-yellow-dark:   #D8D85A;   /* hover state */
 
   /* ── olive accents ───────────────────────────────────────────── */
@@ -42,7 +42,7 @@
   --color-success:       #68A279;
 
   /* ── legacy aliases (keep Tailwind class names working) ──────── */
-  --color-lime:          #EAEA68;   /* was #CEFD58 */
+  --color-lime:          #F8F586;   /* was #CEFD58 */
   --color-lime-dark:     #D8D85A;   /* was #BDEC47 */
   --color-cream:         #FCFBF8;   /* was #F6F1E9 */
   --color-tan:           #E0DDC1;   /* was #E7DAC8 */

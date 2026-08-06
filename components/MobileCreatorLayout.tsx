@@ -5,6 +5,7 @@ import Link from "next/link";
 import { Expert } from "@/lib/mockExperts";
 import { StarSolid } from "iconoir-react";
 import { CategoryIcon } from "@/components/CategoryIcon";
+import { tokens } from "@/components/ui/tokens";
 
 const avaliacoesMock = [
   {
@@ -240,7 +241,7 @@ export function MobileCreatorLayout({ expert }: { expert: Expert }) {
         </div>
 
         {/* CTA Banner */}
-        <div style={{ background: "#EAEA68", borderRadius: 12, padding: 32, display: "flex", flexDirection: "column", gap: 40 }}>
+        <div style={{ background: tokens.lime, borderRadius: 12, padding: 32, display: "flex", flexDirection: "column", gap: 40 }}>
           <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
             <p style={{ fontFamily: "Host Grotesk, sans-serif", fontSize: 24, fontWeight: 300, lineHeight: "32px", color: "#272518", margin: 0 }}>
               Faça parte do Loop.Talk<br />e inspire pessoas.
@@ -282,7 +283,7 @@ export function MobileCreatorLayout({ expert }: { expert: Expert }) {
           alignItems: "center",
           justifyContent: "center",
           height: 56,
-          background: "#EAEA68",
+          background: tokens.lime,
           borderRadius: 8,
           fontSize: 16,
           fontWeight: 600,

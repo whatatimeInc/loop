@@ -3,6 +3,7 @@
 import React, { useState, useEffect, useRef } from "react";
 import { Logo } from "@/components/Logo";
 import { WaitlistModal } from "./WaitlistModal";
+import { tokens } from "@/components/ui/tokens";
 
 // ─── RESPONSIVE HOOK ──────────────────────────────────────────────────────────
 
@@ -179,8 +180,8 @@ function HeroSection({ onCTA, isMobile }: { onCTA: () => void; isMobile: boolean
                 onClick={onCTA}
                 style={{
                   padding: "10px 18px",
-                  background: "#EAEA68",
-                  border: "1px solid #EAEA68",
+                  background: tokens.lime,
+                  border: `1px solid ${tokens.lime}`,
                   borderRadius: 8,
                   fontSize: 16,
                   fontWeight: 600,
@@ -242,8 +243,8 @@ function HeroSection({ onCTA, isMobile }: { onCTA: () => void; isMobile: boolean
                 justifyContent: "center",
                 gap: 8,
                 padding: "12px 20px",
-                background: "#EAEA68",
-                border: "1px solid #EAEA68",
+                background: tokens.lime,
+                border: `1px solid ${tokens.lime}`,
                 borderRadius: 8,
                 fontSize: 16,
                 fontWeight: 600,
@@ -304,7 +305,7 @@ function ProfileCardIllustration() {
         }}
       >
         <div style={{ width: 137, height: 169, position: "absolute", left: 30, top: 47, background: "#AEADA4" }} />
-        <div style={{ width: 137, height: 169, position: "absolute", left: 25, top: 46, background: "#EAEA68" }} />
+        <div style={{ width: 137, height: 169, position: "absolute", left: 25, top: 46, background: tokens.lime }} />
         <div
           style={{
             width: 137,
@@ -361,7 +362,7 @@ function DaysIllustration() {
               style={{
                 width: hi ? 104 : 96,
                 height: hi ? 104 : 96,
-                background: hi ? "#F8F68D" : "#E0DDC1",
+                background: hi ? tokens.limeLight : "#E0DDC1",
                 borderRadius: 4,
                 display: "flex",
                 alignItems: "center",
@@ -407,7 +408,7 @@ function PriceIllustration() {
             top: 0,
             left: 0,
             height: "100%",
-            background: "#EAEA68",
+            background: tokens.lime,
             borderRadius: 99,
             animation: "fillPulse 3.5s ease-in-out infinite",
           }}
@@ -772,7 +773,7 @@ function CTABannerSection({ onCTA, isMobile }: { onCTA: () => void; isMobile: bo
     <section style={{ padding: isMobile ? "0 16px" : "0 246px" }}>
       <div
         style={{
-          background: "#EAEA68",
+          background: tokens.lime,
           borderRadius: 12,
           padding: isMobile ? "32px 24px" : 48,
           display: "flex",
@@ -866,8 +867,8 @@ function LandingFooter({ onCTA, isMobile }: { onCTA: () => void; isMobile: boole
                   alignItems: "center",
                   gap: 8,
                   padding: "12px 20px",
-                  background: "#EAEA68",
-                  border: "1px solid #EAEA68",
+                  background: tokens.lime,
+                  border: `1px solid ${tokens.lime}`,
                   borderRadius: 8,
                   fontSize: 16,
                   fontWeight: 600,
@@ -984,7 +985,7 @@ function MobileBottomCTA({ onCTA }: { onCTA: () => void }) {
           justifyContent: "center",
           gap: 8,
           padding: "14px 20px",
-          background: "#EAEA68",
+          background: tokens.lime,
           border: "none",
           borderRadius: 8,
           fontSize: 16,

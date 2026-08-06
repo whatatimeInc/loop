@@ -3,6 +3,7 @@ import { redirect } from "next/navigation";
 import { Logo } from "@/components/Logo";
 import { createClient } from "@/lib/supabase/server";
 import { ReferralSection } from "./ReferralSection";
+import { tokens } from "@/components/ui/tokens";
 
 export const metadata: Metadata = {
   title: "Sua posição na lista — Loop.Talk",
@@ -76,7 +77,7 @@ export default async function WaitlistConfirmPage() {
           {/* Referral section */}
           <div
             style={{
-              background: "#EAEA68",
+              background: tokens.lime,
               borderRadius: 14,
               padding: "28px 24px",
               display: "flex",

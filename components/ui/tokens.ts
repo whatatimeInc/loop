@@ -16,8 +16,9 @@ export const tokens = {
   faint:  "#AEADA4",
 
   // Brand
-  lime:   "#EAEA68",
-  limeHover: "#FAF9D1",
+  lime:      "#F8F586",   // brand-primary
+  limeLight: "#EAEA68",   // brand-light / hover
+  limeHover: "#FAF9D1",   // brand-inactive
 
   // Semantic
   red:    "#D93B3B",

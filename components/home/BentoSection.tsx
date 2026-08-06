@@ -12,6 +12,7 @@ import {
   IconCategoriaArte,
   IconCategoriaGastronomia,
 } from "@/components/icons";
+import { tokens } from "@/components/ui/tokens";
 
 const ease = cubicBezier(0.22, 1, 0.36, 1);
 
@@ -104,7 +105,7 @@ function BookingUI() {
       <div
         style={{
           padding: "8px 14px",
-          background: "#EAEA68",
+          background: tokens.lime,
           borderRadius: 8,
           textAlign: "center",
           fontWeight: 600,
@@ -252,7 +253,7 @@ export function CTASection() {
       <div className="max-w-[1194px] mx-auto" ref={ref}>
         <motion.div
           className="flex flex-col md:flex-row items-center justify-between gap-10 rounded-xl px-12 py-12"
-          style={{ background: "#EAEA68" }}
+          style={{ background: tokens.lime }}
           initial={{ opacity: 0, y: 24 }}
           animate={inView ? { opacity: 1, y: 0 } : {}}
           transition={{ duration: 0.6, ease }}

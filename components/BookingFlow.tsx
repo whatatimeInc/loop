@@ -6,13 +6,14 @@ import Image from "next/image";
 import { motion, AnimatePresence } from "framer-motion";
 import { Expert } from "@/lib/mockExperts";
 import { Logo } from "@/components/Logo";
+import { tokens } from "@/components/ui/tokens";
 
 // ─── tokens ───────────────────────────────────────────────────────────────────
 
 const DARK      = "#272518";
 const PANEL_BG  = "#FFFFFF";
 const PANEL_BDR = "#E0DDC1";
-const LIME      = "#EAEA68";
+const LIME = tokens.lime;
 const BEIGE_BG  = "#F4F2EB";
 const BEIGE_MID = "#E0DDC1";
 const BEIGE_CRD = "#FCFBF8";

@@ -3,6 +3,7 @@
 import { useState, useCallback } from "react";
 import { useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
+import { tokens } from "@/components/ui/tokens";
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
@@ -553,7 +554,7 @@ export function HostActivationSheet({
             style={{
               height: "100%",
               width: `${progress}%`,
-              background: "#EAEA68",
+              background: tokens.lime,
               transition: "width 0.3s ease",
             }}
           />

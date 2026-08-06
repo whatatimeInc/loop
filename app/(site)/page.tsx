@@ -4,7 +4,8 @@ import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import { CategoryMarquee } from "@/components/home/CategoryMarquee";
 import { HowItWorksSection } from "@/components/home/HowItWorksSection";
-import { ScrollPhrases } from "@/components/home/ScrollPhrases";
+import { NossaPropostaSection } from "@/components/home/NossaPropostaSection";
+import { tokens } from "@/components/ui/tokens";
 
 function useIsMobile() {
   const [isMobile, setIsMobile] = useState(false);
@@ -84,7 +85,7 @@ function MobileBottomCTA() {
           gap: 8,
           width: "100%",
           padding: "12px 20px",
-          background: "#EAEA68",
+          background: tokens.lime,
           borderRadius: 8,
           fontSize: 16,
           fontWeight: 600,
@@ -238,7 +239,7 @@ export default function Home() {
                       justifyContent: "center",
                       gap: 8,
                       padding: "14px 24px",
-                      background: "#EAEA68",
+                      background: tokens.lime,
                       borderRadius: 8,
                       fontSize: 16,
                       fontWeight: 600,
@@ -272,21 +273,19 @@ export default function Home() {
         </div>
       </section>
 
-      {/* ── Scroll phrases ───────────────────────────────────────────────── */}
-      <ScrollPhrases />
-
-      {/* ── Como funciona ────────────────────────────────────────────────── */}
-      <section
-        ref={howItWorksFade.ref}
-        style={{
-          padding: isMobile ? "0" : "0 24px",
-          ...howItWorksFade.style,
-        }}
-      >
-        <div style={{ maxWidth: 1200, margin: "0 auto" }}>
-          <HowItWorksSection isMobile={isMobile} />
-        </div>
-      </section>
+      {/* ── Como funciona / Nossa Proposta ───────────────────────────────── */}
+      {isMobile ? (
+        <section
+          ref={howItWorksFade.ref}
+          style={{ padding: "0", ...howItWorksFade.style }}
+        >
+          <div style={{ maxWidth: 1200, margin: "0 auto" }}>
+            <HowItWorksSection isMobile={true} />
+          </div>
+        </section>
+      ) : (
+        <NossaPropostaSection />
+      )}
 
       {/* ── Acesso real + marquee ─────────────────────────────────────────── */}
       <section
@@ -338,7 +337,7 @@ export default function Home() {
       >
         <div
           style={{
-            background: "#EAEA68",
+            background: tokens.lime,
             borderRadius: 12,
             maxWidth: 1200,
             margin: "0 auto",

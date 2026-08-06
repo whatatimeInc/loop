@@ -4,6 +4,7 @@ import { usePathname, useRouter } from "next/navigation";
 import { useState } from "react";
 import { createClient } from "@/lib/supabase/client";
 import { useDashboard } from "./DashboardShell";
+import { tokens } from "@/components/ui/tokens";
 
 const DARK   = "#272618";
 const MUTED  = "#626053";
@@ -93,7 +94,7 @@ export function DashboardHeader() {
               style={{
                 display: "flex", alignItems: "center", justifyContent: "center",
                 width: 26, height: 26, borderRadius: 6,
-                border: "none", background: copied ? "#EAEA68" : "white",
+                border: "none", background: copied ? tokens.lime : "white",
                 color: DARK, cursor: "pointer",
                 transition: "background 0.15s",
               }}

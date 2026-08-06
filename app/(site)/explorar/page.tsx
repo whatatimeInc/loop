@@ -14,6 +14,7 @@ import {
   IconCategoriaGastronomia,
 } from "@/components/icons";
 import type { ReactNode } from "react";
+import { tokens } from "@/components/ui/tokens";
 
 const categoriaIcones: Record<string, ReactNode> = {
   "Carreira e Negócios": <IconCategoriaCarreira className="w-5 h-5 flex-shrink-0" />,
@@ -85,7 +86,7 @@ export default function Explorar() {
             <button
               type="submit"
               className="h-11 px-5 rounded flex items-center gap-2 text-sm font-semibold transition-opacity hover:opacity-80"
-              style={{ background: "#EAEA68", color: "#272518" }}
+              style={{ background: tokens.lime, color: "#272518" }}
             >
               <Search className="w-4 h-4" />
               Buscar
@@ -215,9 +216,9 @@ export default function Explorar() {
               href="/cadastro"
               className="flex-shrink-0 inline-flex items-center justify-center px-4 py-2 rounded font-semibold text-sm whitespace-nowrap transition-opacity hover:opacity-80"
               style={{
-                background: "#EAEA68",
+                background: tokens.lime,
                 color: "#272518",
-                outline: "1px solid #EAEA68",
+                outline: `1px solid ${tokens.lime}`,
                 boxShadow: "0px 1px 2px rgba(10, 13, 18, 0.05)",
               }}
             >

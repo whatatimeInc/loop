@@ -12,7 +12,6 @@ const gsapReady =
 const PHRASES = [
   "Você tem algo que vale a pena ouvir.",
   "Sua audiência quer acesso a você.",
-  "Seu tempo tem valor. Agora tem um lugar para provar isso.",
 ] as const;
 
 const phraseStyle: React.CSSProperties = {
@@ -28,7 +27,7 @@ const phraseStyle: React.CSSProperties = {
 
 export function ScrollPhrases() {
   const sectionRef = useRef<HTMLElement>(null);
-  const wrapRefs = useRef<(HTMLDivElement | null)[]>([null, null, null]);
+  const wrapRefs = useRef<(HTMLDivElement | null)[]>([null, null]);
 
   useEffect(() => {
     let ctx: { revert: () => void } | null = null;
@@ -45,36 +44,16 @@ export function ScrollPhrases() {
       gsap.registerPlugin(ScrollTrigger);
 
       const section = sectionRef.current;
-      const [w0, w1, w2] = wrapRefs.current;
-      if (!section || !w0 || !w1 || !w2) return;
+      const [w0, w1] = wrapRefs.current;
+      if (!section || !w0 || !w1) return;
 
       gsap.set(w0, { opacity: 1, y: 0 });
-      gsap.set([w1, w2], { opacity: 0, y: 20 });
+      gsap.set(w1, { opacity: 0, y: 20 });
 
       ctx = gsap.context(() => {
         const mm = gsap.matchMedia();
 
         mm.add("(min-width: 768px)", () => {
-          gsap
-            .timeline({
-              scrollTrigger: {
-                trigger: section,
-                pin: true,
-                start: "top top",
-                end: "+=200vh",
-                scrub: 1,
-              },
-            })
-            .to({}, { duration: 2.5 })
-            .to(w0, { opacity: 0, y: -20, ease: "power2.inOut", duration: 0.5 })
-            .to(w1, { opacity: 1, y: 0, ease: "power2.inOut", duration: 0.5 })
-            .to({}, { duration: 2.5 })
-            .to(w1, { opacity: 0, y: -20, ease: "power2.inOut", duration: 0.5 })
-            .to(w2, { opacity: 1, y: 0, ease: "power2.inOut", duration: 0.5 })
-            .to({}, { duration: 3 });
-        });
-
-        mm.add("(max-width: 767px)", () => {
           gsap
             .timeline({
               scrollTrigger: {
@@ -88,9 +67,23 @@ export function ScrollPhrases() {
             .to({}, { duration: 2.5 })
             .to(w0, { opacity: 0, y: -20, ease: "power2.inOut", duration: 0.5 })
             .to(w1, { opacity: 1, y: 0, ease: "power2.inOut", duration: 0.5 })
+            .to({}, { duration: 3 });
+        });
+
+        mm.add("(max-width: 767px)", () => {
+          gsap
+            .timeline({
+              scrollTrigger: {
+                trigger: section,
+                pin: true,
+                start: "top top",
+                end: "+=100vh",
+                scrub: 1,
+              },
+            })
             .to({}, { duration: 2.5 })
-            .to(w1, { opacity: 0, y: -20, ease: "power2.inOut", duration: 0.5 })
-            .to(w2, { opacity: 1, y: 0, ease: "power2.inOut", duration: 0.5 })
+            .to(w0, { opacity: 0, y: -20, ease: "power2.inOut", duration: 0.5 })
+            .to(w1, { opacity: 1, y: 0, ease: "power2.inOut", duration: 0.5 })
             .to({}, { duration: 3 });
         });
       }, section);

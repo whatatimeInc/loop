@@ -9,6 +9,7 @@ import { createClient } from "@/lib/supabase/server";
 import { CategoryIcon } from "@/components/CategoryIcon";
 import { type Categoria } from "@/lib/mockExperts";
 import { ShareButton } from "./ShareButton";
+import { tokens } from "@/components/ui/tokens";
 
 type Props = { params: Promise<{ slug: string }> };
 
@@ -210,7 +211,7 @@ function RealCreatorPage({ profile }: { profile: RealProfile }) {
           {profile.photo_url ? (
             <Image src={profile.photo_url} alt={name} fill className="object-cover object-top" sizes="100vw" />
           ) : (
-            <div style={{ width: "100%", height: "100%", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 72, fontWeight: 700, color: "#272518", background: "#EAEA68" }}>
+            <div style={{ width: "100%", height: "100%", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 72, fontWeight: 700, color: "#272518", background: tokens.lime }}>
               {initials}
             </div>
           )}
@@ -246,7 +247,7 @@ function RealCreatorPage({ profile }: { profile: RealProfile }) {
       <div style={{ position: "fixed", bottom: 0, left: 0, right: 0, zIndex: 50, padding: "17px 16px 16px", background: "rgba(255,255,255,0.50)", backdropFilter: "blur(20px)", WebkitBackdropFilter: "blur(20px)" }}>
         <div style={{ display: "flex", gap: 10 }}>
           {profile.sessionTypes.length > 0 && (
-            <div style={{ flex: 1, display: "flex", alignItems: "center", justifyContent: "center", height: 56, background: "#EAEA68", borderRadius: 8, fontSize: 16, fontWeight: 600, color: "#272618", cursor: "pointer" }}>
+            <div style={{ flex: 1, display: "flex", alignItems: "center", justifyContent: "center", height: 56, background: tokens.lime, borderRadius: 8, fontSize: 16, fontWeight: 600, color: "#272618", cursor: "pointer" }}>
               Agendar Loop.Talk
             </div>
           )}
@@ -267,7 +268,7 @@ function RealCreatorPage({ profile }: { profile: RealProfile }) {
             {profile.photo_url ? (
               <Image src={profile.photo_url} alt={name} fill priority className="object-cover object-top" sizes="456px" />
             ) : (
-              <div style={{ width: "100%", height: "100%", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 72, fontWeight: 700, color: "#272518", background: "#EAEA68" }}>
+              <div style={{ width: "100%", height: "100%", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 72, fontWeight: 700, color: "#272518", background: tokens.lime }}>
                 {initials}
               </div>
             )}
@@ -348,7 +349,7 @@ function RealCreatorPage({ profile }: { profile: RealProfile }) {
                         return (
                           <div key={st.id} style={{
                             flex: 1, height: 72, borderRadius: 4,
-                            background: isHighlighted ? "#EAEA68" : "#FFFFFF",
+                            background: isHighlighted ? tokens.lime : "#FFFFFF",
                             display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", gap: 4,
                           }}>
                             <span style={{ fontSize: 16, fontWeight: 400, color: "#272618", lineHeight: "24px" }}>
@@ -627,7 +628,7 @@ export default async function CreatorPage({ params }: Props) {
         {/* ══ CTA BANNER ══════════════════════════════════════════════════════ */}
         <div style={{ padding: "48px 0" }}>
           <div style={{
-            background: "#EAEA68",
+            background: tokens.lime,
             borderRadius: 12,
             padding: 48,
             display: "flex",

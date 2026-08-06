@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { tokens } from "@/components/ui/tokens";
 
 type Props = {
   referralUrl: string;
@@ -41,7 +42,7 @@ export function ReferralSection({ referralUrl }: Props) {
             padding: "6px 14px",
             borderRadius: 6,
             border: "none",
-            background: copied ? "#272518" : "#EAEA68",
+            background: copied ? "#272518" : tokens.lime,
             color: copied ? "#FCFBF8" : "#272518",
             fontSize: 12,
             fontWeight: 600,

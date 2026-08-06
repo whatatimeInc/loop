@@ -3,6 +3,7 @@
 import { usePathname } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
 import { useRouter } from "next/navigation";
+import { tokens } from "@/components/ui/tokens";
 
 const PAGE_TITLES: Record<string, string> = {
   "/conta/sessoes":                       "Minhas sessões",
@@ -64,7 +65,7 @@ export function ContaHeader({
             width: 36,
             height: 36,
             borderRadius: "50%",
-            background: photoUrl ? "transparent" : "#EAEA68",
+            background: photoUrl ? "transparent" : tokens.lime,
             display: "flex",
             alignItems: "center",
             justifyContent: "center",

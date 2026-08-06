@@ -4,6 +4,7 @@ import { useState } from "react";
 import Link from "next/link";
 import { Expert } from "@/lib/mockExperts";
 import { Logo } from "@/components/Logo";
+import { tokens } from "@/components/ui/tokens";
 
 interface Props {
   expert: Expert;
@@ -100,7 +101,7 @@ export function BookingSidebar({ expert }: Props) {
                   height: 72,
                   borderRadius: 4,
                   border: "none",
-                  background: ativo ? "#EAEA68" : "#fff",
+                  background: ativo ? tokens.lime : "#fff",
                   display: "flex",
                   flexDirection: "column",
                   alignItems: "center",

@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Logo } from "@/components/Logo";
+import { tokens } from "@/components/ui/tokens";
 
 // ─── CATEGORY ICONS ───────────────────────────────────────────────────────────
 
@@ -700,7 +701,7 @@ export function WaitlistModal({ open, onClose, referralCode }: Props) {
                               padding: "0 18px",
                               height: 64,
                               borderRadius: 12,
-                              background: selected ? "#EAEA68" : "#FFFFFF",
+                              background: selected ? tokens.lime : "#FFFFFF",
                               border: "none",
                               cursor: "pointer",
                               textAlign: "left",
@@ -729,8 +730,8 @@ export function WaitlistModal({ open, onClose, referralCode }: Props) {
             <div style={{ flexShrink: 0 }}>
               {/* Two-segment progress bar — both yellow when done */}
               <div style={{ display: "flex", height: 4 }}>
-                <div style={{ flex: 1, background: "#EAEA68" }} />
-                <div style={{ flex: 1, background: done || step === 2 ? "#EAEA68" : "#DAD9D5", transition: "background 0.3s" }} />
+                <div style={{ flex: 1, background: tokens.lime }} />
+                <div style={{ flex: 1, background: done || step === 2 ? tokens.lime : "#DAD9D5", transition: "background 0.3s" }} />
               </div>
               {/* Button area */}
               <div

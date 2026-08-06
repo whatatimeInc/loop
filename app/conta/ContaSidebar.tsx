@@ -5,6 +5,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { Logo } from "@/components/Logo";
 import { HostActivationSheet } from "./HostActivationSheet";
+import { tokens } from "@/components/ui/tokens";
 
 const NAV_LINKS = [
   { href: "/conta/sessoes",       label: "Sessões" },
@@ -83,7 +84,7 @@ export function ContaSidebar({
                 fontSize: 13,
                 fontWeight: 600,
                 color: "#272618",
-                background: "#EAEA68",
+                background: tokens.lime,
                 textDecoration: "none",
               }}
             >

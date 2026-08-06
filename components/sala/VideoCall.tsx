@@ -10,6 +10,7 @@ import DailyIframe, {
   DailyEventObjectNetworkQualityEvent,
 } from "@daily-co/daily-js";
 import type { SessionData, Persona, ChatMessage, TimeExtension } from "./types";
+import { tokens } from "@/components/ui/tokens";
 
 // ── icons ─────────────────────────────────────────────────────────────────────
 
@@ -134,7 +135,7 @@ function ChatSidebar({
             <div key={m.id} style={{ display: "flex", justifyContent: mine ? "flex-end" : "flex-start" }}>
               <div style={{
                 maxWidth: "80%", padding: "8px 12px", borderRadius: mine ? "12px 12px 2px 12px" : "12px 12px 12px 2px",
-                background: mine ? "#EAEA68" : "rgba(255,255,255,0.1)",
+                background: mine ? tokens.lime : "rgba(255,255,255,0.1)",
                 color: mine ? "#272618" : "#F0EFEB", fontSize: 13,
               }}>
                 {!mine && <div style={{ fontSize: 11, color: "#807F71", marginBottom: 4 }}>{m.senderName}</div>}
@@ -156,7 +157,7 @@ function ChatSidebar({
             padding: "8px 12px", color: "#F0EFEB", fontSize: 13, fontFamily: "Inter, sans-serif", outline: "none",
           }}
         />
-        <button onClick={send} style={{ padding: "8px 12px", background: "#EAEA68", border: "none", borderRadius: 8, color: "#272618", fontWeight: 700, cursor: "pointer", fontSize: 13 }}>→</button>
+        <button onClick={send} style={{ padding: "8px 12px", background: tokens.lime, border: "none", borderRadius: 8, color: "#272618", fontWeight: 700, cursor: "pointer", fontSize: 13 }}>→</button>
       </div>
     </div>
   );
@@ -201,7 +202,7 @@ function ExtensionBanner({ onRequest, pending }: { onRequest: () => void; pendin
           onClick={onRequest}
           disabled={pending}
           style={{
-            padding: "8px 16px", background: "#EAEA68", border: "none", borderRadius: 8,
+            padding: "8px 16px", background: tokens.lime, border: "none", borderRadius: 8,
             color: "#272618", fontSize: 13, fontWeight: 700, cursor: pending ? "not-allowed" : "pointer",
             opacity: pending ? 0.5 : 1,
           }}
@@ -232,7 +233,7 @@ function ExtensionRequestModal({ persona, onSelect, onDismiss }: {
               borderRadius: 10, color: "#F0EFEB", fontSize: 14, fontWeight: 700, cursor: "pointer",
               transition: "border-color 0.15s",
             }}
-              onMouseEnter={(e) => (e.currentTarget.style.borderColor = "#EAEA68")}
+              onMouseEnter={(e) => (e.currentTarget.style.borderColor = tokens.lime)}
               onMouseLeave={(e) => (e.currentTarget.style.borderColor = "rgba(255,255,255,0.2)")}
             >
               +{m} min
@@ -264,7 +265,7 @@ function ExtensionIncomingModal({ ext, otherName, onAccept, onDecline }: {
         </p>
         <div style={{ display: "flex", gap: 10 }}>
           <button onClick={onDecline} style={{ flex: 1, padding: "12px", background: "transparent", border: "1px solid rgba(255,255,255,0.2)", borderRadius: 8, color: "#F0EFEB", cursor: "pointer", fontSize: 14 }}>Recusar</button>
-          <button onClick={onAccept} style={{ flex: 1, padding: "12px", background: "#EAEA68", border: "none", borderRadius: 8, color: "#272618", fontWeight: 700, cursor: "pointer", fontSize: 14 }}>Aceitar</button>
+          <button onClick={onAccept} style={{ flex: 1, padding: "12px", background: tokens.lime, border: "none", borderRadius: 8, color: "#272618", fontWeight: 700, cursor: "pointer", fontSize: 14 }}>Aceitar</button>
         </div>
       </div>
     </div>

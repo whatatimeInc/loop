@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { tokens } from "@/components/ui/tokens";
 
 const INTERESTS = [
   { value: "career_business",    label: "Carreira e Negócios" },
@@ -81,7 +82,7 @@ export function WaitlistForm({ referralCode }: Props) {
             width: 48,
             height: 48,
             borderRadius: "50%",
-            background: "#EAEA68",
+            background: tokens.lime,
             display: "flex",
             alignItems: "center",
             justifyContent: "center",
@@ -137,7 +138,7 @@ export function WaitlistForm({ referralCode }: Props) {
                 padding: "8px 14px",
                 borderRadius: 6,
                 border: "none",
-                background: interest === value ? "#EAEA68" : "#E0DDC1",
+                background: interest === value ? tokens.lime : "#E0DDC1",
                 color: "#272518",
                 fontSize: 13,
                 fontWeight: interest === value ? 600 : 400,

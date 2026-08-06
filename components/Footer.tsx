@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import { Logo } from "@/components/Logo";
+import { tokens } from "@/components/ui/tokens";
 
 function useIsMobile() {
   const [isMobile, setIsMobile] = useState(false);
@@ -79,7 +80,7 @@ export function Footer() {
                 alignItems: "center",
                 gap: 8,
                 padding: "12px 20px",
-                background: "#EAEA68",
+                background: tokens.lime,
                 borderRadius: 8,
                 fontSize: 16,
                 fontWeight: 600,
@@ -134,7 +135,7 @@ export function Footer() {
                 alignItems: "center",
                 gap: 8,
                 padding: "12px 20px",
-                background: "#EAEA68",
+                background: tokens.lime,
                 borderRadius: 8,
                 fontSize: 16,
                 fontWeight: 600,

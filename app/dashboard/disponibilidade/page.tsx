@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { createClient } from "@/lib/supabase/client";
+import { tokens } from "@/components/ui/tokens";
 
 const DAYS = [
   { key: "seg", label: "Segunda" },
@@ -172,7 +173,7 @@ export default function DisponibilidadePage() {
                         width: 10,
                         height: 10,
                         borderRadius: "50%",
-                        background: allOn ? "#EAEA68" : someOn ? "rgba(234,234,104,0.4)" : "#E4E2D9",
+                        background: allOn ? tokens.lime : someOn ? "rgba(248,245,134,0.4)" : "#E4E2D9",
                         margin: "4px auto 0",
                       }}
                     />
@@ -213,7 +214,7 @@ export default function DisponibilidadePage() {
                           width: 52,
                           height: 16,
                           borderRadius: 4,
-                          background: active ? "#EAEA68" : "#F4F2EB",
+                          background: active ? tokens.lime : "#F4F2EB",
                           border: `1px solid ${active ? "#CBCB50" : "#E4E2D9"}`,
                           cursor: "pointer",
                           transition: "background 0.1s",
@@ -249,7 +250,7 @@ export default function DisponibilidadePage() {
           padding: "12px 28px",
           borderRadius: 8,
           border: "none",
-          background: saving ? "#E4E2D9" : "#EAEA68",
+          background: saving ? "#E4E2D9" : tokens.lime,
           color: "#272618",
           fontSize: 14,
           fontWeight: 600,

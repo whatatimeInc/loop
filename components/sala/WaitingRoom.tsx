@@ -3,6 +3,7 @@
 import { useEffect, useState, useRef } from "react";
 import Image from "next/image";
 import type { SessionData, Persona } from "./types";
+import { tokens } from "@/components/ui/tokens";
 
 // ── helpers ───────────────────────────────────────────────────────────────────
 
@@ -19,7 +20,7 @@ function Avatar({ profile, size = 80 }: {
   ) : (
     <div style={{
       width: size, height: size, borderRadius: "50%", flexShrink: 0,
-      background: "#EAEA68", border: "3px solid rgba(255,255,255,0.12)",
+      background: tokens.lime, border: "3px solid rgba(255,255,255,0.12)",
       display: "flex", alignItems: "center", justifyContent: "center",
       fontSize: size * 0.35, fontWeight: 700, color: "#272618",
     }}>{initials}</div>
@@ -205,7 +206,7 @@ export function WaitingRoom({
           disabled={!canEnter}
           style={{
             width: "100%", padding: "14px 24px",
-            background: canEnter ? "#EAEA68" : "rgba(255,255,255,0.08)",
+            background: canEnter ? tokens.lime : "rgba(255,255,255,0.08)",
             border: "none", borderRadius: 8,
             color: canEnter ? "#272618" : "#807F71",
             fontSize: 16, fontWeight: 700, cursor: canEnter ? "pointer" : "not-allowed",

@@ -4,11 +4,12 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { Logo } from "@/components/Logo";
 import { useDashboard } from "./DashboardShell";
+import { tokens } from "@/components/ui/tokens";
 
 const DARK  = "#272618";
 const MUTED = "#626053";
 const FAINT = "#AEADA4";
-const LIME  = "#EAEA68";
+const LIME = tokens.lime;
 const BG    = "#FCFBF8";
 const BEIGE = "#F4F2EB";
 const BORDER = "#E4E2D9";

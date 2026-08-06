@@ -2,6 +2,7 @@
 
 import { useCallback, useEffect, useRef, useState } from "react";
 import { ShareAndroid } from "iconoir-react";
+import { tokens } from "@/components/ui/tokens";
 
 const PHOTO_URL = "/mentors/andre-do-amaral/profile.webp";
 
@@ -12,7 +13,7 @@ const T = {
   border: "rgba(39,38,24,0.10)",
   dark: "#272618",
   muted: "#6E6C60",
-  lime: "#EAEA68",
+  lime: tokens.lime,
   limeText: "#3E3B12",
   chipDefault: "#DEDBC6",
   chipDefaultText: "#4A4834",

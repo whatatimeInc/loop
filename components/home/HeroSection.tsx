@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useRef, useEffect } from "react";
 import { motion, cubicBezier } from "framer-motion";
+import { tokens } from "@/components/ui/tokens";
 
 const ease = cubicBezier(0.22, 1, 0.36, 1);
 
@@ -79,7 +80,7 @@ export function HeroSection() {
             href="/cadastro"
             className="inline-flex items-center justify-center font-semibold text-base transition-opacity hover:opacity-85"
             style={{
-              background: "#EAEA68",
+              background: tokens.lime,
               color: "#272518",
               borderRadius: 8,
               padding: "10px 18px",

@@ -5,6 +5,7 @@ import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
 import { Logo } from "@/components/Logo";
+import { tokens } from "@/components/ui/tokens";
 
 type Step = "email" | "password" | "link-sent";
 
@@ -225,7 +226,7 @@ export function LoginForm() {
               width: 56,
               height: 56,
               borderRadius: "50%",
-              background: "#EAEA68",
+              background: tokens.lime,
               display: "flex",
               alignItems: "center",
               justifyContent: "center",
