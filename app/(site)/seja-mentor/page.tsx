@@ -1,5 +1,5 @@
-import { LinkButton } from "@/components/ui/Button";
-import { Check, ArrowRight } from "iconoir-react";
+import { LinkButton, ArrowIcon } from "@/components/ui/Button";
+import { Check } from "iconoir-react";
 
 const beneficios = [
   {
@@ -69,10 +69,10 @@ export default function SejaMentor() {
           Só você, seus seguidores e uma conversa que vale dinheiro.
         </p>
         <div className="flex flex-col sm:flex-row gap-3 justify-center">
-          <LinkButton href="/criar" variant="primary" size="lg">
+          <LinkButton href="/criar" variant="brand-primary" layout="icon-text" icon={<ArrowIcon />}>
             Criar meu perfil grátis
           </LinkButton>
-          <LinkButton href="/explorar" variant="outline" size="lg">
+          <LinkButton href="/explorar" variant="neutral-secondary">
             Ver exemplos de perfis
           </LinkButton>
         </div>
@@ -187,9 +187,8 @@ export default function SejaMentor() {
         <p className="text-gray-400 mb-8 max-w-md mx-auto">
           Grátis pra criar. Você só paga quando recebe. Sem mensalidade, sem contrato.
         </p>
-        <LinkButton href="/criar" variant="primary" size="lg">
+        <LinkButton href="/criar" variant="brand-primary" layout="icon-text" icon={<ArrowIcon />}>
           Criar meu perfil agora
-          <ArrowRight className="w-4 h-4 ml-2" />
         </LinkButton>
         <p className="text-gray-500 text-xs mt-4">
           Leva menos de 2 minutos. Sem cartão de crédito.

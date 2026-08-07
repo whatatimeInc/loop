@@ -3,6 +3,7 @@
 import { useState, useEffect } from "react";
 import { usePathname } from "next/navigation";
 import { Logo } from "@/components/Logo";
+import Link from "next/link";
 import { LinkButton } from "@/components/ui/Button";
 import { LogoutButton } from "@/components/LogoutButton";
 
@@ -68,14 +69,14 @@ export function HeaderClient({ isLoggedIn }: { isLoggedIn: boolean }) {
         <div className="flex items-center gap-2">
           {isLoggedIn ? (
             <>
-              <LinkButton href="/conta" variant="ghost" size="sm">Minha conta</LinkButton>
+              <Link href="/conta" className="text-sm font-medium opacity-70 hover:opacity-100 transition-opacity">Minha conta</Link>
               <LogoutButton />
             </>
           ) : (
             <>
-              <LinkButton href="/login" variant="ghost" size="sm">Entrar</LinkButton>
+              <Link href="/login" className="text-sm font-medium opacity-70 hover:opacity-100 transition-opacity">Entrar</Link>
               <span className="hidden md:inline-flex">
-                <LinkButton href="/cadastro" variant="primary" size="sm">Criar perfil</LinkButton>
+                <LinkButton href="/cadastro" variant="brand-primary">Criar perfil</LinkButton>
               </span>
             </>
           )}
