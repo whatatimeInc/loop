@@ -17,11 +17,12 @@ export function HeaderClient({ isLoggedIn }: { isLoggedIn: boolean }) {
   return (
     <header
       style={{
-        position: "sticky",
+        position: "fixed",
         top: 0,
+        left: 0,
+        right: 0,
         zIndex: 50,
-        padding: "16px 16px 16px",
-        background: "#232311",
+        padding: "16px 16px 0",
       }}
     >
       {/* ── Desktop pill ── */}
