@@ -85,13 +85,13 @@ export function HeroSection() {
     const trackWMobile = 8 * (CARD_W_MOBILE + CARD_GAP);
 
     return (
-      <section style={{ padding: "0 12px 16px", display: "flex", flexDirection: "column", gap: 8 }}>
+      <section style={{ padding: "112px 12px 16px", display: "flex", flexDirection: "column", gap: 8 }}>
         {/* Text block */}
         <div
           style={{
             background:    BRAND_DARK,
             borderRadius:  22,
-            padding:       "96px 24px 32px",
+            padding:       "28px 24px 32px",
           }}
         >
           <div
@@ -255,7 +255,7 @@ export function HeroSection() {
   const trackW = 8 * (CARD_W_DESKTOP + CARD_GAP);
 
   return (
-    <section style={{ padding: "0 12px 16px" }}>
+    <section style={{ padding: "112px 12px 16px" }}>
       <div
         style={{
           position:     "relative",
