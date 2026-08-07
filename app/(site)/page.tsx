@@ -6,6 +6,7 @@ import { CategoryMarquee } from "@/components/home/CategoryMarquee";
 import { HowItWorksSection } from "@/components/home/HowItWorksSection";
 import { NossaPropostaSection } from "@/components/home/NossaPropostaSection";
 import { HeroSection } from "@/components/home/HeroSection";
+import { CategoriesSection } from "@/components/home/CategoriesSection";
 import { tokens } from "@/components/ui/tokens";
 
 function useIsMobile() {
@@ -113,6 +114,9 @@ export default function Home() {
 
       {/* ── Hero ─────────────────────────────────────────────────────────── */}
       <HeroSection />
+
+      {/* ── Fatia 2: Categorias ──────────────────────────────────────────── */}
+      <CategoriesSection />
 
       {/* ── Como funciona / Nossa Proposta ───────────────────────────────── */}
       {isMobile ? (

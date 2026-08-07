@@ -1,85 +1,235 @@
 "use client";
 
-import Link from "next/link";
-import { motion, useInView, cubicBezier } from "framer-motion";
-import { useRef } from "react";
-import {
-  IconCategoriaCarreira,
-  IconCategoriaSaude,
-  IconCategoriaArte,
-  IconCategoriaGastronomia,
-  IconCategoriaModa,
-  IconCategoriaCasa,
-} from "@/components/icons";
+import { useRef, useState, useEffect, useCallback } from "react";
+import { HERO_CATEGORIES } from "@/lib/categories";
 
-const ease = cubicBezier(0.22, 1, 0.36, 1);
-
-const CATEGORIAS = [
-  { label: "Carreira e Negócios", icon: <IconCategoriaCarreira className="w-5 h-5" />, href: "/explorar?categoria=Carreira+e+Neg%C3%B3cios" },
-  { label: "Saúde e Bem Estar",   icon: <IconCategoriaSaude className="w-5 h-5" />,    href: "/explorar?categoria=Sa%C3%BAde+e+Bem+Estar" },
-  { label: "Criatividade",        icon: <IconCategoriaArte className="w-5 h-5" />,     href: "/explorar?categoria=Criatividade" },
-  { label: "Gastronomia",         icon: <IconCategoriaGastronomia className="w-5 h-5" />, href: "/explorar?categoria=Gastronomia" },
-  { label: "Estilo de Vida",      icon: <IconCategoriaModa className="w-5 h-5" />,     href: "/explorar?categoria=Estilo+de+Vida" },
-  { label: "Tecnologia",          icon: <IconCategoriaCasa className="w-5 h-5" />,     href: "/explorar?categoria=Tecnologia" },
-];
+// Placeholder images per category — swap for real mentor photos when available
+const CATEGORY_IMAGES: Record<string, string> = {
+  "Arte e Design": "/hero/hero-1.jpg",
+  "Business":      "/hero/hero-2.jpg",
+  "Moda":          "/hero/hero-3.jpg",
+  "Tecnologia":    "/hero/hero-4.jpg",
+  "Lifestyle":     "/hero/hero-1.jpg",
+  "Gastronomia":   "/hero/hero-2.jpg",
+};
 
 export function CategoriesSection() {
-  const ref = useRef<HTMLDivElement>(null);
-  const inView = useInView(ref, { once: true, margin: "-15% 0px" });
+  const [isMobile, setIsMobile]     = useState(false);
+  const [hoveredIdx, setHoveredIdx] = useState<number | null>(null);
+
+  // Cursor-following image state
+  const sectionRef   = useRef<HTMLElement>(null);
+  const imgRef       = useRef<HTMLDivElement>(null);
+  const posRef       = useRef({ x: 0, y: 0 });      // interpolated position
+  const targetRef    = useRef({ x: 0, y: 0 });      // mouse target
+  const rafRef       = useRef<number>(0);
+  const animatingRef = useRef(false);
+
+  useEffect(() => {
+    const check = () => setIsMobile(window.innerWidth < 768);
+    check();
+    window.addEventListener("resize", check, { passive: true });
+    return () => window.removeEventListener("resize", check);
+  }, []);
+
+  // RAF loop — lerp toward target (factor 0.12 = validated lag feel)
+  const startRaf = useCallback(() => {
+    if (animatingRef.current) return;
+    animatingRef.current = true;
+    const tick = () => {
+      posRef.current.x += (targetRef.current.x - posRef.current.x) * 0.12;
+      posRef.current.y += (targetRef.current.y - posRef.current.y) * 0.12;
+      if (imgRef.current) {
+        imgRef.current.style.transform =
+          `translate(${posRef.current.x}px, ${posRef.current.y}px)`;
+      }
+      rafRef.current = requestAnimationFrame(tick);
+    };
+    rafRef.current = requestAnimationFrame(tick);
+  }, []);
+
+  const stopRaf = useCallback(() => {
+    animatingRef.current = false;
+    cancelAnimationFrame(rafRef.current);
+  }, []);
+
+  useEffect(() => () => cancelAnimationFrame(rafRef.current), []);
+
+  const handleMouseMove = useCallback((e: React.MouseEvent<HTMLElement>) => {
+    const rect = sectionRef.current?.getBoundingClientRect();
+    if (!rect) return;
+    // Centre 160×200 image on cursor
+    targetRef.current.x = e.clientX - rect.left - 80;
+    targetRef.current.y = e.clientY - rect.top  - 100;
+  }, []);
+
+  const handleEnter = useCallback((i: number) => {
+    setHoveredIdx(i);
+    startRaf();
+  }, [startRaf]);
+
+  const handleLeave = useCallback(() => {
+    setHoveredIdx(null);
+    stopRaf();
+  }, [stopRaf]);
+
+  const isHovering = hoveredIdx !== null;
 
   return (
-    /* Wrapper com bg dark e padding para o container flutuante */
-    <section className="py-6 px-4 md:px-6" style={{ background: "#F4F2EB" }}>
+    <section
+      ref={sectionRef}
+      style={{
+        background:    "#232311",
+        paddingTop:    isMobile ? 56 : 88,
+        paddingBottom: isMobile ? 72 : 112,
+        position:      "relative",
+        overflow:      "hidden",
+      }}
+      onMouseMove={isMobile ? undefined : handleMouseMove}
+    >
+      {/* ── Header row ─────────────────────────────────────────────── */}
       <div
-        ref={ref}
-        className="relative overflow-hidden rounded-xl min-h-[60vh] flex items-center justify-center max-w-7xl mx-auto"
+        style={{
+          display:        "flex",
+          justifyContent: "space-between",
+          alignItems:     "flex-start",
+          marginBottom:   isMobile ? 40 : 56,
+          paddingLeft:    isMobile ? 24 : 120,
+          paddingRight:   isMobile ? 24 : 120,
+        }}
       >
-        {/* Vídeo de fundo */}
-        <video
-          autoPlay
-          muted
-          loop
-          playsInline
-          className="absolute inset-0 w-full h-full object-cover"
-        >
-          <source src="/videos/categories.mov" type="video/quicktime" />
-          <source src="/videos/categories.mov" type="video/mp4" />
-        </video>
-
-        {/* Overlay */}
-        <div className="absolute inset-0 bg-dark/60" />
-
-        {/* Conteúdo */}
-        <div className="relative z-10 text-center px-6 py-16 w-full">
-          <motion.h2
-            className="text-3xl md:text-5xl font-normal text-white mb-10 max-w-2xl mx-auto leading-tight"
-            initial={{ opacity: 0, y: 30 }}
-            animate={inView ? { opacity: 1, y: 0 } : {}}
-            transition={{ duration: 0.65, ease }}
+        <div style={{ display: "flex", gap: 12, alignItems: "baseline" }}>
+          <span
+            style={{
+              color:      "#FCFBF8",
+              fontSize:   isMobile ? 14 : 24,
+              fontWeight: 400,
+              fontFamily: "Host Grotesk, var(--font-host-grotesk), sans-serif",
+              flexShrink: 0,
+            }}
           >
-            Encontre os melhores<br />em todas as áreas
-          </motion.h2>
-
-          <div className="flex flex-wrap gap-3 justify-center max-w-2xl mx-auto">
-            {CATEGORIAS.map(({ label, icon, href }, i) => (
-              <motion.div
-                key={label}
-                initial={{ opacity: 0, y: 20, scale: 0.94 }}
-                animate={inView ? { opacity: 1, y: 0, scale: 1 } : {}}
-                transition={{ duration: 0.45, ease, delay: 0.2 + i * 0.07 }}
-              >
-                <Link
-                  href={href}
-                  className="flex items-center gap-2.5 h-12 px-5 rounded-md border border-white/20 text-sm font-medium text-white bg-white/10 backdrop-blur-md hover:bg-white/25 hover:border-white/35 hover:scale-[1.04] transition-all"
-                >
-                  {icon}
-                  {label}
-                </Link>
-              </motion.div>
-            ))}
-          </div>
+            (01)
+          </span>
+          <span
+            style={{
+              color:      "#FCFBF8",
+              fontSize:   isMobile ? 14 : 20,
+              fontWeight: 400,
+              lineHeight: 1.4,
+            }}
+          >
+            Connect with top experts of every field.
+          </span>
         </div>
+        {!isMobile && (
+          <span
+            style={{
+              color:      "rgba(252,251,248,0.38)",
+              fontSize:   16,
+              fontWeight: 400,
+              fontFamily: "Inter, var(--font-inter), sans-serif",
+              flexShrink: 0,
+              paddingTop: 4,
+            }}
+          >
+            Conversas com especialistas.
+          </span>
+        )}
       </div>
+
+      {/* ── Category list ───────────────────────────────────────────── */}
+      <ul style={{ listStyle: "none", margin: 0, padding: 0 }}>
+        {HERO_CATEGORIES.map((cat, i) => {
+          const hovered = hoveredIdx === i;
+          // Odd index (0,2,4 = 1st,3rd,5th): centered; Even (1,3,5): right-aligned
+          const isCentered = i % 2 === 0;
+
+          return (
+            <li
+              key={cat}
+              onMouseEnter={isMobile ? undefined : () => handleEnter(i)}
+              onMouseLeave={isMobile ? undefined : handleLeave}
+              style={{
+                background: hovered ? "#F8F586" : "transparent",
+                transition: "background 0.18s ease",
+                cursor:     isMobile ? "pointer" : "default",
+              }}
+            >
+              <div
+                style={{
+                  display:        "flex",
+                  justifyContent: isMobile ? "flex-start" : isCentered ? "center" : "flex-end",
+                  alignItems:     "center",
+                  height:         isMobile ? "auto" : 120,
+                  paddingTop:     isMobile ? 10 : 0,
+                  paddingBottom:  isMobile ? 10 : 0,
+                  paddingLeft:    isMobile ? 24 : 120,
+                  // Even rows on desktop: 400px from right edge; centered rows: match left margin
+                  paddingRight:   (!isMobile && !isCentered)
+                    ? "clamp(120px, 27.8vw, 400px)"
+                    : (isMobile ? 24 : 120),
+                }}
+              >
+                <span
+                  style={{
+                    fontFamily: "Host Grotesk, var(--font-host-grotesk), sans-serif",
+                    fontSize:   isMobile
+                      ? "clamp(32px, 9vw, 48px)"
+                      : "clamp(48px, 4.5vw, 64px)",
+                    fontWeight: 500,
+                    lineHeight: isMobile ? 1.15 : 1.08,
+                    color:      hovered ? "#232311" : "#FCFBF8",
+                    transition: "color 0.18s ease",
+                    whiteSpace: "nowrap",
+                    userSelect: "none",
+                  }}
+                >
+                  {cat}
+                </span>
+              </div>
+            </li>
+          );
+        })}
+      </ul>
+
+      {/* ── Cursor-following image — desktop only ───────────────────── */}
+      {!isMobile && (
+        <div
+          ref={imgRef}
+          aria-hidden="true"
+          style={{
+            position:      "absolute",
+            top:           0,
+            left:          0,
+            width:         160,
+            height:        200,
+            borderRadius:  12,
+            overflow:      "hidden",
+            pointerEvents: "none",
+            zIndex:        20,
+            opacity:       isHovering ? 1 : 0,
+            scale:         isHovering ? "1" : "0.88",
+            transition:    "opacity 0.22s ease, scale 0.22s ease",
+            willChange:    "transform",
+          }}
+        >
+          <img
+            src={
+              hoveredIdx !== null
+                ? CATEGORY_IMAGES[HERO_CATEGORIES[hoveredIdx]]
+                : CATEGORY_IMAGES["Arte e Design"]
+            }
+            alt=""
+            draggable={false}
+            style={{
+              width:     "100%",
+              height:    "100%",
+              objectFit: "cover",
+              display:   "block",
+            }}
+          />
+        </div>
+      )}
     </section>
   );
 }
