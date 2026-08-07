@@ -80,13 +80,179 @@ export function HeroSection() {
     return () => window.removeEventListener("resize", check);
   }, []);
 
-  const heroH    = isMobile ? HERO_H_MOBILE : HERO_H_DESKTOP;
-  const cardW    = isMobile ? CARD_W_MOBILE : CARD_W_DESKTOP;
-  const textPadX = isMobile ? 24 : 80;
-  // Explicit track width: 8 items × (card + gap), avoids browser max-content recalc
-  const trackW   = 8 * (cardW + CARD_GAP);
-  // Solid panel width: 50/50 split (Figma)
-  const panelW   = "50%";
+  // ── Mobile layout — vertical stack (text above, carousel below) ─────────────
+  if (isMobile) {
+    const trackWMobile = 8 * (CARD_W_MOBILE + CARD_GAP);
+
+    return (
+      <section style={{ padding: "0 12px 16px", display: "flex", flexDirection: "column", gap: 8 }}>
+        {/* Text block */}
+        <div
+          style={{
+            background:    BRAND_DARK,
+            borderRadius:  22,
+            padding:       "96px 24px 32px",
+          }}
+        >
+          <div
+            style={{
+              display:       "flex",
+              flexDirection: "column",
+              alignItems:    "flex-start",
+              gap:           20,
+            }}
+          >
+            <Logo size="header" lime />
+
+            <div style={{ display: "flex", flexDirection: "column", gap: 14 }}>
+              <h1
+                style={{
+                  fontFamily: "Host Grotesk, var(--font-host-grotesk), sans-serif",
+                  fontSize:   "clamp(28px, 7vw, 40px)",
+                  fontWeight: 500,
+                  color:      "#FCFBF8",
+                  lineHeight: 1.08,
+                  margin:     0,
+                }}
+              >
+                Network without<br />the Networking.
+              </h1>
+              <p
+                style={{
+                  fontSize:   14,
+                  color:      "rgba(252,251,248,0.72)",
+                  lineHeight: 1.55,
+                  margin:     0,
+                }}
+              >
+                Get easy 1:1 access to the top experts in
+                <br />
+                <RotatingWord />
+              </p>
+            </div>
+
+            {/* CTAs — stacked, full-width */}
+            <div
+              style={{
+                display:       "flex",
+                flexDirection: "column",
+                gap:           12,
+                alignSelf:     "stretch",
+              }}
+            >
+              <LinkButton
+                href="/cadastro"
+                variant="brand-secondary"
+                layout="icon-text"
+                icon={<ArrowIcon />}
+                className="w-full"
+              >
+                Create a free profile
+              </LinkButton>
+              <LinkButton
+                href="/explorar"
+                variant="brand-primary"
+                layout="icon-text"
+                icon={<ArrowIcon />}
+                className="w-full"
+              >
+                Find an expert
+              </LinkButton>
+            </div>
+          </div>
+        </div>
+
+        {/* Carousel block */}
+        <div
+          style={{
+            background:    tokens.lime,
+            borderRadius:  22,
+            overflow:      "hidden",
+            height:        420,
+            position:      "relative",
+          }}
+        >
+          <div style={{ position: "absolute", inset: 4, overflow: "hidden" }}>
+            <div
+              className="hero-marquee-track"
+              style={{
+                display:    "flex",
+                alignItems: "center",
+                width:      trackWMobile,
+                height:     "100%",
+                transform:  "translateZ(0)",
+              }}
+            >
+              {[...CARDS, ...CARDS].map((card, i) => (
+                <div
+                  key={i}
+                  style={{
+                    flexShrink:   0,
+                    width:        CARD_W_MOBILE,
+                    height:       "100%",
+                    borderRadius: CARD_R,
+                    overflow:     "hidden",
+                    position:     "relative",
+                    marginRight:  CARD_GAP,
+                  }}
+                >
+                  <img
+                    src={card.img}
+                    alt=""
+                    aria-hidden="true"
+                    draggable={false}
+                    style={{
+                      width:      "100%",
+                      height:     "100%",
+                      objectFit:  "cover",
+                      display:    "block",
+                      userSelect: "none",
+                    }}
+                  />
+                  <div
+                    style={{
+                      position:      "absolute",
+                      top:           0,
+                      left:          0,
+                      right:         0,
+                      height:        "45%",
+                      background:    "linear-gradient(180deg, rgba(81,79,65,0.60) 0%, rgba(81,79,65,0) 100%)",
+                      pointerEvents: "none",
+                    }}
+                  />
+                  <div
+                    style={{
+                      position:      "absolute",
+                      top:           24,
+                      left:          24,
+                      right:         12,
+                      zIndex:        1,
+                      display:       "flex",
+                      flexDirection: "column",
+                      gap:           0,
+                    }}
+                  >
+                    <span style={{ fontFamily: "Inter, var(--font-inter), sans-serif", fontSize: 13, fontWeight: 600, color: "#F8F68D", lineHeight: 1.4 }}>
+                      Book an 1:1 with
+                    </span>
+                    <span style={{ fontFamily: "Nerfos, cursive", fontSize: 40, fontWeight: 400, lineHeight: "44px", color: "#F8F68D" }}>
+                      {card.name}
+                    </span>
+                    <span style={{ fontFamily: "Inter, var(--font-inter), sans-serif", fontSize: 11, fontWeight: 600, color: "#F8F68D", textTransform: "uppercase", letterSpacing: "0.05em", lineHeight: 1.4, marginTop: 4 }}>
+                      {card.role}
+                    </span>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+      </section>
+    );
+  }
+
+  // ── Desktop layout — 50/50 split (unchanged) ────────────────────────────────
+  const trackW = 8 * (CARD_W_DESKTOP + CARD_GAP);
 
   return (
     <section style={{ padding: "0 12px 16px" }}>
@@ -94,7 +260,7 @@ export function HeroSection() {
         style={{
           position:     "relative",
           width:        "100%",
-          height:       heroH,
+          height:       HERO_H_DESKTOP,
           borderRadius: 22,
           overflow:     "hidden",
           background:   BRAND_DARK,
@@ -113,7 +279,6 @@ export function HeroSection() {
             overflow:     "hidden",
           }}
         >
-          {/* 4px inset = breathing room on all sides (top, right, bottom, left) */}
           <div style={{ position: "absolute", inset: 4, overflow: "hidden" }}>
             <div
               className="hero-marquee-track"
@@ -130,7 +295,7 @@ export function HeroSection() {
                   key={i}
                   style={{
                     flexShrink:   0,
-                    width:        cardW,
+                    width:        CARD_W_DESKTOP,
                     height:       "100%",
                     borderRadius: CARD_R,
                     overflow:     "hidden",
@@ -138,95 +303,66 @@ export function HeroSection() {
                     marginRight:  CARD_GAP,
                   }}
                 >
-                <img
-                  src={card.img}
-                  alt=""
-                  aria-hidden="true"
-                  draggable={false}
-                  style={{
-                    width:      "100%",
-                    height:     "100%",
-                    objectFit:  "cover",
-                    display:    "block",
-                    userSelect: "none",
-                  }}
-                />
-                {/* Top gradient — caption legibility over any photo */}
-                <div
-                  style={{
-                    position:     "absolute",
-                    top:          0,
-                    left:         0,
-                    right:        0,
-                    height:       "45%",
-                    background:   "linear-gradient(180deg, rgba(81,79,65,0.60) 0%, rgba(81,79,65,0) 100%)",
-                    pointerEvents:"none",
-                  }}
-                />
-                {/* Caption — top-left, 40px from corner (Figma) */}
-                <div
-                  style={{
-                    position:      "absolute",
-                    top:           40,
-                    left:          40,
-                    right:         12,
-                    zIndex:        1,
-                    display:       "flex",
-                    flexDirection: "column",
-                    gap:           0,
-                  }}
-                >
-                  <span
+                  <img
+                    src={card.img}
+                    alt=""
+                    aria-hidden="true"
+                    draggable={false}
                     style={{
-                      fontFamily: "Inter, var(--font-inter), sans-serif",
-                      fontSize:   16,
-                      fontWeight: 600,
-                      color:      "#F8F68D",
-                      lineHeight: 1.4,
+                      width:      "100%",
+                      height:     "100%",
+                      objectFit:  "cover",
+                      display:    "block",
+                      userSelect: "none",
+                    }}
+                  />
+                  <div
+                    style={{
+                      position:      "absolute",
+                      top:           0,
+                      left:          0,
+                      right:         0,
+                      height:        "45%",
+                      background:    "linear-gradient(180deg, rgba(81,79,65,0.60) 0%, rgba(81,79,65,0) 100%)",
+                      pointerEvents: "none",
+                    }}
+                  />
+                  <div
+                    style={{
+                      position:      "absolute",
+                      top:           40,
+                      left:          40,
+                      right:         12,
+                      zIndex:        1,
+                      display:       "flex",
+                      flexDirection: "column",
+                      gap:           0,
                     }}
                   >
-                    Book an 1:1 with
-                  </span>
-                  <span
-                    style={{
-                      fontFamily: "Nerfos, cursive",
-                      fontSize:   isMobile ? 40 : 56,
-                      fontWeight: 400,
-                      lineHeight: isMobile ? "44px" : "61.6px",
-                      color:      "#F8F68D",
-                    }}
-                  >
-                    {card.name}
-                  </span>
-                  <span
-                    style={{
-                      fontFamily:    "Inter, var(--font-inter), sans-serif",
-                      fontSize:      12,
-                      fontWeight:    600,
-                      color:         "#F8F68D",
-                      textTransform: "uppercase",
-                      letterSpacing: "0.05em",
-                      lineHeight:    1.4,
-                      marginTop:     4,
-                    }}
-                  >
-                    {card.role}
-                  </span>
-                </div>
+                    <span style={{ fontFamily: "Inter, var(--font-inter), sans-serif", fontSize: 16, fontWeight: 600, color: "#F8F68D", lineHeight: 1.4 }}>
+                      Book an 1:1 with
+                    </span>
+                    <span style={{ fontFamily: "Nerfos, cursive", fontSize: 56, fontWeight: 400, lineHeight: "61.6px", color: "#F8F68D" }}>
+                      {card.name}
+                    </span>
+                    <span style={{ fontFamily: "Inter, var(--font-inter), sans-serif", fontSize: 12, fontWeight: 600, color: "#F8F68D", textTransform: "uppercase", letterSpacing: "0.05em", lineHeight: 1.4, marginTop: 4 }}>
+                      {card.role}
+                    </span>
+                  </div>
                 </div>
               ))}
             </div>
           </div>
         </div>
 
-        {/* ── Layer 1: Solid dark panel — clean cut (no gradient) ─────── */}
+        {/* ── Layer 1: Solid dark panel — clean cut ───────────────────── */}
         <div
           style={{
             position:   "absolute",
             left:       0,
             top:        0,
             bottom:     0,
-            width:      panelW,
+            width:      "50%",
             background: BRAND_DARK,
             zIndex:     1,
           }}
@@ -235,14 +371,12 @@ export function HeroSection() {
         {/* ── Layer 2: Text + CTAs ─────────────────────────────────────── */}
         <div
           style={{
-            position:     "absolute",
-            inset:        0,
-            zIndex:       2,
-            display:      "flex",
-            alignItems:   isMobile ? "flex-start" : "center",
-            paddingTop:   isMobile ? 40 : 0,
-            paddingLeft:  textPadX,
-            paddingRight: isMobile ? textPadX : 0,
+            position:    "absolute",
+            inset:       0,
+            zIndex:      2,
+            display:     "flex",
+            alignItems:  "center",
+            paddingLeft: 80,
           }}
         >
           <div
@@ -250,19 +384,17 @@ export function HeroSection() {
               display:       "flex",
               flexDirection: "column",
               alignItems:    "flex-start",
-              gap:           isMobile ? 20 : 28,
-              maxWidth:      isMobile ? "100%" : 560,
+              gap:           28,
+              maxWidth:      560,
             }}
           >
-            {/* Wordmark — logo oficial */}
-            <Logo size={isMobile ? "header" : "md"} lime />
+            <Logo size="md" lime />
 
-            {/* Headline + subtitle */}
             <div style={{ display: "flex", flexDirection: "column", gap: 14 }}>
               <h1
                 style={{
                   fontFamily: "Host Grotesk, var(--font-host-grotesk), sans-serif",
-                  fontSize:   isMobile ? "clamp(28px, 7vw, 40px)" : "clamp(34px, 3.5vw, 52px)",
+                  fontSize:   "clamp(34px, 3.5vw, 52px)",
                   fontWeight: 500,
                   color:      "#FCFBF8",
                   lineHeight: 1.08,
@@ -273,7 +405,7 @@ export function HeroSection() {
               </h1>
               <p
                 style={{
-                  fontSize:   isMobile ? 14 : "clamp(14px, 1.2vw, 17px)",
+                  fontSize:   "clamp(14px, 1.2vw, 17px)",
                   color:      "rgba(252,251,248,0.72)",
                   lineHeight: 1.55,
                   margin:     0,
@@ -284,34 +416,19 @@ export function HeroSection() {
               </p>
             </div>
 
-            {/* CTAs */}
             <div
               style={{
-                display:       "flex",
-                flexDirection: isMobile ? "column" : "row",
-                gap:           isMobile ? 12 : 16,
-                alignItems:    "flex-start",
-                flexWrap:      "nowrap",
-                // On mobile, stretch buttons to fill text block width
-                ...(isMobile ? { alignSelf: "stretch" } : {}),
+                display:    "flex",
+                flexDirection: "row",
+                gap:        16,
+                alignItems: "flex-start",
+                flexWrap:   "nowrap",
               }}
             >
-              <LinkButton
-                href="/cadastro"
-                variant="brand-secondary"
-                layout="icon-text"
-                icon={<ArrowIcon />}
-                className={isMobile ? "w-full" : undefined}
-              >
-                {isMobile ? "Create a free profile" : "Create a profile and start monetizing"}
+              <LinkButton href="/cadastro" variant="brand-secondary" layout="icon-text" icon={<ArrowIcon />}>
+                Create a profile and start monetizing
               </LinkButton>
-              <LinkButton
-                href="/explorar"
-                variant="brand-primary"
-                layout="icon-text"
-                icon={<ArrowIcon />}
-                className={isMobile ? "w-full" : undefined}
-              >
+              <LinkButton href="/explorar" variant="brand-primary" layout="icon-text" icon={<ArrowIcon />}>
                 Find an expert
               </LinkButton>
             </div>
