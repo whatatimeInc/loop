@@ -1,125 +1,113 @@
 "use client";
 
-import { useState, useEffect } from "react";
-import { usePathname } from "next/navigation";
 import { Logo } from "@/components/Logo";
 import Link from "next/link";
 import { LinkButton } from "@/components/ui/Button";
 import { LogoutButton } from "@/components/LogoutButton";
+import { tokens } from "@/components/ui/tokens";
 
-function HamburgerIcon({ open }: { open: boolean }) {
-  return (
-    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-      {open ? (
-        <>
-          <path d="M18 6L6 18" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
-          <path d="M6 6L18 18" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
-        </>
-      ) : (
-        <>
-          <path d="M4 6h16" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
-          <path d="M4 12h16" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
-          <path d="M4 18h16" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
-        </>
-      )}
-    </svg>
-  );
-}
+const PILL: React.CSSProperties = {
+  background: tokens.lime,
+  borderRadius: 99,
+  alignItems: "center",
+  color: tokens.dark,
+};
 
 export function HeaderClient({ isLoggedIn }: { isLoggedIn: boolean }) {
-  const pathname = usePathname();
-  const isHome = pathname === "/";
-
-  const [scrolled, setScrolled] = useState(!isHome);
-  // TODO: definir itens do menu mobile
-  const [menuOpen, setMenuOpen] = useState(false);
-
-  useEffect(() => {
-    if (!isHome) return;
-    const onScroll = () => setScrolled(window.scrollY > 20);
-    window.addEventListener("scroll", onScroll, { passive: true });
-    onScroll();
-    return () => window.removeEventListener("scroll", onScroll);
-  }, [isHome]);
-
-  const transparent = isHome && !scrolled;
-
-  const glassStyle = {
-    background: "rgba(255,255,255,0.70)",
-    backdropFilter: "blur(12px)",
-    WebkitBackdropFilter: "blur(12px)",
-    border: "1px solid rgba(255,255,255,0.40)",
-    boxShadow: "0 4px 24px rgba(39,38,24,0.06)",
-  } as React.CSSProperties;
-
   return (
-    <header className="fixed top-0 md:top-8 left-0 right-0 z-50 flex justify-center md:px-4">
-
-      {/* Desktop nav pill — always glass */}
+    <header
+      style={{
+        position: "fixed",
+        top: 16,
+        left: "50%",
+        transform: "translateX(-50%)",
+        width: "calc(100% - 32px)",
+        maxWidth: 960,
+        zIndex: 50,
+      }}
+    >
+      {/* ── Desktop pill ── */}
       <nav
-        className="hidden md:flex items-center justify-between gap-4 px-4 md:py-2 md:rounded-xl w-full md:max-w-3xl"
+        className="hidden md:grid"
         style={{
-          ...glassStyle,
-          color: "#272618",
+          ...PILL,
+          gridTemplateColumns: "1fr auto 1fr",
+          padding: "10px 20px 10px 40px",
         }}
       >
-        <a href="/" aria-label="Ir para a Home">
+        {/* Esquerda: Logo */}
+        <a href="/" aria-label="Ir para a Home" style={{ display: "inline-flex" }}>
           <Logo size="header" />
         </a>
-        <div className="flex items-center gap-2">
+
+        {/* Centro: tagline */}
+        <span
+          style={{
+            fontSize: 15,
+            fontWeight: 500,
+            whiteSpace: "nowrap",
+            color: tokens.dark,
+          }}
+        >
+          Conversas com especialistas.
+        </span>
+
+        {/* Direita: CTA ou estado logado */}
+        <div
+          style={{
+            display: "flex",
+            justifyContent: "flex-end",
+            alignItems: "center",
+            gap: 8,
+          }}
+        >
           {isLoggedIn ? (
             <>
-              <Link href="/conta" className="text-sm font-medium opacity-70 hover:opacity-100 transition-opacity">Minha conta</Link>
+              <Link
+                href="/conta"
+                style={{
+                  fontSize: 14,
+                  fontWeight: 500,
+                  color: tokens.dark,
+                  opacity: 0.7,
+                  textDecoration: "none",
+                }}
+              >
+                Minha conta
+              </Link>
               <LogoutButton />
             </>
           ) : (
-            <>
-              <Link href="/login" className="text-sm font-medium opacity-70 hover:opacity-100 transition-opacity">Entrar</Link>
-              <span className="hidden md:inline-flex">
-                <LinkButton href="/cadastro" variant="brand-primary">Criar perfil</LinkButton>
-              </span>
-            </>
+            <LinkButton href="/cadastro" variant="neutral-secondary">
+              Criar Loop.Talk
+            </LinkButton>
           )}
         </div>
       </nav>
 
-      {/* Mobile nav bar */}
+      {/* ── Mobile pill ── */}
       <nav
-        className="flex md:hidden items-center justify-between px-8 h-20 w-full"
+        className="flex md:hidden items-center justify-between"
         style={{
-          ...(transparent ? {} : {
-            background: "rgba(255,255,255,0.70)",
-            backdropFilter: "blur(12px)",
-            WebkitBackdropFilter: "blur(12px)",
-            borderBottom: "1px solid rgba(255,255,255,0.30)",
-          }),
-          transition: "background 0.3s ease, backdrop-filter 0.3s ease",
-          color: transparent ? "#FCFBF8" : "#272618",
+          ...PILL,
+          padding: "14px 24px",
         }}
       >
-        <a href="/" aria-label="Ir para a Home">
-          <Logo size="header" white={transparent} />
+        <a href="/" aria-label="Ir para a Home" style={{ display: "inline-flex" }}>
+          <Logo size="header" />
         </a>
-
-        {/* TODO: definir itens do menu mobile */}
-        <button
-          onClick={() => setMenuOpen(!menuOpen)}
-          aria-label={menuOpen ? "Fechar menu" : "Abrir menu"}
+        <Link
+          href="/login"
           style={{
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "center",
-            background: "none",
-            border: "none",
-            cursor: "pointer",
-            color: "inherit",
-            padding: 0,
+            fontSize: 15,
+            fontWeight: 500,
+            color: tokens.dark,
+            textDecoration: "none",
           }}
         >
-          <HamburgerIcon open={menuOpen} />
-        </button>
+          Entrar
+        </Link>
       </nav>
-
     </header>
   );
 }
