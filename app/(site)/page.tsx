@@ -7,6 +7,7 @@ import { HowItWorksSection } from "@/components/home/HowItWorksSection";
 import { NossaPropostaSection } from "@/components/home/NossaPropostaSection";
 import { HeroSection } from "@/components/home/HeroSection";
 import { CategoriesSection } from "@/components/home/CategoriesSection";
+import { VideoSection } from "@/components/home/VideoSection";
 import { tokens } from "@/components/ui/tokens";
 
 function useIsMobile() {
@@ -117,6 +118,9 @@ export default function Home() {
 
       {/* ── Fatia 2: Categorias ──────────────────────────────────────────── */}
       <CategoriesSection />
+
+      {/* ── Fatia 3: Vídeo ───────────────────────────────────────────────── */}
+      <VideoSection />
 
       {/* ── Como funciona / Nossa Proposta ───────────────────────────────── */}
       {isMobile ? (
