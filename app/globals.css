@@ -80,7 +80,7 @@
 }
 
 html {
-  background: #F4F2EB;
+  background: #232311;
 }
 
 body {
@@ -97,18 +97,6 @@ body {
   display: none;
 }
 
-/* Hero framed — full viewport minus uniform margin, with svh fallback */
-.hero-framed {
-  height: calc(100vh - 24px);
-  height: calc(100svh - 24px);
-}
-@media (max-width: 767px) {
-  .hero-framed {
-    height: calc(100vh - 16px);
-    height: calc(100svh - 16px);
-  }
-}
-
 /* CTA button hover states */
 .btn-lime {
   transition: background-color 0.18s ease;
@@ -121,4 +109,21 @@ body {
 }
 .btn-dark:hover {
   background-color: #373525 !important;
+}
+
+/* Hero carousel marquee */
+@keyframes hero-marquee {
+  from { transform: translateX(0) translateZ(0); }
+  to   { transform: translateX(-50%) translateZ(0); }
+}
+.hero-marquee-track {
+  animation: hero-marquee 22s linear infinite;
+  will-change: transform;
+  backface-visibility: hidden;
+}
+@media (prefers-reduced-motion: reduce) {
+  .hero-marquee-track {
+    animation: none;
+    will-change: auto;
+  }
 }

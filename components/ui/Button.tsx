@@ -85,7 +85,7 @@ function baseStyle(
     display: "inline-flex",
     alignItems: "center",
     justifyContent: "center",
-    gap: layout !== "text" ? 24 : undefined,
+    gap: layout !== "text" ? 12 : undefined,
     height: 56,
     ...(isIconOnly ? { width: 56 } : { paddingLeft: 40, paddingRight: 40 }),
     borderRadius: 99,

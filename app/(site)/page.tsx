@@ -5,6 +5,7 @@ import Link from "next/link";
 import { CategoryMarquee } from "@/components/home/CategoryMarquee";
 import { HowItWorksSection } from "@/components/home/HowItWorksSection";
 import { NossaPropostaSection } from "@/components/home/NossaPropostaSection";
+import { HeroSection } from "@/components/home/HeroSection";
 import { tokens } from "@/components/ui/tokens";
 
 function useIsMobile() {
@@ -108,170 +109,10 @@ export default function Home() {
   const ctaFade = useFadeIn();
 
   return (
-    <main style={{ background: "#F4F2EB", paddingBottom: isMobile ? 80 : 0 }}>
+    <main style={{ background: "#232311", paddingBottom: isMobile ? 80 : 0 }}>
 
-      {/* ── Hero — viewport-height com moldura arredondada ──────────────── */}
-      <section style={{ padding: isMobile ? 8 : 12 }}>
-        <div
-          style={{
-            position: "relative",
-            width: "100%",
-            height: isMobile ? "calc(100svh - 16px)" : "calc(100svh - 24px)",
-            borderRadius: isMobile ? 16 : 22,
-            overflow: "hidden",
-            // Mobile: column (text over video); Desktop: 2 equal columns
-            display: "flex",
-            flexDirection: isMobile ? "column" : "row",
-            background: isMobile ? "#1C1B14" : "#F6F4F2",
-            justifyContent: isMobile ? "flex-end" : undefined,
-          }}
-        >
-          {isMobile ? (
-            /* ── Mobile: full-bleed vídeo + texto sobreposto ─────────────── */
-            <>
-              <video
-                autoPlay muted loop playsInline
-                poster="/bento-hero.jpg"
-                src="/hero-categories.mp4"
-                style={{
-                  position: "absolute",
-                  inset: 0,
-                  width: "100%",
-                  height: "100%",
-                  objectFit: "cover",
-                  zIndex: 0,
-                }}
-              />
-              <div
-                style={{
-                  position: "absolute",
-                  inset: 0,
-                  zIndex: 1,
-                  background: "linear-gradient(180deg, rgba(0,0,0,0.10) 0%, rgba(0,0,0,0.58) 100%)",
-                }}
-              />
-              <div
-                style={{
-                  position: "relative",
-                  zIndex: 2,
-                  display: "flex",
-                  flexDirection: "column",
-                  gap: 16,
-                  maxWidth: 400,
-                  padding: "24px 24px 40px",
-                }}
-              >
-                <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
-                  <h1
-                    style={{
-                      fontSize: "clamp(28px, 3vw + 8px, 60px)",
-                      fontWeight: 500,
-                      color: "#FCFBF8",
-                      lineHeight: 1.1,
-                      margin: 0,
-                      fontFamily: "var(--font-host-grotesk)",
-                    }}
-                  >
-                    Algumas conversas não têm preço. As suas têm.
-                  </h1>
-                  <p style={{ fontSize: 14, color: "rgba(252,251,248,0.85)", lineHeight: 1.55, margin: 0 }}>
-                    A plataforma para te conectar com sua audiência valorizando seu tempo.
-                  </p>
-                </div>
-              </div>
-            </>
-          ) : (
-            /* ── Desktop: 2 colunas 50/50 ──────────────────────────────── */
-            <>
-              {/* Coluna esquerda — texto + CTA — exatamente 50% */}
-              <div
-                style={{
-                  flex: "0 0 50%",
-                  background: "#F6F4F2",
-                  display: "flex",
-                  flexDirection: "column",
-                  justifyContent: "center",
-                  alignItems: "center",
-                  padding: "64px 48px",
-                  minWidth: 0,
-                }}
-              >
-                {/* Bloco contido: headline + subtítulo + CTA */}
-                <div
-                  style={{
-                    display: "flex",
-                    flexDirection: "column",
-                    gap: 32,
-                    width: "100%",
-                    maxWidth: 460,
-                  }}
-                >
-                  <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
-                    <h1
-                      style={{
-                        fontSize: 40,
-                        fontWeight: 500,
-                        color: "#151918",
-                        lineHeight: "44px",
-                        margin: 0,
-                        fontFamily: "var(--font-host-grotesk)",
-                      }}
-                    >
-                      Algumas conversas não têm preço. As suas têm.
-                    </h1>
-                    <p
-                      style={{
-                        fontSize: 16,
-                        color: "rgba(21,25,24,0.55)",
-                        lineHeight: 1.55,
-                        margin: 0,
-                      }}
-                    >
-                      A plataforma para te conectar com sua audiência valorizando seu tempo.
-                    </p>
-                  </div>
-                  <Link
-                    href="/cadastro"
-                    className="btn-lime"
-                    style={{
-                      display: "flex",
-                      alignItems: "center",
-                      justifyContent: "center",
-                      gap: 8,
-                      padding: "14px 24px",
-                      background: tokens.lime,
-                      borderRadius: 8,
-                      fontSize: 16,
-                      fontWeight: 600,
-                      color: "#151918",
-                      textDecoration: "none",
-                      boxShadow: "0px 1px 2px rgba(10,13,18,0.05)",
-                    }}
-                  >
-                    Criar Loop.Talk
-                    <ArrowIcon />
-                  </Link>
-                </div>
-              </div>
-
-              {/* Coluna direita — vídeo — exatamente 50% */}
-              <div style={{ flex: "0 0 50%", position: "relative", minWidth: 0 }}>
-                <video
-                  autoPlay muted loop playsInline
-                  src="/homepage-hero-423-2.mp4"
-                  style={{
-                    position: "absolute",
-                    inset: 0,
-                    width: "100%",
-                    height: "100%",
-                    objectFit: "cover",
-                  }}
-                />
-              </div>
-            </>
-          )}
-        </div>
-      </section>
+      {/* ── Hero ─────────────────────────────────────────────────────────── */}
+      <HeroSection />
 
       {/* ── Como funciona / Nossa Proposta ───────────────────────────────── */}
       {isMobile ? (

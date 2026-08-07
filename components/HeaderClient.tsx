@@ -17,13 +17,11 @@ export function HeaderClient({ isLoggedIn }: { isLoggedIn: boolean }) {
   return (
     <header
       style={{
-        position: "fixed",
-        top: 16,
-        left: "50%",
-        transform: "translateX(-50%)",
-        width: "calc(100% - 32px)",
-        maxWidth: 960,
+        position: "sticky",
+        top: 0,
         zIndex: 50,
+        padding: "16px 16px 16px",
+        background: "#232311",
       }}
     >
       {/* ── Desktop pill ── */}
@@ -33,6 +31,8 @@ export function HeaderClient({ isLoggedIn }: { isLoggedIn: boolean }) {
           ...PILL,
           gridTemplateColumns: "1fr auto 1fr",
           padding: "10px 20px 10px 40px",
+          maxWidth: 960,
+          margin: "0 auto",
         }}
       >
         {/* Esquerda: Logo */}

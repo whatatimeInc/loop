@@ -23,8 +23,8 @@ export function Logo({ size = "header", white = false, light = false, lime = fal
 
   let filter = "none";
   if (lime) {
-    // black SVG → brand yellow #EAEA68
-    filter = "brightness(0) saturate(100%) invert(96%) sepia(55%) saturate(400%) hue-rotate(5deg) brightness(103%)";
+    // black SVG → brand primary #F8F586
+    filter = "brightness(0) saturate(100%) invert(94%) sepia(70%) saturate(380%) hue-rotate(12deg) brightness(109%)";
   } else if (white) {
     // black SVG → pure white #ffffff (brightness(0) first forces black, invert(1) forces white)
     filter = "brightness(0) invert(1)";
