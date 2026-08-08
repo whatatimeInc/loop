@@ -10,6 +10,7 @@ import { CategoriesSection } from "@/components/home/CategoriesSection";
 import { VideoSection } from "@/components/home/VideoSection";
 import { ExpertSection } from "@/components/home/ExpertSection";
 import { BrandsSection } from "@/components/home/BrandsSection";
+import { CreatorsSection } from "@/components/home/CreatorsSection";
 import { tokens } from "@/components/ui/tokens";
 
 function useIsMobile() {
@@ -129,6 +130,9 @@ export default function Home() {
 
       {/* ── Fatia 5: Criações dos nossos experts (marcas) ────────────────── */}
       <BrandsSection />
+
+      {/* ── Fatia 6: Nossos criadores (cards com hover foto→vídeo) ───────── */}
+      <CreatorsSection />
 
       {/* ── Como funciona / Nossa Proposta ───────────────────────────────── */}
       {isMobile ? (

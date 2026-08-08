@@ -2,10 +2,10 @@
 
 import { useEffect, useState } from "react";
 import { LinkButton, ArrowIcon } from "@/components/ui/Button";
+import { SectionHeader } from "@/components/home/SectionHeader";
 import { tokens } from "@/components/ui/tokens";
 
 const HOST_GROTESK = "Host Grotesk, var(--font-host-grotesk), sans-serif";
-const INTER        = "Inter, var(--font-inter), sans-serif";
 
 // Indenting the CTA to the text column costs 62px on a 375px screen, which leaves
 // less room than the button's default 40px side padding needs. Tightening it here
@@ -71,74 +71,30 @@ export function BrandsSection() {
             maxWidth:      isMobile ? "100%" : 360,
           }}
         >
-          {/* "(04)" hangs in its own column; the title, the description AND the
-              CTA all sit in the column beside it, sharing one left edge. */}
-          <div style={{ display: "flex", gap: 12, alignItems: "baseline" }}>
-            <span
-              style={{
-                color:      tokens.lime,
-                fontSize:   24,
-                fontWeight: 500,
-                fontFamily: HOST_GROTESK,
-                flexShrink: 0,
-              }}
-            >
-              (04)
-            </span>
-
+          {/* "(04)" hangs to the left; the title, the description AND the CTA
+              sit in the column beside it, sharing one left edge. */}
+          <SectionHeader
+            number="(04)"
+            title="Criações dos nossos experts"
+            subtitle="Founders, especialistas e criadores que abriram a agenda."
+            isMobile={isMobile}
+          >
+            {/* Stretches to the text column on mobile — never to the "(04)" edge. */}
             <div
-              style={{
-                display:       "flex",
-                flexDirection: "column",
-                alignItems:    "flex-start",
-                gap:           isMobile ? 20 : 28,
-                minWidth:      0,
-                flex:          1,
-              }}
+              className={isMobile ? "brands-cta" : undefined}
+              style={{ display: "flex", alignSelf: isMobile ? "stretch" : "auto", minWidth: 0 }}
             >
-              <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
-                <span
-                  style={{
-                    color:      tokens.lime,
-                    fontFamily: HOST_GROTESK,
-                    fontSize:   20,
-                    fontWeight: 500,
-                    lineHeight: 1.25,
-                  }}
-                >
-                  Criações dos nossos experts
-                </span>
-                <p
-                  style={{
-                    color:      tokens.lime,
-                    fontFamily: INTER,
-                    fontSize:   14,
-                    fontWeight: 400,
-                    lineHeight: 1.45,
-                    margin:     0,
-                  }}
-                >
-                  Founders, especialistas e criadores que abriram a agenda.
-                </p>
-              </div>
-
-              {/* Stretches to the text column on mobile — never to the "(04)" edge. */}
-              <div
-                className={isMobile ? "brands-cta" : undefined}
-                style={{ display: "flex", alignSelf: isMobile ? "stretch" : "auto", minWidth: 0 }}
+              <LinkButton
+                href="/explorar"
+                variant="brand-secondary"
+                layout="icon-text"
+                icon={<ArrowIcon />}
+                className={isMobile ? "w-full" : undefined}
               >
-                <LinkButton
-                  href="/explorar"
-                  variant="brand-secondary"
-                  layout="icon-text"
-                  icon={<ArrowIcon />}
-                  className={isMobile ? "w-full" : undefined}
-                >
-                  Encontrar experts
-                </LinkButton>
-              </div>
+                Encontrar experts
+              </LinkButton>
             </div>
-          </div>
+          </SectionHeader>
         </div>
 
         {/* ── Right column: brand list, large static type ── */}

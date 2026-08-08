@@ -20,9 +20,22 @@ export const tokens = {
   limeLight: "#EAEA68",   // brand-light / hover
   limeHover: "#FAF9D1",   // brand-inactive
 
+  // Glass — base tint for frosted overlays on dark surfaces
+  glassDark: "#514F41",
+
   // Semantic
   red:    "#D93B3B",
   green:  "#5FAD8E",
 } as const;
 
 export type Tokens = typeof tokens;
+
+/** Hex token → rgba() with the given alpha. Keeps colours out of components. */
+export function withAlpha(hex: string, alpha: number): string {
+  const h = hex.replace("#", "");
+  const n = parseInt(
+    h.length === 3 ? h.split("").map((c) => c + c).join("") : h,
+    16,
+  );
+  return `rgba(${(n >> 16) & 255}, ${(n >> 8) & 255}, ${n & 255}, ${alpha})`;
+}
