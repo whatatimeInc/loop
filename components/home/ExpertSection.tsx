@@ -2,6 +2,7 @@
 
 import { useEffect, useRef, useState } from "react";
 import { LinkButton, ArrowIcon } from "@/components/ui/Button";
+import { SwipeCarousel } from "@/components/home/SwipeCarousel";
 import { tokens } from "@/components/ui/tokens";
 // Cards reused from the first-generation home — NOT recreated.
 // Their internal animations (folder lift/fan, sliding days, price slider) and their
@@ -18,43 +19,9 @@ const BG_PHOTO = "/hero/expert-table.jpg";
 const CARD_H       = 440;
 const CARD_W       = CARD_H; // square cards in the pinned stack
 
-// Mobile swipe carousel. scroll-snap gives native, momentum-correct snapping on
-// touch with no JS; `mandatory` is what guarantees it always lands on a whole card.
-const SWIPE_CSS = `
-  .expert-swipe {
-    display: flex;
-    overflow-x: auto;
-    overflow-y: hidden;
-    scroll-snap-type: x mandatory;
-    -webkit-overflow-scrolling: touch;
-    overscroll-behavior-x: contain;
-    scrollbar-width: none;
-    /* 9vw + 82vw + 9vw = 100vw. Sizing the rail in vw (not %) is what lets the
-       FIRST and LAST cards reach a true centred snap instead of clamping at the
-       edges — so all three settle in exactly the same spot. */
-    padding-inline: 9vw;
-    scroll-padding-inline: 9vw;
-  }
-  .expert-swipe::-webkit-scrollbar { display: none; }
-  .expert-swipe > * {
-    /* Under a full viewport so the neighbouring card peeks in at the edge — the
-       only affordance that there is more to swipe (no dots, no arrows). */
-    flex: 0 0 82vw;
-    /* Without this the agenda card's intrinsic chip-row width (min-width: auto)
-       stretches its slide past the viewport and breaks the snap rhythm. */
-    min-width: 0;
-    box-sizing: border-box;
-    padding-inline: 8px;        /* gutter between neighbouring cards */
-    scroll-snap-align: center;
-    scroll-snap-stop: always;   /* one card per swipe — never skips past one */
-  }
-  /* Safari/Chrome drop a scroll container's trailing padding; this restores it
-     so the last card can settle without hugging the screen edge. */
-  .expert-swipe::after {
-    content: "";
-    flex: 0 0 1px;
-  }
-`;
+// Mobile carousel geometry: 9vw + 82vw + 9vw = 100vw. See SwipeCarousel for why
+// the rail is sized in vw — it is what lets the first and last card reach a true
+// centred snap instead of clamping at the edges.
 const STEP_COUNT   = 3;
 const TRANSITION   = "0.5s cubic-bezier(.4,0,.2,1)";
 
@@ -291,8 +258,6 @@ export function ExpertSection() {
     <>
       {/* FolderIllustration's keyframes travel with the component. */}
       <style dangerouslySetInnerHTML={{ __html: ANIMATION_CSS }} />
-      {/* Native scroll-snap carousel — no JS, no indicator, one card per swipe. */}
-      <style dangerouslySetInnerHTML={{ __html: SWIPE_CSS }} />
 
       <section
         ref={sectionRef}
@@ -442,8 +407,13 @@ export function ExpertSection() {
           /* Mobile: horizontal swipe carousel, one whole card per gesture.
              The track is edge-to-edge so a card can sit centred in the canvas;
              padding lives on the slides instead. */
-          <div
-            className="expert-swipe"
+          <SwipeCarousel
+            name="expert"
+            align="center"
+            slideBasis="82vw"
+            padStart="9vw"
+            padEnd="9vw"
+            slidePadding={8}
             style={{
               position: "relative",
               zIndex:   2,
@@ -455,7 +425,7 @@ export function ExpertSection() {
             {STEPS.map((s) => (
               <div
                 key={s.title}
-                /* Width, gutter and snap all come from .expert-swipe > * */
+                /* Width, gutter and snap all come from the carousel */
                 style={{ display: "flex", justifyContent: "center" }}
               >
                 <StepCard
@@ -471,7 +441,7 @@ export function ExpertSection() {
                 </StepCard>
               </div>
             ))}
-          </div>
+          </SwipeCarousel>
         ) : (
           <div
             style={{

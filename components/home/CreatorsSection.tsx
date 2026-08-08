@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import { LinkButton, ArrowIcon } from "@/components/ui/Button";
 import { SectionHeader } from "@/components/home/SectionHeader";
+import { SwipeCarousel } from "@/components/home/SwipeCarousel";
 import { ExpertGlassCard } from "@/components/ExpertGlassCard";
 import type { Categoria } from "@/lib/mockExperts";
 
@@ -88,36 +89,63 @@ export function CreatorsSection() {
         </div>
       </div>
 
-      {/* ── Cards: side by side on desktop, stacked on mobile. Columns cap at
-             343px and shrink below it, and the track is centred — so 2, 3 or 4
-             creators all stay balanced inside the 120px margins with no code
-             change. ── */}
-      <div
-        style={{
-          display:             "grid",
-          gridTemplateColumns: isMobile
-            ? "1fr"
-            : `repeat(${CREATORS.length}, minmax(0, ${CARD_W}px))`,
-          justifyContent: "center",
-          gap: isMobile ? 16 : 24,
-        }}
-      >
-        {CREATORS.map((c) => (
-          <ExpertGlassCard
-            key={c.slug}
-            photoSrc={`/mentors/${c.slug}/profile.webp`}
-            name={c.name}
-            description={c.description}
-            categoria={c.categoria}
-            // Dark glass: this section sits on the dark home background.
-            variant="dark"
-            // No hover on touch — mobile gets the still photo only.
-            videoSrc={isMobile ? undefined : c.video}
-            aspectRatio={CARD_RATIO}
-            sizes={isMobile ? "100vw" : `${CARD_W}px`}
-          />
-        ))}
-      </div>
+      {/* ── Cards ──
+             Mobile: swipe carousel, same component as the expert section.
+             Desktop: centred grid whose columns cap at 343px and shrink below
+             it, so 2, 3 or 4 creators all stay balanced inside the margins. */}
+      {isMobile ? (
+        // The rail bleeds to the screen edge; the 24px margin is the track's
+        // padding (and scroll-padding), so the first card starts on the margin
+        // and `start` snaps land there too. Never a margin on the card itself.
+        <SwipeCarousel
+          name="creators"
+          align="start"
+          slideBasis="78vw"
+          padStart="24px"
+          padEnd="24px"
+          gap={12}
+          // Cancels the section's own side padding so the track can bleed.
+          style={{ marginLeft: -padX, marginRight: -padX }}
+        >
+          {CREATORS.map((c) => (
+            <ExpertGlassCard
+              key={c.slug}
+              photoSrc={`/mentors/${c.slug}/profile.webp`}
+              name={c.name}
+              description={c.description}
+              categoria={c.categoria}
+              variant="dark"
+              // No video on touch — the carousel must not reintroduce it.
+              aspectRatio={CARD_RATIO}
+              sizes="78vw"
+            />
+          ))}
+        </SwipeCarousel>
+      ) : (
+        <div
+          style={{
+            display:             "grid",
+            gridTemplateColumns: `repeat(${CREATORS.length}, minmax(0, ${CARD_W}px))`,
+            justifyContent:      "center",
+            gap:                 24,
+          }}
+        >
+          {CREATORS.map((c) => (
+            <ExpertGlassCard
+              key={c.slug}
+              photoSrc={`/mentors/${c.slug}/profile.webp`}
+              name={c.name}
+              description={c.description}
+              categoria={c.categoria}
+              // Dark glass: this section sits on the dark home background.
+              variant="dark"
+              videoSrc={c.video}
+              aspectRatio={CARD_RATIO}
+              sizes={`${CARD_W}px`}
+            />
+          ))}
+        </div>
+      )}
     </section>
   );
 }
