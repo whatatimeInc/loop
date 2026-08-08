@@ -8,6 +8,7 @@ import { NossaPropostaSection } from "@/components/home/NossaPropostaSection";
 import { HeroSection } from "@/components/home/HeroSection";
 import { CategoriesSection } from "@/components/home/CategoriesSection";
 import { VideoSection } from "@/components/home/VideoSection";
+import { ExpertSection } from "@/components/home/ExpertSection";
 import { tokens } from "@/components/ui/tokens";
 
 function useIsMobile() {
@@ -121,6 +122,9 @@ export default function Home() {
 
       {/* ── Fatia 3: Vídeo ───────────────────────────────────────────────── */}
       <VideoSection />
+
+      {/* ── Fatia 4: Seja um expert (scroll-pin, 3 cards) ────────────────── */}
+      <ExpertSection />
 
       {/* ── Como funciona / Nossa Proposta ───────────────────────────────── */}
       {isMobile ? (

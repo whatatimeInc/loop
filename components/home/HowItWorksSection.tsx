@@ -22,7 +22,8 @@ const T = {
 };
 
 // ── CSS keyframes + animation classes (injected once) ────────────────────────
-const ANIMATION_CSS = `
+// Exported: any section reusing FolderIllustration must inject this stylesheet.
+export const ANIMATION_CSS = `
   @keyframes how-lift {
     0%, 16%  { transform: translateY(0);     }
     40%, 60% { transform: translateY(-16px); }
@@ -94,20 +95,41 @@ function folderFacePath(fw: number, fh: number): string {
 }
 
 // ── Card 1: Folder illustration with animation ────────────────────────────────
-function FolderIllustration({ playing }: { playing: boolean }) {
+// Exported for reuse (see components/home/ExpertSection.tsx). Requires ANIMATION_CSS.
+export function FolderIllustration({
+  playing,
+  variant = "glass",
+  scale = 1,
+}: {
+  playing: boolean;
+  /** "solid" paints the folder face flat, with no backdrop-filter.
+   *  Default "glass" is what every pre-existing usage renders — leave it alone. */
+  variant?: "glass" | "solid";
+  /** Scales the whole illustration proportionally (1 = original 220px wide). */
+  scale?: number;
+}) {
   const p = playing ? "" : " paused";
 
-  const photoLeft = (26.834 / CW) * FOLDER_W;
-  const photoWidth = (137 / CW) * FOLDER_W;
-  const photoHeight = (169 / CH) * FOLDER_H;
-  const photoRadius = (24 / CW) * FOLDER_W;
+  // All geometry derives from these, so `scale` resizes the illustration as a unit.
+  const fw  = Math.round(FOLDER_W * scale);
+  const fh  = Math.round((fw * CH) / CW);
+  const pad = Math.round(LIFT_PAD * scale);
+
+  // The fanning decoration is brand-yellow by default, which disappears on a
+  // brand-yellow card — the solid variant uses an off-white instead.
+  const decoFan = variant === "solid" ? "#F4F2EB" : T.lime;
+
+  const photoLeft = (26.834 / CW) * fw;
+  const photoWidth = (137 / CW) * fw;
+  const photoHeight = (169 / CH) * fh;
+  const photoRadius = (24 / CW) * fw;
 
   return (
     <div
       style={{
         position: "relative",
-        width: FOLDER_W,
-        height: FOLDER_H + LIFT_PAD,
+        width: fw,
+        height: fh + pad,
         overflow: "hidden",
       }}
     >
@@ -116,10 +138,10 @@ function FolderIllustration({ playing }: { playing: boolean }) {
         className={`how-lift${p}`}
         style={{
           position: "absolute",
-          top: LIFT_PAD,
+          top: pad,
           left: 0,
-          width: FOLDER_W,
-          height: FOLDER_H,
+          width: fw,
+          height: fh,
         }}
       >
         {/* Containment wrapper: clips rotating decoratives to folder bounds at all animation frames */}
@@ -130,8 +152,8 @@ function FolderIllustration({ playing }: { playing: boolean }) {
             style={{ position: "absolute", inset: 0 }}
           >
             <svg
-              width={FOLDER_W}
-              height={FOLDER_H}
+              width={fw}
+              height={fh}
               viewBox={`0 0 ${CW} ${CH}`}
               fill="none"
               style={{ position: "absolute", inset: 0 }}
@@ -139,7 +161,7 @@ function FolderIllustration({ playing }: { playing: boolean }) {
             >
               <path
                 d="M165.525 55.3413L108.388 47.6067C101.833 46.7193 95.7992 51.3063 94.9106 57.852L84.4432 134.959C83.5546 141.505 88.148 147.531 94.7029 148.418L151.84 156.152C158.394 157.04 164.429 152.453 165.317 145.907L175.785 68.7999C176.673 62.2542 172.08 56.2286 165.525 55.3413Z"
-                fill={T.lime}
+                fill={decoFan}
               />
             </svg>
           </div>
@@ -150,8 +172,8 @@ function FolderIllustration({ playing }: { playing: boolean }) {
             style={{ position: "absolute", inset: 0 }}
           >
             <svg
-              width={FOLDER_W}
-              height={FOLDER_H}
+              width={fw}
+              height={fh}
               viewBox={`0 0 ${CW} ${CH}`}
               fill="none"
               style={{ position: "absolute", inset: 0 }}
@@ -182,36 +204,41 @@ function FolderIllustration({ playing }: { playing: boolean }) {
         </div>
       </div>
 
-      {/* ── Folder face — frosted glass ── */}
-      {/* Single div: backdrop-filter blurs the parent stacking context (photo + cards behind it).
+      {/* ── Folder face ── */}
+      {/* glass: backdrop-filter blurs the parent stacking context (photo + cards behind it).
           filter: drop-shadow is on the same element so it doesn't wrap and isolate backdrop-filter.
-          clip-path is applied before filter, so drop-shadow follows the chanfered shape. */}
+          clip-path is applied before filter, so drop-shadow follows the chanfered shape.
+          solid: flat fill, no backdrop-filter — used where the glass reads badly on a coloured card. */}
       <div
         style={{
           position: "absolute",
-          top: LIFT_PAD,
+          top: pad,
           left: 0,
-          width: FOLDER_W,
-          height: FOLDER_H,
+          width: fw,
+          height: fh,
           zIndex: 2,
           pointerEvents: "none",
-          clipPath: folderFacePath(FOLDER_W, FOLDER_H),
-          background:
-            "linear-gradient(135deg, rgba(180,176,140,0.34) 0%, rgba(140,136,104,0.20) 46%, rgba(120,116,86,0.30) 100%), rgba(120,117,88,0.42)",
-          backdropFilter: "blur(16px) saturate(1.1)",
-          WebkitBackdropFilter: "blur(16px) saturate(1.1)",
+          clipPath: folderFacePath(fw, fh),
           filter: "drop-shadow(0px 10px 26px rgba(39,38,24,0.30))",
-          boxShadow:
-            "inset 1px 1px 0 rgba(255,255,255,0.42), inset -1px -1px 0 rgba(120,116,86,0.28)",
+          ...(variant === "solid"
+            ? { background: "#8E8857" }
+            : {
+                background:
+                  "linear-gradient(135deg, rgba(180,176,140,0.34) 0%, rgba(140,136,104,0.20) 46%, rgba(120,116,86,0.30) 100%), rgba(120,117,88,0.42)",
+                backdropFilter: "blur(16px) saturate(1.1)",
+                WebkitBackdropFilter: "blur(16px) saturate(1.1)",
+                boxShadow:
+                  "inset 1px 1px 0 rgba(255,255,255,0.42), inset -1px -1px 0 rgba(120,116,86,0.28)",
+              }),
         }}
       />
 
-      {/* ── Share icon (connected-nodes) — upper-left of glass ── */}
+      {/* ── Share icon (connected-nodes) — upper-left of folder face ── */}
       <span
         style={{
           position: "absolute",
-          left: Math.round((12 / 158) * FOLDER_W),
-          top: LIFT_PAD + Math.round((85 / 192) * FOLDER_H),
+          left: Math.round((12 / 158) * fw),
+          top: pad + Math.round((85 / 192) * fh),
           zIndex: 3,
           color: "#EDEBDD",
           pointerEvents: "none",
@@ -219,15 +246,15 @@ function FolderIllustration({ playing }: { playing: boolean }) {
         }}
         aria-hidden="true"
       >
-        <ShareAndroid width={18} height={18} strokeWidth={1.5} />
+        <ShareAndroid width={Math.round(18 * scale)} height={Math.round(18 * scale)} strokeWidth={1.5} />
       </span>
 
       {/* ── "Loop.Talk" label + name in Nerfos ── */}
       <div
         style={{
           position: "absolute",
-          left: Math.round((16 / CW) * FOLDER_W),
-          top: LIFT_PAD + FOLDER_H - Math.round((58 / 192) * FOLDER_H),
+          left: Math.round((16 / CW) * fw),
+          top: pad + fh - Math.round((58 / 192) * fh),
           zIndex: 3,
           pointerEvents: "none",
         }}
@@ -235,12 +262,12 @@ function FolderIllustration({ playing }: { playing: boolean }) {
         <p
           style={{
             color: "#F3F1E6",
-            fontSize: 12,
+            fontSize: Math.round(12 * scale),
             fontFamily: "var(--font-sans), Inter, sans-serif",
             fontWeight: 600,
-            lineHeight: "17px",
+            lineHeight: `${Math.round(17 * scale)}px`,
             letterSpacing: ".2px",
-            margin: "0 0 5px",
+            margin: `0 0 ${Math.round(5 * scale)}px`,
           }}
         >
           Loop.Talk
@@ -249,7 +276,7 @@ function FolderIllustration({ playing }: { playing: boolean }) {
           style={{
             fontFamily: "Nerfos, cursive",
             color: "#F3F1E6",
-            fontSize: 24,
+            fontSize: Math.round(24 * scale),
             lineHeight: 1,
             margin: 0,
           }}
@@ -271,7 +298,9 @@ const CHIP_STEP = CHIP_SIZE + CHIP_GAP;
 // Three repetitions give enough chips for the carousel scroll
 const ALL_CHIPS = [...DAYS, ...DAYS, ...DAYS];
 
-function AgendaCarousel({ playing }: { playing: boolean }) {
+// Exported for reuse. The wrapRef div below is the clip container that keeps
+// the sliding day chips from leaking — it must keep overflow:hidden + a resolved width.
+export function AgendaCarousel({ playing }: { playing: boolean }) {
   const wrapRef = useRef<HTMLDivElement>(null);
   const rowRef = useRef<HTMLDivElement>(null);
   const [activeIdx, setActiveIdx] = useState<number | null>(null);
@@ -370,7 +399,8 @@ function easeInOutCubic(t: number): number {
   return t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2;
 }
 
-function PriceSlider({ playing }: { playing: boolean }) {
+// Exported for reuse.
+export function PriceSlider({ playing }: { playing: boolean }) {
   const valRef = useRef<HTMLSpanElement>(null);
   const fillRef = useRef<HTMLDivElement>(null);
   const thumbRef = useRef<HTMLDivElement>(null);
