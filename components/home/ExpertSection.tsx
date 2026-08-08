@@ -17,6 +17,44 @@ const BG_PHOTO = "/hero/expert-table.jpg";
 
 const CARD_H       = 440;
 const CARD_W       = CARD_H; // square cards in the pinned stack
+
+// Mobile swipe carousel. scroll-snap gives native, momentum-correct snapping on
+// touch with no JS; `mandatory` is what guarantees it always lands on a whole card.
+const SWIPE_CSS = `
+  .expert-swipe {
+    display: flex;
+    overflow-x: auto;
+    overflow-y: hidden;
+    scroll-snap-type: x mandatory;
+    -webkit-overflow-scrolling: touch;
+    overscroll-behavior-x: contain;
+    scrollbar-width: none;
+    /* 9vw + 82vw + 9vw = 100vw. Sizing the rail in vw (not %) is what lets the
+       FIRST and LAST cards reach a true centred snap instead of clamping at the
+       edges — so all three settle in exactly the same spot. */
+    padding-inline: 9vw;
+    scroll-padding-inline: 9vw;
+  }
+  .expert-swipe::-webkit-scrollbar { display: none; }
+  .expert-swipe > * {
+    /* Under a full viewport so the neighbouring card peeks in at the edge — the
+       only affordance that there is more to swipe (no dots, no arrows). */
+    flex: 0 0 82vw;
+    /* Without this the agenda card's intrinsic chip-row width (min-width: auto)
+       stretches its slide past the viewport and breaks the snap rhythm. */
+    min-width: 0;
+    box-sizing: border-box;
+    padding-inline: 8px;        /* gutter between neighbouring cards */
+    scroll-snap-align: center;
+    scroll-snap-stop: always;   /* one card per swipe — never skips past one */
+  }
+  /* Safari/Chrome drop a scroll container's trailing padding; this restores it
+     so the last card can settle without hugging the screen edge. */
+  .expert-swipe::after {
+    content: "";
+    flex: 0 0 1px;
+  }
+`;
 const STEP_COUNT   = 3;
 const TRANSITION   = "0.5s cubic-bezier(.4,0,.2,1)";
 
@@ -162,6 +200,17 @@ function StepCard({
   );
 }
 
+const HOST_GROTESK = "Host Grotesk, var(--font-host-grotesk), sans-serif";
+const INTER        = "Inter, var(--font-inter), sans-serif";
+
+const numberStyle = (_mobile: boolean): React.CSSProperties => ({
+  fontFamily: HOST_GROTESK,
+  fontSize:   24,
+  fontWeight: 400,
+  color:      tokens.lime,
+  flexShrink: 0,
+});
+
 export function ExpertSection() {
   const [isMobile, setIsMobile]       = useState(false);
   const [reduceMotion, setReduce]     = useState(false);
@@ -235,24 +284,31 @@ export function ExpertSection() {
   }, [usePin]);
 
   const padX = isMobile ? 24 : 120;
+  // Mobile swaps the scroll-pin for a swipe carousel; the desktop pin is untouched.
+  const useSwipe = mounted && isMobile;
 
   return (
     <>
       {/* FolderIllustration's keyframes travel with the component. */}
       <style dangerouslySetInnerHTML={{ __html: ANIMATION_CSS }} />
+      {/* Native scroll-snap carousel — no JS, no indicator, one card per swipe. */}
+      <style dangerouslySetInnerHTML={{ __html: SWIPE_CSS }} />
 
       <section
         ref={sectionRef}
         style={{
           position:   "relative",
           width:      "100%",
-          minHeight:  usePin ? "100vh" : undefined,
+          // Both the pin and the mobile canvas fill the viewport; the
+          // reduced-motion desktop fallback stays content-height.
+          minHeight:  usePin || useSwipe ? "100vh" : undefined,
           height:     usePin ? "100vh" : undefined,
           overflow:   "hidden",
           display:    "flex",
           flexDirection: "column",
           justifyContent: "space-between",
-          padding:    isMobile ? "56px 0 64px" : "72px 0 64px",
+          // Extra bottom room on mobile so the CTA clears the global fixed bar.
+          padding:    isMobile ? "56px 0 104px" : "72px 0 64px",
           background: "#232311",
         }}
       >
@@ -284,112 +340,184 @@ export function ExpertSection() {
         />
 
         {/* ── Top text ── */}
-        <div
-          style={{
-            position:       "relative",
-            zIndex:         2,
-            display:        "flex",
-            flexDirection:  isMobile ? "column" : "row",
-            justifyContent: "space-between",
-            alignItems:     isMobile ? "flex-start" : "flex-end",
-            gap:            isMobile ? 16 : 32,
-            paddingLeft:    padX,
-            paddingRight:   padX,
-          }}
-        >
-          <h2
-            style={{
-              fontFamily: "Host Grotesk, var(--font-host-grotesk), sans-serif",
-              fontSize:   20,
-              fontWeight: 400,
-              lineHeight: 1.4,
-              color:      tokens.lime,
-              margin:     0,
-            }}
-          >
-            Seja um expert Loop.Talk.
-          </h2>
-
+        {isMobile ? (
+          /* Mobile: "(03)" hangs in its own column so the title and the subtitle
+             below it share one left edge — an offset would drift with the font. */
           <div
             style={{
-              display:    "flex",
-              gap:        12,
-              alignItems: "baseline",
-              flexShrink: 0,
+              position:     "relative",
+              zIndex:       2,
+              display:      "flex",
+              alignItems:   "baseline",
+              gap:          8,
+              paddingLeft:  padX,
+              paddingRight: padX,
             }}
           >
             <span
               style={{
-                fontSize:   isMobile ? 15 : 20,
-                fontWeight: 400,
-                lineHeight: 1.4,
-                color:      tokens.lime,
-                textAlign:  "right",
-                // Desktop keeps it on a single line; mobile may wrap.
-                whiteSpace: isMobile ? "normal" : "nowrap",
-              }}
-            >
-              Junte-se à comunidade de especialistas
-            </span>
-            <span
-              style={{
-                fontFamily: "Host Grotesk, var(--font-host-grotesk), sans-serif",
-                fontSize:   isMobile ? 15 : 24,
-                fontWeight: 400,
+                fontFamily: HOST_GROTESK,
+                fontSize:   24,
+                fontWeight: 500,
+                lineHeight: 1.2,
                 color:      tokens.lime,
                 flexShrink: 0,
               }}
             >
               (03)
             </span>
-          </div>
-        </div>
 
-        {/* ── Cards ── */}
-        <div
-          style={{
-            position:       "relative",
-            zIndex:         2,
-            display:        "flex",
-            justifyContent: "center",
-            paddingLeft:    padX,
-            paddingRight:   padX,
-            // Pinned: fixed-height stage the absolute cards stack inside.
-            // Fallback: plain vertical column, normal page scroll.
-            ...(usePin
-              ? { flex: 1, alignItems: "center", margin: "32px 0" }
-              : { flexDirection: "column" as const, gap: 20, margin: "40px 0" }),
-          }}
-        >
+            <div style={{ display: "flex", flexDirection: "column", gap: 10, minWidth: 0 }}>
+              <span
+                style={{
+                  fontFamily: HOST_GROTESK,
+                  fontSize:   20,
+                  fontWeight: 500,
+                  lineHeight: 1.25,
+                  color:      tokens.lime,
+                }}
+              >
+                Junte-se à comunidade de especialistas
+              </span>
+              <h2
+                style={{
+                  fontFamily: INTER,
+                  fontSize:   14,
+                  fontWeight: 400,
+                  lineHeight: 1.45,
+                  color:      tokens.lime,
+                  margin:     0,
+                }}
+              >
+                Seja um expert Loop.Talk.
+              </h2>
+            </div>
+          </div>
+        ) : (
           <div
             style={{
-              position: usePin ? "relative" : "static",
-              width:    "100%",
-              maxWidth: CARD_W,
-              height:   usePin ? CARD_H : undefined,
-              display:  usePin ? "block" : "flex",
-              flexDirection: usePin ? undefined : "column",
-              gap:      usePin ? undefined : 20,
+              position:       "relative",
+              zIndex:         2,
+              display:        "flex",
+              justifyContent: "space-between",
+              alignItems:     "flex-end",
+              gap:            32,
+              paddingLeft:    padX,
+              paddingRight:   padX,
             }}
           >
-            {STEPS.map((s, i) => (
-              <StepCard
-                key={s.title}
-                title={s.title}
-                subtitle={s.subtitle}
-                bg={s.bg}
-                fg={s.fg}
-                muted={s.muted}
-                stacked={usePin}
-                offset={i - activeStep}
+            <h2
+              style={{
+                fontFamily: HOST_GROTESK,
+                fontSize:   20,
+                fontWeight: 400,
+                lineHeight: 1.4,
+                color:      tokens.lime,
+                margin:     0,
+              }}
+            >
+              Seja um expert Loop.Talk.
+            </h2>
+
+            <div style={{ display: "flex", gap: 12, alignItems: "baseline", flexShrink: 0 }}>
+              <span
+                style={{
+                  fontSize:   20,
+                  fontWeight: 400,
+                  lineHeight: 1.4,
+                  color:      tokens.lime,
+                  textAlign:  "right",
+                  whiteSpace: "nowrap",
+                }}
               >
-                {/* Only the card in front animates while pinned; in the fallback
-                    every card plays, since they are all read in sequence. */}
-                {s.render(usePin ? i === activeStep : true)}
-              </StepCard>
+                Junte-se à comunidade de especialistas
+              </span>
+              <span style={numberStyle(false)}>(03)</span>
+            </div>
+          </div>
+        )}
+
+        {/* ── Cards ── */}
+        {useSwipe ? (
+          /* Mobile: horizontal swipe carousel, one whole card per gesture.
+             The track is edge-to-edge so a card can sit centred in the canvas;
+             padding lives on the slides instead. */
+          <div
+            className="expert-swipe"
+            style={{
+              position: "relative",
+              zIndex:   2,
+              flex:     1,
+              alignItems: "center",
+              margin:   "28px 0",
+            }}
+          >
+            {STEPS.map((s) => (
+              <div
+                key={s.title}
+                /* Width, gutter and snap all come from .expert-swipe > * */
+                style={{ display: "flex", justifyContent: "center" }}
+              >
+                <StepCard
+                  title={s.title}
+                  subtitle={s.subtitle}
+                  bg={s.bg}
+                  fg={s.fg}
+                  muted={s.muted}
+                  stacked={false}
+                  offset={0}
+                >
+                  {s.render(true)}
+                </StepCard>
+              </div>
             ))}
           </div>
-        </div>
+        ) : (
+          <div
+            style={{
+              position:       "relative",
+              zIndex:         2,
+              display:        "flex",
+              justifyContent: "center",
+              paddingLeft:    padX,
+              paddingRight:   padX,
+              // Pinned: fixed-height stage the absolute cards stack inside.
+              // Fallback: plain vertical column, normal page scroll.
+              ...(usePin
+                ? { flex: 1, alignItems: "center", margin: "32px 0" }
+                : { flexDirection: "column" as const, gap: 20, margin: "40px 0" }),
+            }}
+          >
+            <div
+              style={{
+                position: usePin ? "relative" : "static",
+                width:    "100%",
+                maxWidth: CARD_W,
+                height:   usePin ? CARD_H : undefined,
+                display:  usePin ? "block" : "flex",
+                flexDirection: usePin ? undefined : "column",
+                gap:      usePin ? undefined : 20,
+              }}
+            >
+              {STEPS.map((s, i) => (
+                <StepCard
+                  key={s.title}
+                  title={s.title}
+                  subtitle={s.subtitle}
+                  bg={s.bg}
+                  fg={s.fg}
+                  muted={s.muted}
+                  stacked={usePin}
+                  offset={i - activeStep}
+                >
+                  {/* Only the card in front animates while pinned; in the fallback
+                      every card plays, since they are all read in sequence. */}
+                  {s.render(usePin ? i === activeStep : true)}
+                </StepCard>
+              ))}
+            </div>
+          </div>
+        )}
 
         {/* ── Bottom CTA ── */}
         <div
