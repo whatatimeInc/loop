@@ -2,8 +2,42 @@
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
+import { Instagram, Linkedin } from "iconoir-react";
 import { Logo } from "@/components/Logo";
-import { tokens } from "@/components/ui/tokens";
+import { LinkButton, ArrowIcon } from "@/components/ui/Button";
+import { tokens, withAlpha } from "@/components/ui/tokens";
+
+const HOST_GROTESK = "Host Grotesk, var(--font-host-grotesk), sans-serif";
+const INTER        = "Inter, var(--font-inter), sans-serif";
+
+// "Create a profile and start monetizing" is 336px wide at the button's 20px
+// type; with the icon and padding it needs 396px, but a 375px screen only
+// leaves 293px. The shared Button is nowrap + fixed 56px height, so on mobile
+// the label would simply be clipped. Here it wraps and the pill grows instead.
+// !important is required because Button applies these as inline styles.
+const CTA_CSS = `
+  .footer-cta > a {
+    padding-left: 24px !important;
+    padding-right: 24px !important;
+    white-space: normal !important;
+    height: auto !important;
+    min-height: 56px;
+    padding-top: 12px !important;
+    padding-bottom: 12px !important;
+    text-align: center;
+  }
+`;
+
+// TODO: /termos and /privacidade do not exist yet — placeholder links.
+const LEGAL = [
+  { label: "Termos e Condições",     href: "#" },
+  { label: "Política de Privacidade", href: "#" },
+];
+
+const SOCIAL = [
+  { label: "Instagram", href: "#", Icon: Instagram },
+  { label: "LinkedIn",  href: "#", Icon: Linkedin  },
+];
 
 function useIsMobile() {
   const [isMobile, setIsMobile] = useState(false);
@@ -16,151 +50,169 @@ function useIsMobile() {
   return isMobile;
 }
 
-function ArrowIcon() {
+/** 48×48 circular social button — the design-system icon-only button is 56×56. */
+function SocialButton({ label, href, Icon }: (typeof SOCIAL)[number]) {
   return (
-    <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
-      <path d="M4.17 10h11.66M10 4.17L15.83 10 10 15.83" stroke="currentColor" strokeWidth="1.67" strokeLinecap="round" strokeLinejoin="round"/>
-    </svg>
-  );
-}
-
-function InstagramIcon() {
-  return (
-    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#FCFBF8" strokeWidth="2">
-      <rect x="2" y="2" width="20" height="20" rx="5" ry="5" />
-      <circle cx="12" cy="12" r="4" />
-      <circle cx="17.5" cy="6.5" r="1" fill="#FCFBF8" stroke="none" />
-    </svg>
-  );
-}
-
-function LinkedInIcon() {
-  return (
-    <svg width="22" height="22" viewBox="0 0 24 24" fill="#FCFBF8">
-      <path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-2-2 2 2 0 0 0-2 2v7h-4v-7a6 6 0 0 1 6-6z" />
-      <rect x="2" y="9" width="4" height="12" />
-      <circle cx="4" cy="4" r="2" />
-    </svg>
-  );
-}
-
-function SocialIcons() {
-  return (
-    <div style={{ display: "flex", gap: 16, alignItems: "center" }}>
-      <a href="#" aria-label="Instagram" style={{ width: 48, height: 48, borderRadius: "50%", background: "#514F41", display: "flex", alignItems: "center", justifyContent: "center", textDecoration: "none", flexShrink: 0 }}>
-        <InstagramIcon />
-      </a>
-      <a href="#" aria-label="LinkedIn" style={{ width: 48, height: 48, borderRadius: "50%", background: "#514F41", display: "flex", alignItems: "center", justifyContent: "center", textDecoration: "none", flexShrink: 0 }}>
-        <LinkedInIcon />
-      </a>
-    </div>
+    <a
+      href={href}
+      aria-label={label}
+      style={{
+        width:          48,
+        height:         48,
+        borderRadius:   99,
+        background:     tokens.dark,
+        color:          tokens.bg,
+        display:        "flex",
+        alignItems:     "center",
+        justifyContent: "center",
+        flexShrink:     0,
+        textDecoration: "none",
+      }}
+    >
+      <Icon width={24} height={24} color="currentColor" />
+    </a>
   );
 }
 
 export function Footer() {
   const isMobile = useIsMobile();
 
-  if (isMobile) {
-    return (
-      <footer style={{ padding: "0 16px 96px" }}>
-        <div style={{ background: "#272618", borderRadius: 12, padding: "40px 40px 0" }}>
-
-          {/* Logo + tagline + CTA */}
-          <div style={{ display: "flex", flexDirection: "column", gap: 40, marginBottom: 24 }}>
-            <div style={{ display: "flex", flexDirection: "column", gap: 24, alignItems: "flex-start" }}>
-              <Logo size="footer" lime />
-              <p style={{ fontSize: 14, color: "#AEADA4", lineHeight: "20px", margin: 0 }}>
-                A plataforma para te conectar com sua audiência valorizando seu tempo.
-              </p>
-            </div>
-            <Link
-              href="/cadastro"
-              style={{
-                display: "inline-flex",
-                alignItems: "center",
-                gap: 8,
-                padding: "12px 20px",
-                background: tokens.lime,
-                borderRadius: 8,
-                fontSize: 16,
-                fontWeight: 600,
-                color: "#272618",
-                textDecoration: "none",
-                alignSelf: "flex-start",
-                boxShadow: "0px 1px 2px rgba(10,13,18,0.05)",
-              }}
-            >
-              Criar Loop.Talk
-              <ArrowIcon />
-            </Link>
-          </div>
-
-          {/* Social icons */}
-          <div style={{ paddingTop: 24, borderTop: "1px solid #514F41", paddingBottom: 24 }}>
-            <SocialIcons />
-          </div>
-
-          {/* Bottom bar */}
-          <div style={{ paddingTop: 24, paddingBottom: 24, borderTop: "1px solid #514F41", display: "flex", flexDirection: "column", gap: 24 }}>
-            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-              <a href="#" style={{ fontSize: 12, color: "#AEADA4", lineHeight: "18px", textDecoration: "none" }}>Termos e Condições</a>
-              <a href="#" style={{ fontSize: 12, color: "#AEADA4", lineHeight: "18px", textDecoration: "none" }}>Política de Privacidade</a>
-            </div>
-            <span style={{ fontSize: 12, color: "#AEADA4", lineHeight: "18px", textAlign: "center" }}>© 2026 Loop.Talk</span>
-          </div>
-
-        </div>
-      </footer>
-    );
-  }
+  const legalStyle: React.CSSProperties = {
+    fontFamily:     INTER,
+    fontSize:       12,
+    fontWeight:     400,
+    lineHeight:     "18px",
+    color:          tokens.dark,
+    textDecoration: "none",
+  };
 
   return (
-    <footer style={{ padding: "0 24px 24px" }}>
-      <div style={{ background: "#272618", borderRadius: 16, padding: "40px 40px 0" }}>
-
-        {/* Top row */}
-        <div style={{ display: "flex", flexDirection: "row", justifyContent: "space-between", alignItems: "flex-end", marginBottom: 40 }}>
-          {/* Left: logo + tagline + CTA */}
-          <div style={{ display: "flex", flexDirection: "column", gap: 40 }}>
-            <div style={{ display: "flex", flexDirection: "column", gap: 16, alignItems: "flex-start" }}>
-              <Logo size="footer" lime />
-              <p style={{ fontSize: 16, color: "#AEADA4", lineHeight: "24px", margin: 0, maxWidth: 340 }}>
-                A plataforma para te conectar com sua audiência valorizando seu tempo.
-              </p>
-            </div>
-            <Link
-              href="/cadastro"
+    <footer style={{ padding: isMobile ? "0 16px 16px" : "0 24px 24px" }}>
+      <style dangerouslySetInnerHTML={{ __html: CTA_CSS }} />
+      <div
+        style={{
+          background:   tokens.lime,
+          borderRadius: 32,
+          // No bottom padding — the bottom bar's own padding is the breathing room.
+          padding:      isMobile ? "40px 24px 0" : "48px 48px 0",
+          display:        "flex",
+          flexDirection:  "column",
+          gap:            24,
+        }}
+      >
+        {/* ── Top block ── */}
+        <div
+          style={{
+            display:        "flex",
+            flexDirection:  isMobile ? "column" : "row",
+            alignItems:     "flex-start",
+            justifyContent: "space-between",
+            gap:            isMobile ? 40 : 40,
+            paddingBottom:  32,
+          }}
+        >
+          {/* Left: headline + CTAs */}
+          <div
+            style={{
+              display:       "flex",
+              flexDirection: "column",
+              alignItems:    "flex-start",
+              gap:           isMobile ? 32 : 48,
+              flex:          1,
+              minWidth:      0,
+              alignSelf:     isMobile ? "stretch" : "auto",
+            }}
+          >
+            <h2
               style={{
-                display: "inline-flex",
-                alignItems: "center",
-                gap: 8,
-                padding: "12px 20px",
-                background: tokens.lime,
-                borderRadius: 8,
-                fontSize: 16,
-                fontWeight: 600,
-                color: "#272618",
-                textDecoration: "none",
-                alignSelf: "flex-start",
-                boxShadow: "0px 1px 2px rgba(10,13,18,0.05)",
+                fontFamily: HOST_GROTESK,
+                // Deliberately larger than the hero's version of this line.
+                fontSize:   isMobile ? "clamp(32px, 9vw, 44px)" : "clamp(48px, 5.6vw, 80px)",
+                fontWeight: 500,
+                lineHeight: 1.1,
+                color:      tokens.dark,
+                margin:     0,
               }}
             >
-              Criar Loop.Talk
-            </Link>
+              Network without<br />the Networking.
+            </h2>
+
+            <div
+              className={isMobile ? "footer-cta" : undefined}
+              style={{
+                display:       "flex",
+                flexDirection: isMobile ? "column" : "row",
+                gap:           isMobile ? 12 : 24,
+                alignItems:    isMobile ? "stretch" : "center",
+                alignSelf:     isMobile ? "stretch" : "auto",
+                flexWrap:      "wrap",
+                minWidth:      0,
+              }}
+            >
+              {/* Dark fill. neutral-primary is the only variant that reads on brand. */}
+              <LinkButton
+                href="/cadastro"
+                variant="neutral-primary"
+                layout="icon-text"
+                icon={<ArrowIcon />}
+                className={isMobile ? "w-full" : undefined}
+              >
+                Create a profile and start monetizing
+              </LinkButton>
+              {/* brand-primary's lime fill matches the card, so it reads as the
+                  outlined, transparent button the design calls for. */}
+              <LinkButton
+                href="/explorar"
+                variant="brand-primary"
+                layout="icon-text"
+                icon={<ArrowIcon />}
+                className={isMobile ? "w-full" : undefined}
+              >
+                Find an expert
+              </LinkButton>
+            </div>
           </div>
-          {/* Right: social icons */}
-          <SocialIcons />
+
+          {/* Right: wordmark */}
+          <div
+            style={{
+              padding:    isMobile ? 0 : "24px 48px",
+              flexShrink: 0,
+            }}
+          >
+            <Logo size="footer" className="!h-10 w-auto" />
+          </div>
         </div>
 
-        {/* Bottom bar */}
-        <div style={{ borderTop: "1px solid #514F41", padding: "32px 0", display: "flex", flexDirection: "row", alignItems: "center", justifyContent: "space-between" }}>
-          <span style={{ fontSize: 12, color: "#AEADA4", lineHeight: "18px" }}>© 2026 Loop.Talk</span>
-          <div style={{ display: "flex", gap: 32 }}>
-            <a href="#" style={{ fontSize: 12, color: "#AEADA4", lineHeight: "18px", textDecoration: "none" }}>Termos e Condições</a>
-            <a href="#" style={{ fontSize: 12, color: "#AEADA4", lineHeight: "18px", textDecoration: "none" }}>Política de Privacidade</a>
+        {/* ── Bottom bar — border-top is inset by the card's own side padding ── */}
+        <div
+          style={{
+            borderTop:      `1px solid ${withAlpha(tokens.dark, 0.15)}`,
+            paddingTop:     isMobile ? 24 : 40,
+            paddingBottom:  isMobile ? 24 : 40,
+            display:        "flex",
+            flexDirection:  isMobile ? "column" : "row",
+            alignItems:     isMobile ? "flex-start" : "center",
+            justifyContent: "space-between",
+            gap:            isMobile ? 24 : 32,
+          }}
+        >
+          <span style={{ ...legalStyle, flexShrink: 0 }}>© 2026 Loop.Talk</span>
+
+          <div style={{ display: "flex", gap: 32, flexWrap: "wrap" }}>
+            {LEGAL.map(({ label, href }) => (
+              <Link key={label} href={href} style={legalStyle}>
+                {label}
+              </Link>
+            ))}
+          </div>
+
+          <div style={{ display: "flex", gap: 16, alignItems: "center", flexShrink: 0 }}>
+            {SOCIAL.map((s) => (
+              <SocialButton key={s.label} {...s} />
+            ))}
           </div>
         </div>
-
       </div>
     </footer>
   );
