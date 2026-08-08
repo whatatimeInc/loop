@@ -20,6 +20,9 @@ export const tokens = {
   limeLight: "#EAEA68",   // brand-light / hover
   limeHover: "#FAF9D1",   // brand-inactive
 
+  // Neutral olive surface (brand-neutral-600) — solid folder face, banner card
+  neutral600: "#8E8857",
+
   // Glass — base tint for frosted overlays on dark surfaces
   glassDark: "#514F41",
 

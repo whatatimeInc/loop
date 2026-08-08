@@ -11,6 +11,7 @@ import { VideoSection } from "@/components/home/VideoSection";
 import { ExpertSection } from "@/components/home/ExpertSection";
 import { BrandsSection } from "@/components/home/BrandsSection";
 import { CreatorsSection } from "@/components/home/CreatorsSection";
+import { JoinBanner } from "@/components/home/JoinBanner";
 import { tokens } from "@/components/ui/tokens";
 
 function useIsMobile() {
@@ -111,7 +112,6 @@ export default function Home() {
   const isMobile = useIsMobile();
   const howItWorksFade = useFadeIn(60);
   const acessoFade = useFadeIn();
-  const ctaFade = useFadeIn();
 
   return (
     <main style={{ background: "#232311", paddingBottom: isMobile ? 80 : 0 }}>
@@ -188,70 +188,8 @@ export default function Home() {
         <CategoryMarquee />
       </section>
 
-      {/* ── CTA Banner ───────────────────────────────────────────────────── */}
-      <section
-        ref={ctaFade.ref}
-        style={{
-          padding: isMobile ? "40px 16px" : "64px 24px",
-          ...ctaFade.style,
-        }}
-      >
-        <div
-          style={{
-            background: tokens.lime,
-            borderRadius: 12,
-            maxWidth: 1200,
-            margin: "0 auto",
-            padding: isMobile ? 24 : 48,
-            display: "flex",
-            flexDirection: isMobile ? "column" : "row",
-            alignItems: isMobile ? "flex-start" : "flex-end",
-            justifyContent: "space-between",
-            gap: isMobile ? 24 : 32,
-          }}
-        >
-          <div style={{ display: "flex", flexDirection: "column", gap: 12, flex: 1 }}>
-            <h2
-              style={{
-                fontSize: isMobile ? 22 : 48,
-                fontWeight: 500,
-                color: "#272518",
-                lineHeight: isMobile ? "28px" : "52.8px",
-                margin: 0,
-                fontFamily: "var(--font-host-grotesk)",
-              }}
-            >
-              Faça parte do Loop.Talk<br />e inspire pessoas.
-            </h2>
-            <p style={{ fontSize: isMobile ? 14 : 16, color: "#272518", lineHeight: "22px", margin: 0 }}>
-              Conecte-se virtualmente, aconselhe e ganhe pelo seu tempo.
-            </p>
-          </div>
-          <Link
-            href="/cadastro"
-            className="btn-dark"
-            style={{
-              display: "inline-flex",
-              alignItems: "center",
-              gap: 8,
-              padding: "12px 20px",
-              background: "#272618",
-              borderRadius: 8,
-              fontSize: 16,
-              fontWeight: 600,
-              color: "#FCFBF8",
-              textDecoration: "none",
-              whiteSpace: "nowrap",
-              flexShrink: 0,
-              alignSelf: isMobile ? "flex-start" : "auto",
-              boxShadow: "0px 1px 2px rgba(10,13,18,0.05)",
-            }}
-          >
-            Criar Loop.Talk
-            <ArrowIcon />
-          </Link>
-        </div>
-      </section>
+      {/* ── Fatia 7: banner "Faça parte" ─────────────────────────────────── */}
+      <JoinBanner />
 
       {isMobile && <MobileBottomCTA />}
 
