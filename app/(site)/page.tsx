@@ -1,10 +1,7 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
 import Link from "next/link";
-import { CategoryMarquee } from "@/components/home/CategoryMarquee";
-import { HowItWorksSection } from "@/components/home/HowItWorksSection";
-import { NossaPropostaSection } from "@/components/home/NossaPropostaSection";
 import { HeroSection } from "@/components/home/HeroSection";
 import { CategoriesSection } from "@/components/home/CategoriesSection";
 import { VideoSection } from "@/components/home/VideoSection";
@@ -23,40 +20,6 @@ function useIsMobile() {
     return () => window.removeEventListener("resize", check);
   }, []);
   return isMobile;
-}
-
-function useFadeIn(delay = 0) {
-  const ref = useRef<HTMLElement>(null);
-  const [visible, setVisible] = useState(false);
-
-  useEffect(() => {
-    const el = ref.current;
-    if (!el) return;
-    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
-      setVisible(true);
-      return;
-    }
-    const observer = new IntersectionObserver(
-      ([entry]) => {
-        if (entry.isIntersecting) {
-          setVisible(true);
-          observer.disconnect();
-        }
-      },
-      { threshold: 0.08 }
-    );
-    observer.observe(el);
-    return () => observer.disconnect();
-  }, []);
-
-  return {
-    ref,
-    style: {
-      opacity: visible ? 1 : 0,
-      transform: visible ? "translateY(0)" : "translateY(28px)",
-      transition: `opacity 0.65s ease ${delay}ms, transform 0.65s ease ${delay}ms`,
-    } as React.CSSProperties,
-  };
 }
 
 function ArrowIcon() {
@@ -110,8 +73,6 @@ function MobileBottomCTA() {
 
 export default function Home() {
   const isMobile = useIsMobile();
-  const howItWorksFade = useFadeIn(60);
-  const acessoFade = useFadeIn();
 
   return (
     <main style={{ background: "#232311", paddingBottom: isMobile ? 80 : 0 }}>
@@ -133,60 +94,6 @@ export default function Home() {
 
       {/* ── Fatia 6: Nossos criadores (cards com hover foto→vídeo) ───────── */}
       <CreatorsSection />
-
-      {/* ── Como funciona / Nossa Proposta ───────────────────────────────── */}
-      {isMobile ? (
-        <section
-          ref={howItWorksFade.ref}
-          style={{ padding: "0", ...howItWorksFade.style }}
-        >
-          <div style={{ maxWidth: 1200, margin: "0 auto" }}>
-            <HowItWorksSection isMobile={true} />
-          </div>
-        </section>
-      ) : (
-        <NossaPropostaSection />
-      )}
-
-      {/* ── Acesso real + marquee ─────────────────────────────────────────── */}
-      <section
-        ref={acessoFade.ref}
-        style={{
-          padding: isMobile ? "64px 0 0" : "96px 0 0",
-          textAlign: "center",
-          overflow: "hidden",
-          ...acessoFade.style,
-        }}
-      >
-        <div
-          style={{
-            maxWidth: 1200,
-            margin: "0 auto",
-            padding: isMobile ? "0 24px" : "0 32px",
-            display: "flex",
-            flexDirection: "column",
-            gap: 12,
-            alignItems: "center",
-          }}
-        >
-          <h2
-            style={{
-              fontSize: isMobile ? 28 : 48,
-              fontWeight: 500,
-              color: "#272618",
-              lineHeight: 1.1,
-              margin: 0,
-              fontFamily: "var(--font-host-grotesk)",
-            }}
-          >
-            Acesso real, presença real
-          </h2>
-          <p style={{ fontSize: isMobile ? 14 : 16, color: "#272618", lineHeight: "24px", margin: 0 }}>
-            Compartilhe conhecimento via 1:1 com sua audiência.
-          </p>
-        </div>
-        <CategoryMarquee />
-      </section>
 
       {/* ── Fatia 7: banner "Faça parte" ─────────────────────────────────── */}
       <JoinBanner />
