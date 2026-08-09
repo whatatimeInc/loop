@@ -232,13 +232,13 @@ export function HeroSection() {
                       gap:           0,
                     }}
                   >
-                    <span style={{ fontFamily: "Inter, var(--font-inter), sans-serif", fontSize: 13, fontWeight: 600, color: "#F8F68D", lineHeight: 1.4 }}>
+                    <span style={{ fontFamily: "Inter, var(--font-inter), sans-serif", fontSize: 13, fontWeight: 600, color: tokens.lime, lineHeight: 1.4 }}>
                       Book an 1:1 with
                     </span>
-                    <span style={{ fontFamily: "Nerfos, cursive", fontSize: 40, fontWeight: 400, lineHeight: "44px", color: "#F8F68D" }}>
+                    <span style={{ fontFamily: "Nerfos, cursive", fontSize: 40, fontWeight: 400, lineHeight: "44px", color: tokens.lime }}>
                       {card.name}
                     </span>
-                    <span style={{ fontFamily: "Inter, var(--font-inter), sans-serif", fontSize: 11, fontWeight: 600, color: "#F8F68D", textTransform: "uppercase", letterSpacing: "0.05em", lineHeight: 1.4, marginTop: 4 }}>
+                    <span style={{ fontFamily: "Inter, var(--font-inter), sans-serif", fontSize: 11, fontWeight: 600, color: tokens.lime, textTransform: "uppercase", letterSpacing: "0.05em", lineHeight: 1.4, marginTop: 4 }}>
                       {card.role}
                     </span>
                   </div>
@@ -339,13 +339,13 @@ export function HeroSection() {
                       gap:           0,
                     }}
                   >
-                    <span style={{ fontFamily: "Inter, var(--font-inter), sans-serif", fontSize: 16, fontWeight: 600, color: "#F8F68D", lineHeight: 1.4 }}>
+                    <span style={{ fontFamily: "Inter, var(--font-inter), sans-serif", fontSize: 16, fontWeight: 600, color: tokens.lime, lineHeight: 1.4 }}>
                       Book an 1:1 with
                     </span>
-                    <span style={{ fontFamily: "Nerfos, cursive", fontSize: 56, fontWeight: 400, lineHeight: "61.6px", color: "#F8F68D" }}>
+                    <span style={{ fontFamily: "Nerfos, cursive", fontSize: 56, fontWeight: 400, lineHeight: "61.6px", color: tokens.lime }}>
                       {card.name}
                     </span>
-                    <span style={{ fontFamily: "Inter, var(--font-inter), sans-serif", fontSize: 12, fontWeight: 600, color: "#F8F68D", textTransform: "uppercase", letterSpacing: "0.05em", lineHeight: 1.4, marginTop: 4 }}>
+                    <span style={{ fontFamily: "Inter, var(--font-inter), sans-serif", fontSize: 12, fontWeight: 600, color: tokens.lime, textTransform: "uppercase", letterSpacing: "0.05em", lineHeight: 1.4, marginTop: 4 }}>
                       {card.role}
                     </span>
                   </div>

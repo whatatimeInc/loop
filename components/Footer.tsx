@@ -10,24 +10,6 @@ import { tokens, withAlpha } from "@/components/ui/tokens";
 const HOST_GROTESK = "Host Grotesk, var(--font-host-grotesk), sans-serif";
 const INTER        = "Inter, var(--font-inter), sans-serif";
 
-// "Create a profile and start monetizing" is 336px wide at the button's 20px
-// type; with the icon and padding it needs 396px, but a 375px screen only
-// leaves 293px. The shared Button is nowrap + fixed 56px height, so on mobile
-// the label would simply be clipped. Here it wraps and the pill grows instead.
-// !important is required because Button applies these as inline styles.
-const CTA_CSS = `
-  .footer-cta > a {
-    padding-left: 24px !important;
-    padding-right: 24px !important;
-    white-space: normal !important;
-    height: auto !important;
-    min-height: 56px;
-    padding-top: 12px !important;
-    padding-bottom: 12px !important;
-    text-align: center;
-  }
-`;
-
 // TODO: /termos and /privacidade do not exist yet — placeholder links.
 const LEGAL = [
   { label: "Termos e Condições",     href: "#" },
@@ -88,7 +70,6 @@ export function Footer() {
 
   return (
     <footer style={{ padding: isMobile ? "0 16px 16px" : "0 24px 24px" }}>
-      <style dangerouslySetInnerHTML={{ __html: CTA_CSS }} />
       <div
         style={{
           background:   tokens.lime,
@@ -138,7 +119,6 @@ export function Footer() {
             </h2>
 
             <div
-              className={isMobile ? "footer-cta" : undefined}
               style={{
                 display:       "flex",
                 flexDirection: isMobile ? "column" : "row",
@@ -149,7 +129,9 @@ export function Footer() {
                 minWidth:      0,
               }}
             >
-              {/* Dark fill. neutral-primary is the only variant that reads on brand. */}
+              {/* Dark fill. neutral-primary is the only variant that reads on brand.
+                  The full label needs 396px at the button's 20px type, so mobile
+                  uses a short one rather than wrapping or clipping the pill. */}
               <LinkButton
                 href="/cadastro"
                 variant="neutral-primary"
@@ -157,7 +139,7 @@ export function Footer() {
                 icon={<ArrowIcon />}
                 className={isMobile ? "w-full" : undefined}
               >
-                Create a profile and start monetizing
+                {isMobile ? "Criar meu link" : "Create a profile and start monetizing"}
               </LinkButton>
               {/* brand-primary's lime fill matches the card, so it reads as the
                   outlined, transparent button the design calls for. */}
