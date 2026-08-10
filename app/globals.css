@@ -8,12 +8,17 @@
   font-display: swap;
 }
 
-@theme {
-  /* ── brand ───────────────────────────────────────────────────── */
+/* ── brand ───────────────────────────────────────────────────────────────
+   `static` porque estas são consumidas por `var()` em estilo inline, não só
+   por classe Tailwind. Sem ele o tree-shake as removeria assim que a última
+   classe bg-lime/text-lime saísse do código, e os inline quebrariam calados. */
+@theme static {
   --color-yellow:        #F8F586;   /* brand-primary */
   --color-yellow-light:  #EAEA68;   /* brand-light / hover */
   --color-yellow-dark:   #D8D85A;   /* hover state */
+}
 
+@theme {
   /* ── olive accents ───────────────────────────────────────────── */
   --color-olive-100:     #E0DDC1;
   --color-olive-400:     #A39E79;

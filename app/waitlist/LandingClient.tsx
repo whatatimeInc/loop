@@ -854,7 +854,7 @@ function LandingFooter({ onCTA, isMobile }: { onCTA: () => void; isMobile: boole
         >
           <div style={{ display: "flex", flexDirection: "column", gap: isMobile ? 24 : 40 }}>
             <div style={{ display: "flex", flexDirection: "column", gap: 16, alignItems: "flex-start" }}>
-              <Logo size="footer" lime />
+              <Logo size="footer" style={{ color: "var(--color-yellow)" }} />
               <p style={{ fontSize: 16, color: "#AEADA4", lineHeight: 1.5, margin: 0, maxWidth: 340 }}>
                 A plataforma para te conectar com sua audiência valorizando seu tempo.
               </p>

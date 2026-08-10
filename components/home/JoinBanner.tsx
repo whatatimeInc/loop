@@ -16,10 +16,10 @@ const INTER        = "Inter, var(--font-inter), sans-serif";
 export type JoinBannerVariant = "neutral" | "brand";
 
 const VARIANT: Record<JoinBannerVariant, {
-  card: string; ink: string; button: "brand-secondary" | "neutral-secondary"; logo: "lime" | "dark";
+  card: string; ink: string; button: "brand-secondary" | "neutral-secondary";
 }> = {
-  neutral: { card: tokens.neutral600, ink: tokens.lime, button: "brand-secondary",   logo: "lime" },
-  brand:   { card: tokens.lime,       ink: tokens.dark, button: "neutral-secondary", logo: "dark" },
+  neutral: { card: tokens.neutral600, ink: tokens.lime, button: "brand-secondary" },
+  brand:   { card: tokens.lime,       ink: tokens.dark, button: "neutral-secondary" },
 };
 
 const DEFAULT_CHIPS = ["Networking", "Criatividade", "Inspiração"];
@@ -109,12 +109,12 @@ export function JoinBanner({
             ))}
           </div>
 
-          {/* Wordmark via the Logo component — className sets the height so the
-              component itself stays untouched. At 80px tall the mark is 336px
-              wide, which overflows the mobile card, so it steps down there. */}
+          {/* A cor vem do contexto (look.ink); a altura, do className. A 80px
+              o wordmark tem 336px de largura e estoura o card mobile, por isso
+              ele desce lá. */}
           <Logo
             size="hero"
-            lime={look.logo === "lime"}
+            style={{ color: look.ink }}
             className={isMobile ? "!h-14 w-auto" : "!h-20 w-auto"}
           />
         </div>

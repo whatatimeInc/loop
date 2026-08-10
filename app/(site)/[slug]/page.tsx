@@ -1,4 +1,5 @@
 import Image from "next/image";
+import { Logo } from "@/components/Logo";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { experts } from "@/lib/mockExperts";
@@ -327,7 +328,7 @@ function RealCreatorPage({ profile }: { profile: RealProfile }) {
               {/* Logo + nome + social */}
               <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 12 }}>
                 <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 8 }}>
-                  <img src="/logo.svg" alt="Loop.Talk" style={{ height: 20, display: "block" }} />
+                  <Logo size="header" style={{ height: 20 }} />
                   <p style={{ fontSize: 30, fontWeight: 400, color: "#181D27", lineHeight: "38px", textAlign: "center", margin: 0 }}>
                     {name || profile.username}
                   </p>
