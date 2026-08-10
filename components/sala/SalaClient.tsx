@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState, useCallback, useRef } from "react";
-import { createBrowserClient } from "@supabase/ssr";
+import { createClient } from "@/lib/supabase/client";
 import type { SessionData, Persona, Screen } from "./types";
 import { WaitingRoom } from "./WaitingRoom";
 import { VideoCall } from "./VideoCall";
@@ -13,14 +13,6 @@ import {
   NoShowGuestScreen,
   ConnectionLostScreen,
 } from "./SpecialStates";
-
-// ── Supabase browser client (env vars are public-safe) ────────────────────────
-function createClient() {
-  return createBrowserClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY!,
-  );
-}
 
 // ── Props ─────────────────────────────────────────────────────────────────────
 
