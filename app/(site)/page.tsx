@@ -74,8 +74,10 @@ function MobileBottomCTA() {
 export default function Home() {
   const isMobile = useIsMobile();
 
+  // Sem background próprio: o canvas da rota (SiteCanvas) já pinta, e é ele
+  // que o footer também enxerga.
   return (
-    <main style={{ background: "#232311", paddingBottom: isMobile ? 80 : 0 }}>
+    <main style={{ paddingBottom: isMobile ? 80 : 0 }}>
 
       {/* ── Hero ─────────────────────────────────────────────────────────── */}
       <HeroSection />
