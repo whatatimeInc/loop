@@ -246,10 +246,18 @@ function RealCreatorPage({ profile }: { profile: RealProfile }) {
       {/* Fixed bottom CTA */}
       <div style={{ position: "fixed", bottom: 0, left: 0, right: 0, zIndex: 50, padding: "17px 16px 16px", background: "rgba(255,255,255,0.50)", backdropFilter: "blur(20px)", WebkitBackdropFilter: "blur(20px)" }}>
         <div style={{ display: "flex", gap: 10 }}>
+          {/* Sem destino ainda: /agendar só resolve slugs de lib/mockExperts,
+              então um href levaria a 404. Fica desabilitado de forma honesta
+              até o agendamento aceitar perfis reais. */}
           {profile.sessionTypes.length > 0 && (
-            <div style={{ flex: 1, display: "flex", alignItems: "center", justifyContent: "center", height: 56, background: tokens.lime, borderRadius: 8, fontSize: 16, fontWeight: 600, color: "#272618", cursor: "pointer" }}>
+            <button
+              type="button"
+              disabled
+              aria-label="Agendar Loop.Talk — indisponível no momento"
+              style={{ flex: 1, display: "flex", alignItems: "center", justifyContent: "center", height: 56, background: tokens.lime, borderRadius: 8, fontSize: 16, fontWeight: 600, fontFamily: "inherit", color: "#272618", border: "none", opacity: 0.45, cursor: "not-allowed" }}
+            >
               Agendar Loop.Talk
-            </div>
+            </button>
           )}
           <ShareButton slug={profile.username ?? ""} name={name} />
         </div>
@@ -362,9 +370,16 @@ function RealCreatorPage({ profile }: { profile: RealProfile }) {
                         );
                       })}
                     </div>
-                    <div style={{ display: "flex", alignItems: "center", justifyContent: "center", padding: "12px 20px", borderRadius: 8, background: "#272618", color: "#FCFBF8", fontSize: 16, fontWeight: 600, cursor: "pointer" }}>
+                    {/* Ver nota do CTA mobile: sem destino até /agendar aceitar
+                        perfis reais. width:100% preserva o bloco que o <div> tinha. */}
+                    <button
+                      type="button"
+                      disabled
+                      aria-label="Agendar Loop.Talk — indisponível no momento"
+                      style={{ width: "100%", display: "flex", alignItems: "center", justifyContent: "center", padding: "12px 20px", borderRadius: 8, background: "#272618", color: "#FCFBF8", fontSize: 16, fontWeight: 600, fontFamily: "inherit", border: "none", opacity: 0.45, cursor: "not-allowed" }}
+                    >
                       Agendar Loop.Talk
-                    </div>
+                    </button>
                   </div>
                 ) : (
                   <p style={{ fontSize: 13, color: "#626053", margin: 0, textAlign: "center" }}>Nenhuma sessão disponível no momento.</p>
