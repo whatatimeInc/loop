@@ -32,21 +32,33 @@ export function VideoSection() {
           borderRadius: BORDER_RADIUS,
           overflow:     "hidden",
           position:     "relative",
-          // ── TODO: replace this brand-color placeholder with the video ──────
-          // When the mp4 file is uploaded, swap this background out and add:
-          //
-          //   <video
-          //     autoPlay muted loop playsInline
-          //     style={{ width: "100%", height: "100%", objectFit: "cover", display: "block" }}
-          //   >
-          //     <source src="/video/[filename].mp4" type="video/mp4" />
-          //   </video>
-          //
-          // The overflow:hidden on this div clips the video to the rounded corners.
-          // ────────────────────────────────────────────────────────────────────
+          // Fallback enquanto o vídeo carrega e, no mobile, a cor das tarjas
+          // do letterbox — o próprio vídeo já é fundo brand, então a costura
+          // some.
           background: "var(--color-lime)",
         }}
-      />
+      >
+        <video
+          autoPlay
+          muted
+          loop
+          playsInline
+          preload="metadata"
+          poster="/videos/como-funciona-poster.jpg"
+          style={{
+            width:      "100%",
+            height:     "100%",
+            // Mobile: contain — mostra a largura toda (chips inteiros),
+            // sem esticar a altura fixa do container.
+            // Desktop: cover — preenche o container, sem tarja.
+            objectFit:  isMobile ? "contain" : "cover",
+            display:    "block",
+          }}
+        >
+          <source src="/videos/como-funciona.webm" type="video/webm" />
+          <source src="/videos/como-funciona.mp4" type="video/mp4" />
+        </video>
+      </div>
     </section>
   );
 }
