@@ -9,16 +9,16 @@ const PHOTO_URL = "/mentors/andre-do-amaral/profile.webp";
 // ── Design tokens ─────────────────────────────────────────────────────────────
 const T = {
   sectionBg: "#F2F0E8",
-  card: "#FCFBF8",
-  border: "rgba(39,38,24,0.10)",
-  dark: "#272618",
+  card: "var(--color-cream)",
+  border: "color-mix(in srgb, var(--color-gray-900) 10%, transparent)",
+  dark: "var(--color-gray-900)",
   muted: "#6E6C60",
   lime: tokens.lime,
   limeText: "#3E3B12",
   chipDefault: "#DEDBC6",
   chipDefaultText: "#4A4834",
-  track: "#DAD9D5",
-  decoBeige: "#E0DDC1",
+  track: "var(--color-gray-200)",
+  decoBeige: "var(--color-olive-100)",
 };
 
 // ── CSS keyframes + animation classes (injected once) ────────────────────────
@@ -117,7 +117,7 @@ export function FolderIllustration({
 
   // The fanning decoration is brand-yellow by default, which disappears on a
   // brand-yellow card — the solid variant uses an off-white instead.
-  const decoFan = variant === "solid" ? "#F4F2EB" : T.lime;
+  const decoFan = variant === "solid" ? "var(--color-gray-100)" : T.lime;
 
   const photoLeft = (26.834 / CW) * fw;
   const photoWidth = (137 / CW) * fw;
@@ -219,16 +219,16 @@ export function FolderIllustration({
           zIndex: 2,
           pointerEvents: "none",
           clipPath: folderFacePath(fw, fh),
-          filter: "drop-shadow(0px 10px 26px rgba(39,38,24,0.30))",
+          filter: "drop-shadow(0px 10px 26px color-mix(in srgb, var(--color-gray-900) 30%, transparent))",
           ...(variant === "solid"
-            ? { background: "#8E8857" }
+            ? { background: "var(--color-olive-600)" }
             : {
                 background:
                   "linear-gradient(135deg, rgba(180,176,140,0.34) 0%, rgba(140,136,104,0.20) 46%, rgba(120,116,86,0.30) 100%), rgba(120,117,88,0.42)",
                 backdropFilter: "blur(16px) saturate(1.1)",
                 WebkitBackdropFilter: "blur(16px) saturate(1.1)",
                 boxShadow:
-                  "inset 1px 1px 0 rgba(255,255,255,0.42), inset -1px -1px 0 rgba(120,116,86,0.28)",
+                  "inset 1px 1px 0 color-mix(in srgb, var(--color-bg-white) 42%, transparent), inset -1px -1px 0 rgba(120,116,86,0.28)",
               }),
         }}
       />
@@ -342,6 +342,8 @@ export function AgendaCarousel({ playing }: { playing: boolean }) {
       style={{
         width: "100%",
         overflow: "hidden",
+        // Os #000 abaixo não são cor: numa máscara só o alpha é lido, e #000
+        // significa "opaco". Não tokenizar.
         WebkitMaskImage:
           "linear-gradient(90deg, transparent, #000 18%, #000 82%, transparent)",
         maskImage:
@@ -537,8 +539,8 @@ export function PriceSlider({ playing }: { playing: boolean }) {
             width: THUMB_W,
             height: 48,
             borderRadius: 99,
-            background: "rgba(224,221,193,0.40)",
-            border: "1px solid #fff",
+            background: "color-mix(in srgb, var(--color-olive-100) 40%, transparent)",
+            border: "1px solid var(--color-bg-white)",
             backdropFilter: "blur(4px)",
             WebkitBackdropFilter: "blur(4px)",
             willChange: "transform",

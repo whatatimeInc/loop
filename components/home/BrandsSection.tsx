@@ -43,7 +43,7 @@ export function BrandsSection() {
   return (
     <section
       style={{
-        background:    "#232311",
+        background:    "var(--color-surface-canvas)",
         paddingTop:    isMobile ? 56 : 88,
         paddingBottom: isMobile ? 72 : 112,
         paddingLeft:   padX,

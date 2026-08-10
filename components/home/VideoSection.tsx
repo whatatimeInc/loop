@@ -44,7 +44,7 @@ export function VideoSection() {
           //
           // The overflow:hidden on this div clips the video to the rounded corners.
           // ────────────────────────────────────────────────────────────────────
-          background: "#F8F586",
+          background: "var(--color-lime)",
         }}
       />
     </section>

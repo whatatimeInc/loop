@@ -29,8 +29,8 @@ const STEPS = [
   {
     title:    "Crie seu perfil",
     subtitle: "Em minutos, um link exclusivo para compartilhar com sua audiência.",
-    bg:       "#F8F586",
-    fg:       "#272618",
+    bg:       "var(--color-lime)",
+    fg:       "var(--color-gray-900)",
     muted:    "#5D5B3F",
     // Local variant: solid folder face instead of glass, scaled down to fit the card.
     // The glass version stays untouched everywhere else it is used.
@@ -41,15 +41,15 @@ const STEPS = [
   {
     title:    "Defina sua agenda",
     subtitle: "Escolha seus horários e conecte ao Google Calendar.",
-    bg:       "#FCFBF8",
-    fg:       "#272618",
+    bg:       "var(--color-cream)",
+    fg:       "var(--color-gray-900)",
     muted:    "#6E6C60",
     render:   (playing: boolean) => <AgendaCarousel playing={playing} />,
   },
   {
     title:    "Receba seu valor",
     subtitle: "Defina seu preço e receba na conta de preferência. Sem mensalidade.",
-    bg:       "#A39E79",
+    bg:       "var(--color-olive-400)",
     fg:       tokens.lime,
     muted:    tokens.lime,
     render:   (playing: boolean) => <PriceSlider playing={playing} />,
@@ -112,7 +112,7 @@ function StepCard({
         minHeight:     stacked ? undefined : 400,
         margin:        stacked ? undefined : "0 auto",
         background:    bg,
-        border:        "0.5px solid rgba(39,38,24,0.10)",
+        border:        "0.5px solid color-mix(in srgb, var(--color-gray-900) 10%, transparent)",
         borderRadius:  24,
         padding:       "32px 24px 28px",
         display:       "flex",
@@ -274,7 +274,7 @@ export function ExpertSection() {
           justifyContent: "space-between",
           // Extra bottom room on mobile so the CTA clears the global fixed bar.
           padding:    isMobile ? "56px 0 104px" : "72px 0 64px",
-          background: "#232311",
+          background: "var(--color-surface-canvas)",
         }}
       >
         {/* ── Background photo + legibility overlay ── */}

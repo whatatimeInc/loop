@@ -3,7 +3,6 @@
 import { useRef, useCallback } from "react";
 import Image from "next/image";
 import { CategoryIcon } from "@/components/CategoryIcon";
-import { tokens, withAlpha } from "@/components/ui/tokens";
 import type { Categoria } from "@/lib/mockExperts";
 
 /**
@@ -16,7 +15,7 @@ import type { Categoria } from "@/lib/mockExperts";
  */
 /**
  * "light" is the PDP look: pale glass and near-black text, made for a light page.
- * "dark" tints the glass with #514F41 and flips the text to off-white, for the
+ * "dark" tints the glass with var(--color-gray-700) and flips the text to off-white, for the
  * dark home background. Default stays "light" so existing usage is untouched.
  */
 export type GlassVariant = "light" | "dark";
@@ -24,18 +23,20 @@ export type GlassVariant = "light" | "dark";
 // The blur must fade out via mask-image. backdrop-filter cannot be applied
 // through a gradient background — swapping this mask for a linear-gradient
 // background makes the blur cut off hard at the edge again.
+// Os #000 aqui não são cor: numa máscara só o alpha é lido, e #000 significa
+// "opaco". Não tokenizar — trocar por var() não muda nada e só confunde.
 const GLASS_MASK = "linear-gradient(to top, #000 0%, #000 40%, transparent 100%)";
 
 const VARIANT = {
   light: {
-    chipBg: "rgba(255,255,255,0.40)",
+    chipBg: "color-mix(in srgb, var(--color-bg-white) 40%, transparent)",
     text:   "#181D27",
   },
   dark: {
     // Flat colour, not a gradient — the fade is the mask's job.
-    tint:   withAlpha(tokens.glassDark, 0.45),
-    chipBg: withAlpha(tokens.glassDark, 0.55),
-    text:   "#FCFBF8",
+    tint:   "color-mix(in srgb, var(--color-gray-700) 45%, transparent)",
+    chipBg: "color-mix(in srgb, var(--color-gray-700) 55%, transparent)",
+    text:   "var(--color-cream)",
   },
 } as const;
 
@@ -135,7 +136,7 @@ export function ExpertGlassCard({
         // aspectRatio drives the height when given, so the card keeps its
         // portrait proportion at whatever width the grid hands it.
         ...(aspectRatio ? { aspectRatio, height: "auto" } : { height }),
-        background:   "#E0DDC1",
+        background:   "var(--color-olive-100)",
       }}
     >
       {/* ── Media layer (z 1): photo and video stacked, crossfaded by opacity ── */}
@@ -221,7 +222,7 @@ export function ExpertGlassCard({
               zIndex:        2,
               pointerEvents: "none",
               background:
-                "linear-gradient(180deg, transparent 60%, rgba(255,255,255,0.38) 76%, rgba(255,255,255,0.82) 100%)",
+                "linear-gradient(180deg, transparent 60%, color-mix(in srgb, var(--color-bg-white) 38%, transparent) 76%, color-mix(in srgb, var(--color-bg-white) 82%, transparent) 100%)",
             }}
           />
           <div

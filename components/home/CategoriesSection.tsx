@@ -79,7 +79,7 @@ export function CategoriesSection() {
     <section
       ref={sectionRef}
       style={{
-        background:    "#232311",
+        background:    "var(--color-surface-canvas)",
         paddingTop:    isMobile ? 56 : 88,
         paddingBottom: isMobile ? 72 : 112,
         position:      "relative",
@@ -101,7 +101,7 @@ export function CategoriesSection() {
         <div style={{ display: "flex", gap: 12, alignItems: "baseline" }}>
           <span
             style={{
-              color:      "#FCFBF8",
+              color:      "var(--color-cream)",
               fontSize:   isMobile ? 14 : 24,
               fontWeight: 400,
               fontFamily: "Host Grotesk, var(--font-host-grotesk), sans-serif",
@@ -112,7 +112,7 @@ export function CategoriesSection() {
           </span>
           <span
             style={{
-              color:      "#FCFBF8",
+              color:      "var(--color-cream)",
               fontSize:   isMobile ? 14 : 20,
               fontWeight: 400,
               lineHeight: 1.4,
@@ -124,7 +124,7 @@ export function CategoriesSection() {
         {!isMobile && (
           <span
             style={{
-              color:      "rgba(252,251,248,0.38)",
+              color:      "color-mix(in srgb, var(--color-cream) 38%, transparent)",
               fontSize:   16,
               fontWeight: 400,
               fontFamily: "Inter, var(--font-inter), sans-serif",
@@ -150,7 +150,7 @@ export function CategoriesSection() {
               onMouseEnter={isMobile ? undefined : () => handleEnter(i)}
               onMouseLeave={isMobile ? undefined : handleLeave}
               style={{
-                background: hovered ? "#F8F586" : "transparent",
+                background: hovered ? "var(--color-lime)" : "transparent",
                 transition: "background 0.18s ease",
                 cursor:     isMobile ? "pointer" : "default",
               }}
@@ -178,7 +178,7 @@ export function CategoriesSection() {
                       : "clamp(48px, 4.5vw, 64px)",
                     fontWeight: 500,
                     lineHeight: isMobile ? 1.15 : 1.08,
-                    color:      hovered ? "#232311" : "#FCFBF8",
+                    color:      hovered ? "var(--color-surface-canvas)" : "var(--color-cream)",
                     transition: "color 0.18s ease",
                     whiteSpace: "nowrap",
                     userSelect: "none",

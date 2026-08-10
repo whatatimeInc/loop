@@ -7,7 +7,7 @@ import { tokens } from "@/components/ui/tokens";
 import { HERO_CATEGORIES } from "@/lib/categories";
 
 // ── Brand dark background ─────────────────────────────────────────────────────
-const BRAND_DARK = "#232311";
+const BRAND_DARK = "var(--color-surface-canvas)";
 
 // ── Carousel cards ────────────────────────────────────────────────────────────
 // 4 unique cards — rendered as [...CARDS, ...CARDS] = 8 items for seamless loop.
@@ -110,7 +110,7 @@ export function HeroSection() {
                   fontFamily: "Host Grotesk, var(--font-host-grotesk), sans-serif",
                   fontSize:   "clamp(28px, 7vw, 40px)",
                   fontWeight: 500,
-                  color:      "#FCFBF8",
+                  color:      "var(--color-cream)",
                   lineHeight: 1.08,
                   margin:     0,
                 }}
@@ -120,7 +120,7 @@ export function HeroSection() {
               <p
                 style={{
                   fontSize:   14,
-                  color:      "rgba(252,251,248,0.72)",
+                  color:      "color-mix(in srgb, var(--color-cream) 72%, transparent)",
                   lineHeight: 1.55,
                   margin:     0,
                 }}
@@ -216,7 +216,7 @@ export function HeroSection() {
                       left:          0,
                       right:         0,
                       height:        "45%",
-                      background:    "linear-gradient(180deg, rgba(81,79,65,0.60) 0%, rgba(81,79,65,0) 100%)",
+                      background:    "linear-gradient(180deg, color-mix(in srgb, var(--color-gray-700) 60%, transparent) 0%, rgb(from var(--color-gray-700) r g b / 0) 100%)",
                       pointerEvents: "none",
                     }}
                   />
@@ -323,7 +323,7 @@ export function HeroSection() {
                       left:          0,
                       right:         0,
                       height:        "45%",
-                      background:    "linear-gradient(180deg, rgba(81,79,65,0.60) 0%, rgba(81,79,65,0) 100%)",
+                      background:    "linear-gradient(180deg, color-mix(in srgb, var(--color-gray-700) 60%, transparent) 0%, rgb(from var(--color-gray-700) r g b / 0) 100%)",
                       pointerEvents: "none",
                     }}
                   />
@@ -396,7 +396,7 @@ export function HeroSection() {
                   fontFamily: "Host Grotesk, var(--font-host-grotesk), sans-serif",
                   fontSize:   "clamp(34px, 3.5vw, 52px)",
                   fontWeight: 500,
-                  color:      "#FCFBF8",
+                  color:      "var(--color-cream)",
                   lineHeight: 1.08,
                   margin:     0,
                 }}
@@ -406,7 +406,7 @@ export function HeroSection() {
               <p
                 style={{
                   fontSize:   "clamp(14px, 1.2vw, 17px)",
-                  color:      "rgba(252,251,248,0.72)",
+                  color:      "color-mix(in srgb, var(--color-cream) 72%, transparent)",
                   lineHeight: 1.55,
                   margin:     0,
                 }}

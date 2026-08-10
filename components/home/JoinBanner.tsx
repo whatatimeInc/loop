@@ -54,7 +54,7 @@ export function JoinBanner({
   return (
     <section
       style={{
-        background:   "#232311",
+        background:   "var(--color-surface-canvas)",
         paddingLeft:  padX,
         paddingRight: padX,
         paddingTop:   isMobile ? 24 : 40,

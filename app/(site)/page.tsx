@@ -40,7 +40,7 @@ function MobileBottomCTA() {
         right: 0,
         zIndex: 50,
         padding: 16,
-        background: "rgba(255,255,255,0.50)",
+        background: "color-mix(in srgb, var(--color-bg-white) 50%, transparent)",
         backdropFilter: "blur(20px)",
         WebkitBackdropFilter: "blur(20px)",
       }}
@@ -59,7 +59,7 @@ function MobileBottomCTA() {
           borderRadius: 8,
           fontSize: 16,
           fontWeight: 600,
-          color: "#272618",
+          color: "var(--color-gray-900)",
           textDecoration: "none",
           boxShadow: "0px 1px 2px rgba(10,13,18,0.05)",
         }}
