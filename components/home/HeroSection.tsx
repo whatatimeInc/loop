@@ -57,10 +57,12 @@ function RotatingWord() {
         opacity:        visible ? 1 : 0,
         transform:      visible ? "translateY(0)" : "translateY(-6px)",
         transition:     "opacity 0.4s ease, transform 0.4s ease",
-        color:          tokens.lime,
+        fontFamily:     "Host Grotesk, var(--font-host-grotesk), sans-serif",
+        fontSize:       20,
+        fontWeight:     400,
+        color:          "var(--color-cream)",
         textDecoration: "underline",
-        textDecorationColor: tokens.lime,
-        fontWeight:     700,
+        textDecorationColor: "var(--color-cream)",
       }}
     >
       {HERO_CATEGORIES[index]}
@@ -119,13 +121,15 @@ export function HeroSection() {
               </h1>
               <p
                 style={{
-                  fontSize:   14,
-                  color:      "color-mix(in srgb, var(--color-cream) 72%, transparent)",
+                  fontFamily: "Host Grotesk, var(--font-host-grotesk), sans-serif",
+                  fontSize:   20,
+                  fontWeight: 400,
+                  color:      "var(--color-cream)",
                   lineHeight: 1.55,
                   margin:     0,
                 }}
               >
-                Get easy 1:1 access to the top experts in
+                Conversas 1:1 com os melhores em
                 <br />
                 <RotatingWord />
               </p>
@@ -165,7 +169,7 @@ export function HeroSection() {
         {/* Carousel block */}
         <div
           style={{
-            background:    tokens.lime,
+            background:    "var(--color-olive-400)",
             borderRadius:  22,
             overflow:      "hidden",
             height:        420,
@@ -274,7 +278,7 @@ export function HeroSection() {
             right:        0,
             bottom:       0,
             left:         "50%",
-            background:   tokens.lime,
+            background:   "var(--color-olive-400)",
             borderRadius: 18,
             overflow:     "hidden",
           }}
@@ -405,13 +409,15 @@ export function HeroSection() {
               </h1>
               <p
                 style={{
-                  fontSize:   "clamp(14px, 1.2vw, 17px)",
-                  color:      "color-mix(in srgb, var(--color-cream) 72%, transparent)",
+                  fontFamily: "Host Grotesk, var(--font-host-grotesk), sans-serif",
+                  fontSize:   20,
+                  fontWeight: 400,
+                  color:      "var(--color-cream)",
                   lineHeight: 1.55,
                   margin:     0,
                 }}
               >
-                Get easy 1:1 access to the top experts in{" "}
+                Conversas 1:1 com os melhores em{" "}
                 <RotatingWord />
               </p>
             </div>

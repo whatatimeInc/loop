@@ -2,7 +2,7 @@ type LogoSize = "header" | "md" | "footer" | "hero";
 
 const heights: Record<LogoSize, number> = {
   header: 28,
-  md:     36,
+  md:     80,
   footer: 44,
   hero:   56,
 };

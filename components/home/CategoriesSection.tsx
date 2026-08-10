@@ -124,7 +124,7 @@ export function CategoriesSection() {
         {!isMobile && (
           <span
             style={{
-              color:      "color-mix(in srgb, var(--color-cream) 38%, transparent)",
+              color:      "var(--color-cream)",
               fontSize:   16,
               fontWeight: 400,
               fontFamily: "Inter, var(--font-inter), sans-serif",
@@ -175,7 +175,7 @@ export function CategoriesSection() {
                     fontFamily: "Host Grotesk, var(--font-host-grotesk), sans-serif",
                     fontSize:   isMobile
                       ? "clamp(32px, 9vw, 48px)"
-                      : "clamp(48px, 4.5vw, 64px)",
+                      : 80,
                     fontWeight: 500,
                     lineHeight: isMobile ? 1.15 : 1.08,
                     color:      hovered ? "var(--color-surface-canvas)" : "var(--color-cream)",
