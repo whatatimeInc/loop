@@ -2,6 +2,7 @@
 
 import { useRef, useState, useEffect, useCallback } from "react";
 import { HERO_CATEGORIES } from "@/lib/categories";
+import { useRevealOnView, revealStyle } from "@/components/home/useReveal";
 
 // Placeholder images per category — swap for real mentor photos when available
 const CATEGORY_IMAGES: Record<string, string> = {
@@ -24,6 +25,7 @@ export function CategoriesSection() {
   const targetRef    = useRef({ x: 0, y: 0 });      // mouse target
   const rafRef       = useRef<number>(0);
   const animatingRef = useRef(false);
+  const revealPhase  = useRevealOnView(sectionRef);
 
   useEffect(() => {
     const check = () => setIsMobile(window.innerWidth < 768);
@@ -79,6 +81,7 @@ export function CategoriesSection() {
     <section
       ref={sectionRef}
       style={{
+        ...revealStyle(revealPhase),
         background:    "var(--color-surface-canvas)",
         paddingTop:    isMobile ? 56 : 88,
         paddingBottom: isMobile ? 72 : 112,

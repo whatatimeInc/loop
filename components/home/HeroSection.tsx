@@ -5,6 +5,14 @@ import { LinkButton, ArrowIcon } from "@/components/ui/Button";
 import { Logo } from "@/components/Logo";
 import { tokens } from "@/components/ui/tokens";
 import { HERO_CATEGORIES } from "@/lib/categories";
+import { useRevealOnLoad, revealStyle, STAGGER } from "@/components/home/useReveal";
+
+// ── Sequência de entrada do Hero — headline primeiro (protege o LCP), o
+// resto segue em stagger a partir daí. Não é ordem de DOM, é ordem de tempo.
+const DELAY_HEADLINE = 0;
+const DELAY_LOGO     = STAGGER;
+const DELAY_SUBTITLE = STAGGER * 2;
+const DELAY_CTAS     = STAGGER * 3;
 
 // ── Brand dark background ─────────────────────────────────────────────────────
 const BRAND_DARK = "var(--color-surface-canvas)";
@@ -74,6 +82,7 @@ function RotatingWord() {
 
 export function HeroSection() {
   const [isMobile, setIsMobile] = useState(false);
+  const revealPhase = useRevealOnLoad();
 
   useEffect(() => {
     const check = () => setIsMobile(window.innerWidth < 768);
@@ -104,11 +113,12 @@ export function HeroSection() {
               gap:           20,
             }}
           >
-            <Logo size="header" style={{ color: "var(--color-lime)" }} />
+            <Logo size="header" style={{ ...revealStyle(revealPhase, DELAY_LOGO), color: "var(--color-lime)" }} />
 
             <div style={{ display: "flex", flexDirection: "column", gap: 14 }}>
               <h1
                 style={{
+                  ...revealStyle(revealPhase, DELAY_HEADLINE),
                   fontFamily: "Host Grotesk, var(--font-host-grotesk), sans-serif",
                   fontSize:   "clamp(28px, 7vw, 40px)",
                   fontWeight: 500,
@@ -121,6 +131,7 @@ export function HeroSection() {
               </h1>
               <p
                 style={{
+                  ...revealStyle(revealPhase, DELAY_SUBTITLE),
                   fontFamily: "Host Grotesk, var(--font-host-grotesk), sans-serif",
                   fontSize:   20,
                   fontWeight: 400,
@@ -138,6 +149,7 @@ export function HeroSection() {
             {/* CTAs — stacked, full-width */}
             <div
               style={{
+                ...revealStyle(revealPhase, DELAY_CTAS),
                 display:       "flex",
                 flexDirection: "column",
                 gap:           12,
@@ -392,11 +404,12 @@ export function HeroSection() {
               maxWidth:      560,
             }}
           >
-            <Logo size="md" style={{ color: "var(--color-lime)" }} />
+            <Logo size="md" style={{ ...revealStyle(revealPhase, DELAY_LOGO), color: "var(--color-lime)" }} />
 
             <div style={{ display: "flex", flexDirection: "column", gap: 14 }}>
               <h1
                 style={{
+                  ...revealStyle(revealPhase, DELAY_HEADLINE),
                   fontFamily: "Host Grotesk, var(--font-host-grotesk), sans-serif",
                   fontSize:   "clamp(34px, 3.5vw, 52px)",
                   fontWeight: 500,
@@ -409,6 +422,7 @@ export function HeroSection() {
               </h1>
               <p
                 style={{
+                  ...revealStyle(revealPhase, DELAY_SUBTITLE),
                   fontFamily: "Host Grotesk, var(--font-host-grotesk), sans-serif",
                   fontSize:   20,
                   fontWeight: 400,
@@ -424,6 +438,7 @@ export function HeroSection() {
 
             <div
               style={{
+                ...revealStyle(revealPhase, DELAY_CTAS),
                 display:    "flex",
                 flexDirection: "row",
                 gap:        16,

@@ -1,9 +1,10 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { LinkButton, ArrowIcon } from "@/components/ui/Button";
 import { Logo } from "@/components/Logo";
 import { tokens } from "@/components/ui/tokens";
+import { useRevealOnView, revealStyle } from "@/components/home/useReveal";
 
 const HOST_GROTESK = "Host Grotesk, var(--font-host-grotesk), sans-serif";
 const INTER        = "Inter, var(--font-inter), sans-serif";
@@ -40,6 +41,8 @@ export function JoinBanner({
   ctaHref?:     string;
 }) {
   const [isMobile, setIsMobile] = useState(false);
+  const sectionRef = useRef<HTMLElement>(null);
+  const revealPhase = useRevealOnView(sectionRef);
 
   useEffect(() => {
     const check = () => setIsMobile(window.innerWidth < 768);
@@ -53,7 +56,9 @@ export function JoinBanner({
 
   return (
     <section
+      ref={sectionRef}
       style={{
+        ...revealStyle(revealPhase),
         background:   "var(--color-surface-canvas)",
         paddingLeft:  padX,
         paddingRight: padX,

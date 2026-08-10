@@ -1,11 +1,12 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { LinkButton, ArrowIcon } from "@/components/ui/Button";
 import { SectionHeader } from "@/components/home/SectionHeader";
 import { SwipeCarousel } from "@/components/home/SwipeCarousel";
 import { ExpertGlassCard } from "@/components/ExpertGlassCard";
 import type { Categoria } from "@/lib/mockExperts";
+import { useRevealOnView, revealStyle } from "@/components/home/useReveal";
 
 // Placeholder roster — swap for real featured creators when they are picked.
 // TODO: no per-mentor videos exist yet (public/mentors/* only has photos), so
@@ -36,6 +37,8 @@ const CARD_RATIO = "343 / 500";
 
 export function CreatorsSection() {
   const [isMobile, setIsMobile] = useState(false);
+  const sectionRef = useRef<HTMLElement>(null);
+  const revealPhase = useRevealOnView(sectionRef);
 
   useEffect(() => {
     const check = () => setIsMobile(window.innerWidth < 768);
@@ -48,7 +51,9 @@ export function CreatorsSection() {
 
   return (
     <section
+      ref={sectionRef}
       style={{
+        ...revealStyle(revealPhase),
         background:    "var(--color-surface-canvas)",
         paddingTop:    isMobile ? 56 : 88,
         paddingBottom: isMobile ? 72 : 112,

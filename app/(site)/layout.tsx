@@ -1,5 +1,5 @@
 import { Header } from "@/components/Header";
-import { Footer } from "@/components/Footer";
+import { FooterReveal } from "@/components/FooterReveal";
 import { SiteCanvas } from "@/components/SiteCanvas";
 
 export default function SiteLayout({ children }: { children: React.ReactNode }) {
@@ -7,7 +7,7 @@ export default function SiteLayout({ children }: { children: React.ReactNode }) 
     <SiteCanvas>
       <Header />
       <main>{children}</main>
-      <Footer />
+      <FooterReveal />
     </SiteCanvas>
   );
 }
