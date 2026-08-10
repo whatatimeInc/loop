@@ -54,7 +54,7 @@ const depoimentos = [
 
 export default function SejaMentor() {
   return (
-    <div className="theme-dark min-h-screen bg-dark text-gray-25">
+    <div className="min-h-screen bg-dark text-gray-25">
 
       {/* ======== HERO ======== */}
       <section className="min-h-[90vh] flex flex-col items-center justify-center text-center px-6 pt-28 pb-20">

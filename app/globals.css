@@ -13,9 +13,9 @@
    por classe Tailwind. Sem ele o tree-shake as removeria assim que a última
    classe bg-lime/text-lime saísse do código, e os inline quebrariam calados. */
 @theme static {
-  --color-yellow:        #F8F586;   /* brand-primary */
-  --color-yellow-light:  #EAEA68;   /* brand-light / hover */
-  --color-yellow-dark:   #D8D85A;   /* hover state */
+  --color-lime:          #F8F586;   /* brand-primary */
+  --color-lime-light:    #EAEA68;   /* brand-light / hover */
+  --color-lime-dark:     #D8D85A;   /* hover state */
 }
 
 @theme {
@@ -25,33 +25,19 @@
   --color-olive-600:     #8E8857;
 
   /* ── backgrounds ─────────────────────────────────────────────── */
-  --color-bg:            #FCFBF8;   /* bg-primary — warm off-white */
   --color-bg-subtle:     #F4F2EB;   /* bg-secondary */
   --color-bg-white:      #FFFFFF;   /* elevated cards only */
 
   /* ── near-black ──────────────────────────────────────────────── */
   --color-dark:          #272618;   /* primary dark surface & text */
 
-  /* ── neutral scale (warm) ────────────────────────────────────── */
-  --color-neutral-50:    #FCFBF8;
-  --color-neutral-100:   #F4F2EB;
-  --color-neutral-200:   #DAD9D5;
-  --color-neutral-400:   #AEADA4;
-  --color-neutral-600:   #626053;
-  --color-neutral-700:   #807F71;
-  --color-neutral-800:   #373525;
-  --color-neutral-900:   #272618;
 
   /* ── semantic ────────────────────────────────────────────────── */
   --color-error:         #EB6A67;
   --color-success:       #68A279;
 
   /* ── legacy aliases (keep Tailwind class names working) ──────── */
-  --color-lime:          #F8F586;   /* was #CEFD58 */
-  --color-lime-dark:     #D8D85A;   /* was #BDEC47 */
   --color-cream:         #FCFBF8;   /* was #F6F1E9 */
-  --color-tan:           #E0DDC1;   /* was #E7DAC8 */
-  --color-tan-dark:      #A39E79;   /* was #D6C9B5 */
 
   /* ── gray scale (warm-toned, for backwards compat) ───────────── */
   --color-gray-25:       #FDFDFD;
@@ -127,13 +113,8 @@
 }
 
 :root {
-  --background: var(--color-bg);
+  --background: var(--color-cream);
   --foreground: var(--color-dark);
-}
-
-.theme-dark {
-  --background: var(--color-dark);
-  --foreground: var(--color-neutral-50);
 }
 
 html {

@@ -102,7 +102,7 @@ export function HeroSection() {
               gap:           20,
             }}
           >
-            <Logo size="header" style={{ color: "var(--color-yellow)" }} />
+            <Logo size="header" style={{ color: "var(--color-lime)" }} />
 
             <div style={{ display: "flex", flexDirection: "column", gap: 14 }}>
               <h1
@@ -388,7 +388,7 @@ export function HeroSection() {
               maxWidth:      560,
             }}
           >
-            <Logo size="md" style={{ color: "var(--color-yellow)" }} />
+            <Logo size="md" style={{ color: "var(--color-lime)" }} />
 
             <div style={{ display: "flex", flexDirection: "column", gap: 14 }}>
               <h1
