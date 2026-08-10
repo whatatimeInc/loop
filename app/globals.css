@@ -79,6 +79,48 @@
   --radius-pill: 999px;
 }
 
+/* ── semântico — canvas ─────────────────────────────────────────────────
+   Papéis, não cores: o componente pede "a superfície da página" e o canvas
+   decide o valor. Estes são os defaults (claro).
+
+   `static` é obrigatório aqui: sem ele o Tailwind faz tree-shake das vars
+   ainda não usadas, e `var(--color-surface-canvas)` resolveria vazio fora de
+   um [data-canvas]. Com `static` a var sempre existe, e as utilities
+   (bg-surface-canvas, text-on-canvas…) são geradas quando alguém as usar. */
+@theme static {
+  --color-surface-canvas:   #FCFBF8;   /* fundo da página */
+  --color-surface-raised:   #FCFBF8;   /* cards sobre o canvas */
+  --color-on-canvas:        #272618;   /* texto principal */
+  --color-on-canvas-muted:  #626053;   /* texto secundário */
+  --color-border-on-canvas: #E4E2D9;   /* divisórias sobre o canvas */
+}
+
+/* ══ Camada semântica — inversão por canvas ═════════════════════════════
+   Os valores default vivem no @theme acima (bloco "semântico — canvas"), de
+   onde o Tailwind gera as utilities (bg-surface-canvas, text-on-canvas…).
+   Aqui só trocamos os VALORES por canvas: como a utility resolve a var em
+   tempo de execução, a classe e o `style={{ color: "var(--color-on-canvas)" }}`
+   seguem a mesma cascata. Uma alavanca para os dois dialetos.
+
+   Qualquer subárvore pode inverter sem o componente saber de nada.
+   AINDA NÃO CONSUMIDO — esta adição é puramente aditiva.
+   ══════════════════════════════════════════════════════════════════════ */
+[data-canvas="light"] {
+  --color-surface-canvas:     #FCFBF8;
+  --color-surface-raised:     #FCFBF8;
+  --color-on-canvas:          #272618;
+  --color-on-canvas-muted:    #626053;
+  --color-border-on-canvas:   #E4E2D9;
+}
+
+[data-canvas="dark"] {
+  --color-surface-canvas:     #232311;
+  --color-surface-raised:     #373525;
+  --color-on-canvas:          #FCFBF8;
+  --color-on-canvas-muted:    #AEADA4;
+  --color-border-on-canvas:   rgba(252, 251, 248, 0.15);
+}
+
 :root {
   --background: var(--color-bg);
   --foreground: var(--color-dark);

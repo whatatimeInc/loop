@@ -377,7 +377,7 @@ export function NossaPropostaSection() {
       <style dangerouslySetInnerHTML={{ __html: ANIMATION_CSS }} />
       <div
         ref={sectionRef}
-        style={{ background: "#151918", borderRadius: 22, overflow: "hidden" }}
+        style={{ background: "#272618", borderRadius: 22, overflow: "hidden" }}
       >
 
         {/* ── (a) Section header — centered ──────────────────────────────── */}
