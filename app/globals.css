@@ -30,7 +30,7 @@
   --color-bg-white:      #FFFFFF;   /* elevated cards only */
 
   /* ── near-black ──────────────────────────────────────────────── */
-  --color-dark:          #272518;   /* primary dark surface & text */
+  --color-dark:          #272618;   /* primary dark surface & text */
 
   /* ── neutral scale (warm) ────────────────────────────────────── */
   --color-neutral-50:    #FCFBF8;
@@ -40,7 +40,7 @@
   --color-neutral-600:   #626053;
   --color-neutral-700:   #807F71;
   --color-neutral-800:   #373525;
-  --color-neutral-900:   #272518;
+  --color-neutral-900:   #272618;
 
   /* ── semantic ────────────────────────────────────────────────── */
   --color-error:         #EB6A67;
@@ -64,7 +64,7 @@
   --color-gray-600:      #626053;
   --color-gray-700:      #514F41;
   --color-gray-800:      #373525;
-  --color-gray-900:      #272518;
+  --color-gray-900:      #272618;
 
   /* ── typography ──────────────────────────────────────────────── */
   --font-sans:           var(--font-inter);
