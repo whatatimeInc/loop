@@ -373,7 +373,7 @@ export function CadastroForm() {
               disabled={loading}
               style={{
                 padding: "14px 20px",
-                borderRadius: 8,
+                borderRadius: "var(--radius-pill)",
                 background: "#272618",
                 color: "#FCFBF8",
                 border: "none",

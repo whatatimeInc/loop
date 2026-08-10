@@ -88,7 +88,7 @@ function baseStyle(
     gap: layout !== "text" ? 12 : undefined,
     height: 56,
     ...(isIconOnly ? { width: 56 } : { paddingLeft: 40, paddingRight: 40 }),
-    borderRadius: 99,
+    borderRadius: "var(--radius-pill)",
     border: `1px solid ${cfg.border}`,
     background: bg,
     color: cfg.color,
@@ -123,7 +123,7 @@ function overlayStyle(
   return {
     position: "absolute",
     inset: 0,
-    borderRadius: 99,
+    borderRadius: "var(--radius-pill)",
     background: cfg.overlayColor ?? "transparent",
     opacity,
     transition: "opacity 0.15s ease",

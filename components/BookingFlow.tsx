@@ -857,7 +857,7 @@ function StepPagamento({ expert, duracao, data, horario, onPago }: {
                 onClick={pagarCartao}
                 disabled={!cardValido || processando}
                 style={{
-                  width: "100%", padding: "14px 0", borderRadius: 6, border: "none",
+                  width: "100%", padding: "14px 0", borderRadius: "var(--radius-pill)", border: "none",
                   background: cardValido && !processando ? DARK : BEIGE_MID,
                   color: cardValido && !processando ? TXT_LIGHT : TXT_MUTED,
                   fontSize: 15, fontWeight: 600, cursor: cardValido && !processando ? "pointer" : "not-allowed",
@@ -1196,7 +1196,7 @@ export function BookingFlow({ expert, duracaoInicial, header, footer }: {
                     onClick={avancar}
                     disabled={!podeAvancar()}
                     style={{
-                      width: "100%", padding: "14px 0", borderRadius: 6, border: "none",
+                      width: "100%", padding: "14px 0", borderRadius: "var(--radius-pill)", border: "none",
                       background: podeAvancar() ? DARK : BEIGE_MID,
                       color: podeAvancar() ? TXT_LIGHT : TXT_MUTED,
                       fontSize: 15, fontWeight: 600,
@@ -1228,7 +1228,7 @@ export function BookingFlow({ expert, duracaoInicial, header, footer }: {
                 <button
                   onClick={voltar}
                   style={{
-                    padding: "10px 20px", borderRadius: 6,
+                    padding: "10px 20px", borderRadius: "var(--radius-pill)",
                     border: `1.5px solid ${BEIGE_MID}`,
                     background: "transparent", color: TXT_MUTED,
                     fontSize: 14, fontWeight: 500, cursor: "pointer",
@@ -1243,7 +1243,7 @@ export function BookingFlow({ expert, duracaoInicial, header, footer }: {
                     onClick={avancar}
                     disabled={!podeAvancar()}
                     style={{
-                      padding: "12px 28px", borderRadius: 6, border: "none",
+                      padding: "12px 28px", borderRadius: "var(--radius-pill)", border: "none",
                       background: podeAvancar() ? DARK : BEIGE_MID,
                       color: podeAvancar() ? TXT_LIGHT : TXT_MUTED,
                       fontSize: 15, fontWeight: 600,
