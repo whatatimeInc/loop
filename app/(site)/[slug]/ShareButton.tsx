@@ -54,11 +54,11 @@ export function ShareButton({
         title={copied ? "Link copiado!" : "Compartilhar perfil"}
         style={{
           width: 40, height: 40, borderRadius: "50%",
-          background: "rgba(255,255,255,0.40)",
+          background: "color-mix(in srgb, var(--color-bg-white) 40%, transparent)",
           backdropFilter: "blur(15px)",
           WebkitBackdropFilter: "blur(15px)",
           border: "none",
-          color: copied ? "#5FAD8E" : "#272618",
+          color: copied ? "#5FAD8E" : "var(--color-gray-900)",
           display: "flex", alignItems: "center", justifyContent: "center",
           cursor: "pointer", flexShrink: 0,
           transition: "background 0.15s",
@@ -94,9 +94,9 @@ export function ShareButton({
       title={copied ? "Link copiado!" : "Compartilhar perfil"}
       style={{
         width: 44, height: 44, borderRadius: "50%",
-        border: "1px solid #DAD9D5",
-        background: copied ? tokens.lime : "#FCFBF8",
-        color: "#272618",
+        border: "1px solid var(--color-gray-200)",
+        background: copied ? tokens.lime : "var(--color-cream)",
+        color: "var(--color-gray-900)",
         display: "flex", alignItems: "center", justifyContent: "center",
         cursor: "pointer", flexShrink: 0,
         transition: "background 0.15s",

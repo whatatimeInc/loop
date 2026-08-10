@@ -56,8 +56,8 @@ function Field({
     borderRadius: 8,
     border: `1.5px solid ${error ? "#D93B3B" : "#E4E2D9"}`,
     fontSize: 14,
-    color: "#272618",
-    background: "#FFFFFF",
+    color: "var(--color-gray-900)",
+    background: "var(--color-bg-white)",
     outline: "none",
     fontFamily: "inherit",
     resize: "vertical" as const,
@@ -65,7 +65,7 @@ function Field({
   };
   return (
     <div>
-      <label style={{ display: "block", fontSize: 12, fontWeight: 600, color: "#626053", marginBottom: 6 }}>
+      <label style={{ display: "block", fontSize: 12, fontWeight: 600, color: "var(--color-gray-600)", marginBottom: 6 }}>
         {label}
       </label>
       {multiline ? (
@@ -80,7 +80,7 @@ function Field({
         <input type={type} value={value} onChange={(e) => onChange(e.target.value)} placeholder={placeholder} style={base} />
       )}
       {error && <p style={{ fontSize: 12, color: "#D93B3B", margin: "4px 0 0" }}>{error}</p>}
-      {helper && !error && <p style={{ fontSize: 12, color: "#AEADA4", margin: "4px 0 0" }}>{helper}</p>}
+      {helper && !error && <p style={{ fontSize: 12, color: "var(--color-gray-400)", margin: "4px 0 0" }}>{helper}</p>}
     </div>
   );
 }
@@ -95,7 +95,7 @@ function StepBasicInfo({
 }) {
   return (
     <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
-      <p style={{ fontSize: 14, color: "#626053", margin: 0 }}>
+      <p style={{ fontSize: 14, color: "var(--color-gray-600)", margin: 0 }}>
         Confirme seu nome. Ele aparecerá no seu perfil público.
       </p>
       <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12 }}>
@@ -139,7 +139,7 @@ function StepProfile({
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img src={photoUrl} alt="" style={{ width: "100%", height: "100%", objectFit: "cover" }} onError={() => {}} />
           </div>
-          <p style={{ fontSize: 13, color: "#626053" }}>Preview da foto</p>
+          <p style={{ fontSize: 13, color: "var(--color-gray-600)" }}>Preview da foto</p>
         </div>
       )}
       <Field
@@ -168,7 +168,7 @@ function StepUsername({
   const slug = username.toLowerCase().replace(/[^a-z0-9-]/g, "-").replace(/-+/g, "-").replace(/^-|-$/g, "");
   return (
     <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
-      <p style={{ fontSize: 14, color: "#626053", margin: 0 }}>
+      <p style={{ fontSize: 14, color: "var(--color-gray-600)", margin: 0 }}>
         Escolha o nome único do seu link público.
       </p>
       <Field
@@ -184,10 +184,10 @@ function StepUsername({
           style={{
             padding: "12px 14px",
             borderRadius: 8,
-            background: "#F4F2EB",
+            background: "var(--color-gray-100)",
             border: "1px solid #E4E2D9",
             fontSize: 14,
-            color: "#272618",
+            color: "var(--color-gray-900)",
           }}
         >
           Seu link: <strong>loop.talk/{slug}</strong>
@@ -217,7 +217,7 @@ function StepSessions({
 
   return (
     <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
-      <p style={{ fontSize: 14, color: "#626053", margin: 0 }}>
+      <p style={{ fontSize: 14, color: "var(--color-gray-600)", margin: 0 }}>
         Defina as opções de sessão que os clientes poderão agendar.
       </p>
       {sessions.map((s, i) => (
@@ -231,7 +231,7 @@ function StepSessions({
           }}
         >
           <div>
-            <label style={{ display: "block", fontSize: 12, fontWeight: 600, color: "#626053", marginBottom: 6 }}>
+            <label style={{ display: "block", fontSize: 12, fontWeight: 600, color: "var(--color-gray-600)", marginBottom: 6 }}>
               Duração
             </label>
             <select
@@ -243,8 +243,8 @@ function StepSessions({
                 borderRadius: 8,
                 border: "1.5px solid #E4E2D9",
                 fontSize: 14,
-                color: "#272618",
-                background: "#FFFFFF",
+                color: "var(--color-gray-900)",
+                background: "var(--color-bg-white)",
                 fontFamily: "inherit",
               }}
             >
@@ -261,7 +261,7 @@ function StepSessions({
               background: "none",
               border: "none",
               cursor: "pointer",
-              color: "#AEADA4",
+              color: "var(--color-gray-400)",
               fontSize: 18,
               padding: "8px",
               marginBottom: 2,
@@ -282,7 +282,7 @@ function StepSessions({
           border: "1.5px dashed #E4E2D9",
           background: "none",
           fontSize: 14,
-          color: "#626053",
+          color: "var(--color-gray-600)",
           cursor: "pointer",
           fontFamily: "inherit",
           alignSelf: "flex-start",
@@ -308,7 +308,7 @@ function StepAvailability({
   };
   return (
     <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
-      <p style={{ fontSize: 14, color: "#626053", margin: 0 }}>
+      <p style={{ fontSize: 14, color: "var(--color-gray-600)", margin: 0 }}>
         Quais dias da semana você está disponível? A configuração de horários fica no painel.
       </p>
       <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
@@ -320,9 +320,9 @@ function StepAvailability({
               width: 52,
               height: 52,
               borderRadius: 8,
-              border: `2px solid ${availability[day] ? "#272618" : "#E4E2D9"}`,
-              background: availability[day] ? "#272618" : "#FFFFFF",
-              color: availability[day] ? "#FCFBF8" : "#626053",
+              border: `2px solid ${availability[day] ? "var(--color-gray-900)" : "#E4E2D9"}`,
+              background: availability[day] ? "var(--color-gray-900)" : "var(--color-bg-white)",
+              color: availability[day] ? "var(--color-cream)" : "var(--color-gray-600)",
               fontSize: 13,
               fontWeight: 600,
               cursor: "pointer",
@@ -333,7 +333,7 @@ function StepAvailability({
           </button>
         ))}
       </div>
-      <p style={{ fontSize: 12, color: "#AEADA4", margin: 0 }}>
+      <p style={{ fontSize: 12, color: "var(--color-gray-400)", margin: 0 }}>
         Horários específicos e bloqueios configurados em Painel → Disponibilidade.
       </p>
     </div>
@@ -347,7 +347,7 @@ function StepPayment({
 }) {
   return (
     <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
-      <p style={{ fontSize: 14, color: "#626053", margin: 0 }}>
+      <p style={{ fontSize: 14, color: "var(--color-gray-600)", margin: 0 }}>
         Informe sua chave Pix para receber os pagamentos das sessões.
       </p>
       <Field
@@ -528,7 +528,7 @@ export function HostActivationSheet({
         style={{
           position: "fixed",
           inset: 0,
-          background: "rgba(39,38,24,0.5)",
+          background: "color-mix(in srgb, var(--color-gray-900) 50%, transparent)",
           zIndex: 200,
         }}
       />
@@ -541,11 +541,11 @@ export function HostActivationSheet({
           right: 0,
           bottom: 0,
           width: 480,
-          background: "#FCFBF8",
+          background: "var(--color-cream)",
           zIndex: 201,
           display: "flex",
           flexDirection: "column",
-          boxShadow: "-4px 0 32px rgba(39,38,24,0.12)",
+          boxShadow: "-4px 0 32px color-mix(in srgb, var(--color-gray-900) 12%, transparent)",
         }}
       >
         {/* Progress bar */}
@@ -571,10 +571,10 @@ export function HostActivationSheet({
           }}
         >
           <div>
-            <p style={{ fontSize: 11, fontWeight: 600, color: "#AEADA4", margin: "0 0 2px", textTransform: "uppercase", letterSpacing: "0.06em" }}>
+            <p style={{ fontSize: 11, fontWeight: 600, color: "var(--color-gray-400)", margin: "0 0 2px", textTransform: "uppercase", letterSpacing: "0.06em" }}>
               Passo {stepIndex + 1} de {STEPS.length}
             </p>
-            <h2 style={{ fontSize: 18, fontWeight: 500, color: "#272618", margin: 0, fontFamily: "var(--font-host-grotesk)" }}>
+            <h2 style={{ fontSize: 18, fontWeight: 500, color: "var(--color-gray-900)", margin: 0, fontFamily: "var(--font-host-grotesk)" }}>
               {currentStep.label}
             </h2>
           </div>
@@ -584,7 +584,7 @@ export function HostActivationSheet({
               background: "none",
               border: "none",
               cursor: "pointer",
-              color: "#AEADA4",
+              color: "var(--color-gray-400)",
               fontSize: 22,
               lineHeight: 1,
               padding: 4,
@@ -603,7 +603,7 @@ export function HostActivationSheet({
                 flex: 1,
                 height: 3,
                 borderRadius: 99,
-                background: i <= stepIndex ? "#272618" : "#E4E2D9",
+                background: i <= stepIndex ? "var(--color-gray-900)" : "#E4E2D9",
                 transition: "background 0.2s",
               }}
             />
@@ -664,7 +664,7 @@ export function HostActivationSheet({
                 border: "1.5px solid #E4E2D9",
                 background: "none",
                 fontSize: 14,
-                color: "#626053",
+                color: "var(--color-gray-600)",
                 cursor: "pointer",
                 fontFamily: "inherit",
               }}
@@ -680,8 +680,8 @@ export function HostActivationSheet({
               flex: 1,
               padding: "13px 20px",
               borderRadius: 8,
-              background: "#272618",
-              color: "#FCFBF8",
+              background: "var(--color-gray-900)",
+              color: "var(--color-cream)",
               border: "none",
               fontSize: 15,
               fontWeight: 600,
@@ -706,7 +706,7 @@ export function HostActivationSheet({
                 border: "none",
                 cursor: "pointer",
                 fontSize: 13,
-                color: "#AEADA4",
+                color: "var(--color-gray-400)",
                 fontFamily: "inherit",
                 flexShrink: 0,
               }}

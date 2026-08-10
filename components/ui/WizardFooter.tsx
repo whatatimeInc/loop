@@ -66,7 +66,7 @@ export function WizardFooter({
         display: "flex", alignItems: "center",
         justifyContent: showBack ? "space-between" : "flex-end",
         padding: "16px 20px 20px",
-        background: "rgba(255,255,255,0.50)",
+        background: "color-mix(in srgb, var(--color-bg-white) 50%, transparent)",
         backdropFilter: "blur(20px)",
         WebkitBackdropFilter: "blur(20px)",
       }}>
@@ -94,7 +94,7 @@ export function WizardFooter({
             display: "flex", alignItems: "center", gap: 8,
             padding: "12px 20px", borderRadius: 8, border: "none",
             background: active ? tokens.dark : tokens.borderSubtle,
-            color: active ? "#FCFBF8" : tokens.faint,
+            color: active ? "var(--color-cream)" : tokens.faint,
             fontSize: 16, fontWeight: 600,
             cursor: active ? "pointer" : "not-allowed",
             fontFamily: "inherit", transition: "all 0.2s",

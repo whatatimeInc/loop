@@ -14,15 +14,15 @@ function Avatar({ profile, size = 80 }: {
   const initials = [profile.name, profile.last_name]
     .filter(Boolean).map((s) => s![0].toUpperCase()).join("").slice(0, 2) || "?";
   return profile.photo_url ? (
-    <div style={{ width: size, height: size, borderRadius: "50%", overflow: "hidden", flexShrink: 0, border: "3px solid rgba(255,255,255,0.12)" }}>
+    <div style={{ width: size, height: size, borderRadius: "50%", overflow: "hidden", flexShrink: 0, border: "3px solid color-mix(in srgb, var(--color-bg-white) 12%, transparent)" }}>
       <Image src={profile.photo_url} alt={profile.name ?? ""} width={size} height={size} style={{ objectFit: "cover" }} />
     </div>
   ) : (
     <div style={{
       width: size, height: size, borderRadius: "50%", flexShrink: 0,
-      background: tokens.lime, border: "3px solid rgba(255,255,255,0.12)",
+      background: tokens.lime, border: "3px solid color-mix(in srgb, var(--color-bg-white) 12%, transparent)",
       display: "flex", alignItems: "center", justifyContent: "center",
-      fontSize: size * 0.35, fontWeight: 700, color: "#272618",
+      fontSize: size * 0.35, fontWeight: 700, color: "var(--color-gray-900)",
     }}>{initials}</div>
   );
 }
@@ -75,19 +75,19 @@ function DeviceStatus() {
   }, []);
 
   const dot = (status: "checking" | "ok" | "error") =>
-    status === "ok" ? "#68A279" : status === "error" ? "#C0392B" : "#807F71";
+    status === "ok" ? "var(--color-success)" : status === "error" ? "#C0392B" : "var(--color-gray-500)";
 
   return (
     <div style={{ display: "flex", gap: 16, alignItems: "center" }}>
       <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
         <span style={{ width: 8, height: 8, borderRadius: "50%", background: dot(mic), display: "inline-block" }} />
-        <span style={{ fontSize: 13, color: "#807F71" }}>
+        <span style={{ fontSize: 13, color: "var(--color-gray-500)" }}>
           {mic === "checking" ? "Verificando mic..." : mic === "ok" ? "Microfone ativo" : "Mic sem permissão"}
         </span>
       </div>
       <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
         <span style={{ width: 8, height: 8, borderRadius: "50%", background: dot(cam), display: "inline-block" }} />
-        <span style={{ fontSize: 13, color: "#807F71" }}>
+        <span style={{ fontSize: 13, color: "var(--color-gray-500)" }}>
           {cam === "checking" ? "Verificando câmera..." : cam === "ok" ? "Câmera ativa" : "Câmera sem permissão"}
         </span>
       </div>
@@ -145,7 +145,7 @@ export function WaitingRoom({
         <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 12 }}>
           <Avatar profile={other} size={80} />
           <div style={{ textAlign: "center" }}>
-            <p style={{ fontSize: 13, color: "#807F71", margin: "0 0 4px" }}>
+            <p style={{ fontSize: 13, color: "var(--color-gray-500)", margin: "0 0 4px" }}>
               {persona === "mentor" ? "Convidado" : "Host"}
             </p>
             <p style={{ fontSize: 20, fontWeight: 600, color: "#F0EFEB", margin: 0 }}>{fullName(other)}</p>
@@ -153,14 +153,14 @@ export function WaitingRoom({
         </div>
 
         {/* Session info */}
-        <div style={{ background: "rgba(255,255,255,0.06)", borderRadius: 12, padding: "20px 24px", width: "100%", display: "flex", flexDirection: "column", gap: 12 }}>
+        <div style={{ background: "color-mix(in srgb, var(--color-bg-white) 6%, transparent)", borderRadius: 12, padding: "20px 24px", width: "100%", display: "flex", flexDirection: "column", gap: 12 }}>
           <p style={{ fontSize: 14, fontWeight: 600, color: "#F0EFEB", margin: 0 }}>{sessionLabel}</p>
-          <p style={{ fontSize: 13, color: "#807F71", margin: 0 }}>{formatScheduledTime(session.starts_at)}</p>
+          <p style={{ fontSize: 13, color: "var(--color-gray-500)", margin: 0 }}>{formatScheduledTime(session.starts_at)}</p>
 
           {/* Countdown */}
           {diff > 0 && (
             <div style={{ textAlign: "center", marginTop: 4 }}>
-              <p style={{ fontSize: 11, color: "#807F71", margin: "0 0 4px", textTransform: "uppercase", letterSpacing: 0.5 }}>começa em</p>
+              <p style={{ fontSize: 11, color: "var(--color-gray-500)", margin: "0 0 4px", textTransform: "uppercase", letterSpacing: 0.5 }}>começa em</p>
               <p style={{ fontSize: 36, fontWeight: 700, fontFamily: "monospace", color: "#F0EFEB", margin: 0 }}>
                 {formatMmSs(diff)}
               </p>
@@ -168,7 +168,7 @@ export function WaitingRoom({
           )}
 
           {otherJoined && diff > 0 && (
-            <p style={{ fontSize: 13, color: "#68A279", margin: 0, textAlign: "center" }}>
+            <p style={{ fontSize: 13, color: "var(--color-success)", margin: 0, textAlign: "center" }}>
               {fullName(other)} já está na sala — você pode entrar agora.
             </p>
           )}
@@ -179,12 +179,12 @@ export function WaitingRoom({
 
         {/* Contextual tip (guest only) */}
         {tip && (
-          <p style={{ fontSize: 13, color: "#807F71", textAlign: "center", margin: 0 }}>{tip}</p>
+          <p style={{ fontSize: 13, color: "var(--color-gray-500)", textAlign: "center", margin: 0 }}>{tip}</p>
         )}
 
         {/* Private note (mentor only, or always) */}
         <div style={{ width: "100%", display: "flex", flexDirection: "column", gap: 8 }}>
-          <label style={{ fontSize: 12, color: "#807F71", letterSpacing: 0.3 }}>
+          <label style={{ fontSize: 12, color: "var(--color-gray-500)", letterSpacing: 0.3 }}>
             Nota privada (só você vê)
           </label>
           <textarea
@@ -193,7 +193,7 @@ export function WaitingRoom({
             rows={3}
             placeholder="Anotações para esta sessão..."
             style={{
-              background: "rgba(255,255,255,0.06)", border: "1px solid rgba(255,255,255,0.1)",
+              background: "color-mix(in srgb, var(--color-bg-white) 6%, transparent)", border: "1px solid color-mix(in srgb, var(--color-bg-white) 10%, transparent)",
               borderRadius: 8, padding: "10px 12px", color: "#F0EFEB", fontSize: 14,
               resize: "none", fontFamily: "Inter, sans-serif", outline: "none", width: "100%", boxSizing: "border-box",
             }}
@@ -206,9 +206,9 @@ export function WaitingRoom({
           disabled={!canEnter}
           style={{
             width: "100%", padding: "14px 24px",
-            background: canEnter ? tokens.lime : "rgba(255,255,255,0.08)",
+            background: canEnter ? tokens.lime : "color-mix(in srgb, var(--color-bg-white) 8%, transparent)",
             border: "none", borderRadius: 8,
-            color: canEnter ? "#272618" : "#807F71",
+            color: canEnter ? "var(--color-gray-900)" : "var(--color-gray-500)",
             fontSize: 16, fontWeight: 700, cursor: canEnter ? "pointer" : "not-allowed",
             transition: "all 0.2s",
           }}

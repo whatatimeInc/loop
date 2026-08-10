@@ -79,9 +79,9 @@ function ShareIcon() {
 function SocialCircle({ href, label, children }: { href: string; label: string; children: React.ReactNode }) {
   return (
     <a href={href} aria-label={label} style={{
-      width: 36, height: 36, background: "#E0DDC1", borderRadius: "50%",
+      width: 36, height: 36, background: "var(--color-olive-100)", borderRadius: "50%",
       display: "flex", alignItems: "center", justifyContent: "center",
-      textDecoration: "none", color: "#272618", flexShrink: 0,
+      textDecoration: "none", color: "var(--color-gray-900)", flexShrink: 0,
     }}>
       {children}
     </a>
@@ -92,7 +92,7 @@ export function MobileCreatorLayout({ expert }: { expert: Expert }) {
   const recomendam = Math.round(expert.rating * 20);
 
   return (
-    <div className="md:hidden" style={{ background: "#F4F2EB", paddingBottom: 96 }}>
+    <div className="md:hidden" style={{ background: "var(--color-gray-100)", paddingBottom: 96 }}>
 
       {/* Main scroll content */}
       <div style={{ padding: "96px 16px 16px", display: "flex", flexDirection: "column", gap: 24 }}>
@@ -111,19 +111,19 @@ export function MobileCreatorLayout({ expert }: { expert: Expert }) {
           {/* Gradient overlay — no blur, keeps photo crisp; white fade starts at 55% */}
           <div style={{
             position: "absolute", inset: 0,
-            background: "linear-gradient(180deg, rgba(255,255,255,0) 55%, rgba(255,255,255,0.38) 75%, rgba(255,255,255,0.80) 100%)",
+            background: "linear-gradient(180deg, rgb(from var(--color-bg-white) r g b / 0) 55%, color-mix(in srgb, var(--color-bg-white) 38%, transparent) 75%, color-mix(in srgb, var(--color-bg-white) 80%, transparent) 100%)",
           }} />
 
           {/* Share button */}
           <div style={{
             position: "absolute", top: 12, right: 12, zIndex: 2,
             width: 36, height: 36,
-            background: "rgba(255,255,255,0.40)",
+            background: "color-mix(in srgb, var(--color-bg-white) 40%, transparent)",
             borderRadius: "50%",
             backdropFilter: "blur(20px)",
             WebkitBackdropFilter: "blur(20px)",
             display: "flex", alignItems: "center", justifyContent: "center",
-            color: "#272618",
+            color: "var(--color-gray-900)",
           }}>
             <ShareIcon />
           </div>
@@ -139,12 +139,12 @@ export function MobileCreatorLayout({ expert }: { expert: Expert }) {
             display: "flex", flexDirection: "column", alignItems: "center", gap: 12,
           }}>
             <span style={{
-              background: "rgba(255,255,255,0.40)",
+              background: "color-mix(in srgb, var(--color-bg-white) 40%, transparent)",
               backdropFilter: "blur(20px)",
               WebkitBackdropFilter: "blur(20px)",
               borderRadius: 4,
               padding: "8px 12px",
-              fontSize: 12, fontWeight: 600, color: "#272618",
+              fontSize: 12, fontWeight: 600, color: "var(--color-gray-900)",
               boxShadow: "0px 1px 2px rgba(10,13,18,0.05)",
               display: "inline-flex",
               alignItems: "center",
@@ -168,28 +168,28 @@ export function MobileCreatorLayout({ expert }: { expert: Expert }) {
         <div style={{ display: "flex", justifyContent: "center", alignItems: "center", gap: 24 }}>
           <div style={{ display: "flex", flexDirection: "column", alignItems: "flex-start", gap: 4 }}>
             <div style={{ display: "flex", alignItems: "center", gap: 4 }}>
-              <StarSolid className="w-4 h-4" style={{ color: "#272618" }} />
-              <span style={{ fontSize: 20, color: "#272618", lineHeight: "24px" }}>{expert.rating.toFixed(1)}</span>
+              <StarSolid className="w-4 h-4" style={{ color: "var(--color-gray-900)" }} />
+              <span style={{ fontSize: 20, color: "var(--color-gray-900)", lineHeight: "24px" }}>{expert.rating.toFixed(1)}</span>
             </div>
-            <span style={{ fontSize: 14, color: "#272618" }}>{avaliacoesMock.length * 10} avaliações</span>
+            <span style={{ fontSize: 14, color: "var(--color-gray-900)" }}>{avaliacoesMock.length * 10} avaliações</span>
           </div>
           <div style={{ display: "flex", flexDirection: "column", alignItems: "flex-start", gap: 4, width: 78 }}>
-            <span style={{ fontSize: 20, color: "#272618" }}>{expert.sessoes}+</span>
-            <span style={{ fontSize: 14, color: "#272618" }}>sessões</span>
+            <span style={{ fontSize: 20, color: "var(--color-gray-900)" }}>{expert.sessoes}+</span>
+            <span style={{ fontSize: 14, color: "var(--color-gray-900)" }}>sessões</span>
           </div>
           <div style={{ display: "flex", flexDirection: "column", alignItems: "flex-start", gap: 4, width: 78 }}>
-            <span style={{ fontSize: 20, color: "#272618" }}>{recomendam}%</span>
-            <span style={{ fontSize: 14, color: "#272618" }}>recomendam</span>
+            <span style={{ fontSize: 20, color: "var(--color-gray-900)" }}>{recomendam}%</span>
+            <span style={{ fontSize: 14, color: "var(--color-gray-900)" }}>recomendam</span>
           </div>
         </div>
 
         {/* Content: Sobre + Avaliações */}
-        <div style={{ borderTop: "1px solid #DAD9D5", paddingTop: 24, paddingBottom: 24, display: "flex", flexDirection: "column", gap: 32 }}>
+        <div style={{ borderTop: "1px solid var(--color-gray-200)", paddingTop: 24, paddingBottom: 24, display: "flex", flexDirection: "column", gap: 32 }}>
 
           {/* Sobre header + social icons */}
           <div style={{ display: "flex", flexDirection: "column", gap: 24 }}>
             <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start" }}>
-              <h2 style={{ fontSize: 24, fontWeight: 400, color: "#272618", lineHeight: "32px", margin: 0 }}>Sobre</h2>
+              <h2 style={{ fontSize: 24, fontWeight: 400, color: "var(--color-gray-900)", lineHeight: "32px", margin: 0 }}>Sobre</h2>
               <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
                 <SocialCircle href={expert.social.instagram ?? "#"} label="Instagram"><InstagramIcon /></SocialCircle>
                 <SocialCircle href={expert.social.linkedin ?? "#"} label="LinkedIn"><LinkedInIcon /></SocialCircle>
@@ -197,27 +197,27 @@ export function MobileCreatorLayout({ expert }: { expert: Expert }) {
                 <SocialCircle href="#" label="TikTok"><TikTokIcon /></SocialCircle>
               </div>
             </div>
-            <p style={{ fontSize: 14, color: "#272618", lineHeight: "18px", margin: 0 }}>{expert.bio}</p>
+            <p style={{ fontSize: 14, color: "var(--color-gray-900)", lineHeight: "18px", margin: 0 }}>{expert.bio}</p>
           </div>
 
           {/* Avaliações */}
           <div style={{ display: "flex", flexDirection: "column", gap: 32 }}>
-            <h2 style={{ fontSize: 24, fontWeight: 400, color: "#272618", lineHeight: "32px", margin: 0 }}>Avaliações</h2>
+            <h2 style={{ fontSize: 24, fontWeight: 400, color: "var(--color-gray-900)", lineHeight: "32px", margin: 0 }}>Avaliações</h2>
 
             <div style={{ display: "flex", flexDirection: "column", gap: 24 }}>
               {avaliacoesMock.map((av) => (
-                <div key={av.nome} style={{ background: "#E0DDC1", borderRadius: 12, padding: 32, display: "flex", flexDirection: "column", gap: 18 }}>
+                <div key={av.nome} style={{ background: "var(--color-olive-100)", borderRadius: 12, padding: 32, display: "flex", flexDirection: "column", gap: 18 }}>
                   <div style={{ display: "flex", flexDirection: "column", gap: 4 }}>
                     <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-                      <span style={{ fontSize: 16, fontWeight: 700, color: "#272618" }}>{av.nome}</span>
+                      <span style={{ fontSize: 16, fontWeight: 700, color: "var(--color-gray-900)" }}>{av.nome}</span>
                       <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-                        <StarSolid className="w-5 h-5" style={{ color: "#272618" }} />
-                        <span style={{ fontSize: 16, fontWeight: 700, color: "#272618" }}>{av.nota}.0</span>
+                        <StarSolid className="w-5 h-5" style={{ color: "var(--color-gray-900)" }} />
+                        <span style={{ fontSize: 16, fontWeight: 700, color: "var(--color-gray-900)" }}>{av.nota}.0</span>
                       </div>
                     </div>
-                    <span style={{ fontSize: 14, color: "#272618" }}>{av.data}</span>
+                    <span style={{ fontSize: 14, color: "var(--color-gray-900)" }}>{av.data}</span>
                   </div>
-                  <p style={{ fontSize: 16, color: "#272618", lineHeight: "24px", margin: 0 }}>{av.texto}</p>
+                  <p style={{ fontSize: 16, color: "var(--color-gray-900)", lineHeight: "24px", margin: 0 }}>{av.texto}</p>
                 </div>
               ))}
             </div>
@@ -225,11 +225,11 @@ export function MobileCreatorLayout({ expert }: { expert: Expert }) {
             <button style={{
               alignSelf: "stretch",
               padding: "12px 20px",
-              background: "#FCFBF8",
+              background: "var(--color-cream)",
               border: "none",
-              outline: "1px solid #8E8857",
+              outline: "1px solid var(--color-olive-600)",
               outlineOffset: -1,
-              color: "#272618",
+              color: "var(--color-gray-900)",
               fontSize: 16,
               fontWeight: 600,
               borderRadius: 8,
@@ -255,11 +255,11 @@ export function MobileCreatorLayout({ expert }: { expert: Expert }) {
             alignItems: "center",
             gap: 8,
             padding: "12px 20px",
-            background: "#272618",
+            background: "var(--color-gray-900)",
             borderRadius: 8,
             fontSize: 16,
             fontWeight: 600,
-            color: "#FCFBF8",
+            color: "var(--color-cream)",
             textDecoration: "none",
             alignSelf: "flex-start",
           }}>
@@ -274,7 +274,7 @@ export function MobileCreatorLayout({ expert }: { expert: Expert }) {
       <div style={{
         position: "fixed", bottom: 0, left: 0, right: 0, zIndex: 50,
         padding: "17px 16px 16px",
-        background: "rgba(255,255,255,0.50)",
+        background: "color-mix(in srgb, var(--color-bg-white) 50%, transparent)",
         backdropFilter: "blur(20px)",
         WebkitBackdropFilter: "blur(20px)",
       }}>
@@ -287,7 +287,7 @@ export function MobileCreatorLayout({ expert }: { expert: Expert }) {
           borderRadius: 8,
           fontSize: 16,
           fontWeight: 600,
-          color: "#272618",
+          color: "var(--color-gray-900)",
           textDecoration: "none",
         }}>
           Agendar Loop.Talk

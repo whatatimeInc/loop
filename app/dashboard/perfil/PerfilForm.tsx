@@ -112,7 +112,7 @@ export function PerfilForm({
           background: tokens.bg, opacity: 0.7, cursor: "not-allowed",
         }}>
           <span style={{
-            padding: "12px 14px", background: "#F4F2EB", color: tokens.muted,
+            padding: "12px 14px", background: "var(--color-gray-100)", color: tokens.muted,
             fontSize: 13, whiteSpace: "nowrap",
             borderRight: `1px solid ${tokens.borderSubtle}`, flexShrink: 0,
           }}>

@@ -36,8 +36,8 @@ function InlineInput({
         style={{
           position: "relative",
           height: 52,
-          background: "#FCFBF8",
-          border: `1px solid ${error ? "#EB6A67" : focused ? "#272618" : "#DAD9D5"}`,
+          background: "var(--color-cream)",
+          border: `1px solid ${error ? "var(--color-error)" : focused ? "var(--color-gray-900)" : "var(--color-gray-200)"}`,
           borderRadius: 8,
           boxShadow: "0px 1px 2px rgba(10,13,18,0.05)",
         }}
@@ -51,7 +51,7 @@ function InlineInput({
             top: floated ? 9 : 17,
             fontSize: floated ? 10 : 14,
             fontWeight: floated ? 600 : 400,
-            color: floated ? "#626053" : "#AEADA4",
+            color: floated ? "var(--color-gray-600)" : "var(--color-gray-400)",
             lineHeight: 1,
           }}
         >
@@ -75,14 +75,14 @@ function InlineInput({
             background: "transparent",
             outline: "none",
             fontSize: 14,
-            color: "#272618",
+            color: "var(--color-gray-900)",
             fontFamily: "inherit",
             boxSizing: "border-box",
           }}
         />
       </div>
-      {error && <p style={{ fontSize: 12, color: "#EB6A67", marginTop: 4 }}>{error}</p>}
-      {helper && !error && <p style={{ fontSize: 12, color: "#AEADA4", marginTop: 4 }}>{helper}</p>}
+      {error && <p style={{ fontSize: 12, color: "var(--color-error)", marginTop: 4 }}>{error}</p>}
+      {helper && !error && <p style={{ fontSize: 12, color: "var(--color-gray-400)", marginTop: 4 }}>{helper}</p>}
     </div>
   );
 }
@@ -182,7 +182,7 @@ export function CadastroForm() {
       <div
         style={{
           minHeight: "100vh",
-          background: "#F4F2EB",
+          background: "var(--color-gray-100)",
           display: "flex",
           alignItems: "center",
           justifyContent: "center",
@@ -195,7 +195,7 @@ export function CadastroForm() {
           </div>
           <div
             style={{
-              background: "#FFFFFF",
+              background: "var(--color-bg-white)",
               borderRadius: 16,
               border: "1px solid #E4E2D9",
               padding: "40px 32px",
@@ -213,21 +213,21 @@ export function CadastroForm() {
                 margin: "0 auto 20px",
               }}
             >
-              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#272618" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="var(--color-gray-900)" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                 <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z" />
                 <polyline points="22,6 12,13 2,6" />
               </svg>
             </div>
-            <h2 style={{ fontSize: 20, fontWeight: 500, color: "#272618", margin: "0 0 12px", fontFamily: "var(--font-host-grotesk)" }}>
+            <h2 style={{ fontSize: 20, fontWeight: 500, color: "var(--color-gray-900)", margin: "0 0 12px", fontFamily: "var(--font-host-grotesk)" }}>
               Verifique seu e-mail
             </h2>
-            <p style={{ fontSize: 14, color: "#626053", lineHeight: 1.6, margin: 0 }}>
+            <p style={{ fontSize: 14, color: "var(--color-gray-600)", lineHeight: 1.6, margin: 0 }}>
               Enviamos um link de acesso para{" "}
-              <strong style={{ color: "#272618" }}>{email}</strong>. Clique nele
+              <strong style={{ color: "var(--color-gray-900)" }}>{email}</strong>. Clique nele
               para ativar sua conta.
             </p>
           </div>
-          <p style={{ fontSize: 13, color: "#AEADA4", marginTop: 20 }}>
+          <p style={{ fontSize: 13, color: "var(--color-gray-400)", marginTop: 20 }}>
             Não recebeu?{" "}
             <button
               onClick={() => setStep("form")}
@@ -236,7 +236,7 @@ export function CadastroForm() {
                 border: "none",
                 cursor: "pointer",
                 fontSize: 13,
-                color: "#272618",
+                color: "var(--color-gray-900)",
                 fontWeight: 600,
                 padding: 0,
                 fontFamily: "inherit",
@@ -255,7 +255,7 @@ export function CadastroForm() {
     <div
       style={{
         minHeight: "100vh",
-        background: "#F4F2EB",
+        background: "var(--color-gray-100)",
         display: "flex",
         alignItems: "center",
         justifyContent: "center",
@@ -265,14 +265,14 @@ export function CadastroForm() {
       <div style={{ maxWidth: 400, width: "100%" }}>
         <div style={{ display: "flex", flexDirection: "column", alignItems: "center", marginBottom: 32 }}>
           <Logo size="header" />
-          <p style={{ fontSize: 14, color: "#626053", marginTop: 10 }}>
+          <p style={{ fontSize: 14, color: "var(--color-gray-600)", marginTop: 10 }}>
             Crie sua conta gratuitamente
           </p>
         </div>
 
         <div
           style={{
-            background: "#FFFFFF",
+            background: "var(--color-bg-white)",
             borderRadius: 16,
             border: "1px solid #E4E2D9",
             padding: "32px",
@@ -291,10 +291,10 @@ export function CadastroForm() {
               padding: "12px 16px",
               borderRadius: 8,
               border: "1.5px solid #E4E2D9",
-              background: "#FFFFFF",
+              background: "var(--color-bg-white)",
               fontSize: 14,
               fontWeight: 600,
-              color: "#272618",
+              color: "var(--color-gray-900)",
               cursor: googleLoading ? "not-allowed" : "pointer",
               fontFamily: "inherit",
               opacity: googleLoading ? 0.6 : 1,
@@ -306,7 +306,7 @@ export function CadastroForm() {
 
           <div style={{ display: "flex", alignItems: "center", gap: 12, margin: "20px 0" }}>
             <div style={{ flex: 1, height: 1, background: "#E4E2D9" }} />
-            <span style={{ fontSize: 12, color: "#AEADA4" }}>ou</span>
+            <span style={{ fontSize: 12, color: "var(--color-gray-400)" }}>ou</span>
             <div style={{ flex: 1, height: 1, background: "#E4E2D9" }} />
           </div>
 
@@ -354,18 +354,18 @@ export function CadastroForm() {
                   background: "rgba(235,106,103,0.08)",
                   border: "1px solid rgba(235,106,103,0.3)",
                   fontSize: 13,
-                  color: "#EB6A67",
+                  color: "var(--color-error)",
                 }}
               >
                 {errors.geral}
               </div>
             )}
 
-            <p style={{ fontSize: 12, color: "#AEADA4", lineHeight: 1.5, margin: "4px 0 0" }}>
+            <p style={{ fontSize: 12, color: "var(--color-gray-400)", lineHeight: 1.5, margin: "4px 0 0" }}>
               Ao criar sua conta você concorda com os{" "}
-              <Link href="/termos" style={{ color: "#626053" }}>Termos de Uso</Link>{" "}
+              <Link href="/termos" style={{ color: "var(--color-gray-600)" }}>Termos de Uso</Link>{" "}
               e a{" "}
-              <Link href="/privacidade" style={{ color: "#626053" }}>Política de Privacidade</Link>.
+              <Link href="/privacidade" style={{ color: "var(--color-gray-600)" }}>Política de Privacidade</Link>.
             </p>
 
             <button
@@ -374,8 +374,8 @@ export function CadastroForm() {
               style={{
                 padding: "14px 20px",
                 borderRadius: "var(--radius-pill)",
-                background: "#272618",
-                color: "#FCFBF8",
+                background: "var(--color-gray-900)",
+                color: "var(--color-cream)",
                 border: "none",
                 fontSize: 15,
                 fontWeight: 600,
@@ -390,9 +390,9 @@ export function CadastroForm() {
           </form>
         </div>
 
-        <p style={{ textAlign: "center", fontSize: 14, color: "#626053", marginTop: 20 }}>
+        <p style={{ textAlign: "center", fontSize: 14, color: "var(--color-gray-600)", marginTop: 20 }}>
           Já tem conta?{" "}
-          <Link href="/login" style={{ fontWeight: 600, color: "#272618", textDecoration: "none" }}>
+          <Link href="/login" style={{ fontWeight: 600, color: "var(--color-gray-900)", textDecoration: "none" }}>
             Entrar
           </Link>
         </p>

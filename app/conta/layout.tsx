@@ -24,7 +24,7 @@ export default async function ContaLayout({
   const hostActivated = profile?.host_profile_activated ?? false;
 
   return (
-    <div style={{ display: "flex", minHeight: "100vh", background: "#FCFBF8" }}>
+    <div style={{ display: "flex", minHeight: "100vh", background: "var(--color-cream)" }}>
       <ContaSidebar
         hostActivated={hostActivated}
         userId={user.id}

@@ -121,16 +121,16 @@ export default function DisponibilidadePage() {
   }
 
   if (loading) {
-    return <p style={{ color: "#626053", fontSize: 14 }}>Carregando…</p>;
+    return <p style={{ color: "var(--color-gray-600)", fontSize: 14 }}>Carregando…</p>;
   }
 
   return (
     <div>
       <div style={{ marginBottom: 24 }}>
-        <h1 style={{ fontSize: 24, fontWeight: 700, color: "#272618", margin: "0 0 8px" }}>
+        <h1 style={{ fontSize: 24, fontWeight: 700, color: "var(--color-gray-900)", margin: "0 0 8px" }}>
           Disponibilidade
         </h1>
-        <p style={{ fontSize: 14, color: "#626053", margin: 0 }}>
+        <p style={{ fontSize: 14, color: "var(--color-gray-600)", margin: 0 }}>
           Selecione os horários disponíveis por dia. Clique para marcar ou arraste para selecionar vários.
         </p>
       </div>
@@ -159,7 +159,7 @@ export default function DisponibilidadePage() {
                       padding: "0 4px 12px",
                       fontSize: 12,
                       fontWeight: 600,
-                      color: "#272618",
+                      color: "var(--color-gray-900)",
                       textAlign: "center",
                       cursor: "pointer",
                       minWidth: 60,
@@ -173,7 +173,7 @@ export default function DisponibilidadePage() {
                         width: 10,
                         height: 10,
                         borderRadius: "50%",
-                        background: allOn ? tokens.lime : someOn ? "rgba(248,245,134,0.4)" : "#E4E2D9",
+                        background: allOn ? tokens.lime : someOn ? "color-mix(in srgb, var(--color-lime) 40%, transparent)" : "#E4E2D9",
                         margin: "4px auto 0",
                       }}
                     />
@@ -188,7 +188,7 @@ export default function DisponibilidadePage() {
                 <td
                   style={{
                     fontSize: 11,
-                    color: "#626053",
+                    color: "var(--color-gray-600)",
                     paddingRight: 12,
                     textAlign: "right",
                     whiteSpace: "nowrap",
@@ -214,7 +214,7 @@ export default function DisponibilidadePage() {
                           width: 52,
                           height: 16,
                           borderRadius: 4,
-                          background: active ? tokens.lime : "#F4F2EB",
+                          background: active ? tokens.lime : "var(--color-gray-100)",
                           border: `1px solid ${active ? "#CBCB50" : "#E4E2D9"}`,
                           cursor: "pointer",
                           transition: "background 0.1s",
@@ -251,7 +251,7 @@ export default function DisponibilidadePage() {
           borderRadius: 8,
           border: "none",
           background: saving ? "#E4E2D9" : tokens.lime,
-          color: "#272618",
+          color: "var(--color-gray-900)",
           fontSize: 14,
           fontWeight: 600,
           cursor: saving ? "not-allowed" : "pointer",

@@ -39,7 +39,7 @@ export function ContaSidebar({
           display: "flex",
           flexDirection: "column",
           padding: "32px 0",
-          background: "#FCFBF8",
+          background: "var(--color-cream)",
           minHeight: "100vh",
         }}
       >
@@ -60,7 +60,7 @@ export function ContaSidebar({
                   borderRadius: 8,
                   fontSize: 14,
                   fontWeight: active ? 600 : 400,
-                  color: active ? "#272618" : "#626053",
+                  color: active ? "var(--color-gray-900)" : "var(--color-gray-600)",
                   background: active ? "rgba(234,234,104,0.15)" : "transparent",
                   textDecoration: "none",
                 }}
@@ -83,7 +83,7 @@ export function ContaSidebar({
                 borderRadius: 8,
                 fontSize: 13,
                 fontWeight: 600,
-                color: "#272618",
+                color: "var(--color-gray-900)",
                 background: tokens.lime,
                 textDecoration: "none",
               }}
@@ -95,11 +95,11 @@ export function ContaSidebar({
               style={{
                 padding: 12,
                 borderRadius: 8,
-                background: "#F4F2EB",
+                background: "var(--color-gray-100)",
                 border: "1px solid #E4E2D9",
               }}
             >
-              <p style={{ fontSize: 12, color: "#626053", margin: "0 0 8px" }}>
+              <p style={{ fontSize: 12, color: "var(--color-gray-600)", margin: "0 0 8px" }}>
                 Quer monetizar seu tempo?
               </p>
               <button
@@ -110,7 +110,7 @@ export function ContaSidebar({
                   padding: 0,
                   fontSize: 13,
                   fontWeight: 600,
-                  color: "#272618",
+                  color: "var(--color-gray-900)",
                   cursor: "pointer",
                   fontFamily: "inherit",
                 }}

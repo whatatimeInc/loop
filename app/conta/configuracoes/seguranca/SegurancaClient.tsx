@@ -19,7 +19,7 @@ function Field({
 }) {
   return (
     <div>
-      <label style={{ display: "block", fontSize: 12, fontWeight: 600, color: "#626053", marginBottom: 6 }}>
+      <label style={{ display: "block", fontSize: 12, fontWeight: 600, color: "var(--color-gray-600)", marginBottom: 6 }}>
         {label}
       </label>
       <input
@@ -33,14 +33,14 @@ function Field({
           borderRadius: 8,
           border: "1.5px solid #E4E2D9",
           fontSize: 14,
-          color: "#272618",
-          background: "#FFFFFF",
+          color: "var(--color-gray-900)",
+          background: "var(--color-bg-white)",
           outline: "none",
           boxSizing: "border-box",
         }}
       />
       {helper && (
-        <p style={{ fontSize: 12, color: "#AEADA4", marginTop: 4 }}>{helper}</p>
+        <p style={{ fontSize: 12, color: "var(--color-gray-400)", marginTop: 4 }}>{helper}</p>
       )}
     </div>
   );
@@ -93,7 +93,7 @@ export function SegurancaClient({
   }
 
   const cardStyle: React.CSSProperties = {
-    background: "#FFFFFF",
+    background: "var(--color-bg-white)",
     borderRadius: 12,
     border: "1px solid #E4E2D9",
     padding: "24px",
@@ -105,19 +105,19 @@ export function SegurancaClient({
     <div>
       {/* E-mail section */}
       <div style={cardStyle}>
-        <h2 style={{ fontSize: 15, fontWeight: 600, color: "#272618", margin: "0 0 4px" }}>
+        <h2 style={{ fontSize: 15, fontWeight: 600, color: "var(--color-gray-900)", margin: "0 0 4px" }}>
           E-mail
         </h2>
-        <p style={{ fontSize: 13, color: "#626053", margin: "0 0 16px" }}>
+        <p style={{ fontSize: 13, color: "var(--color-gray-600)", margin: "0 0 16px" }}>
           Para alterar seu e-mail, entre em contato com o suporte.
         </p>
         <div
           style={{
             padding: "12px 14px",
             borderRadius: 8,
-            background: "#F4F2EB",
+            background: "var(--color-gray-100)",
             fontSize: 14,
-            color: "#272618",
+            color: "var(--color-gray-900)",
           }}
         >
           {email}
@@ -126,10 +126,10 @@ export function SegurancaClient({
 
       {/* Password section */}
       <div style={cardStyle}>
-        <h2 style={{ fontSize: 15, fontWeight: 600, color: "#272618", margin: "0 0 4px" }}>
+        <h2 style={{ fontSize: 15, fontWeight: 600, color: "var(--color-gray-900)", margin: "0 0 4px" }}>
           {hasPassword ? "Alterar senha" : "Definir senha"}
         </h2>
-        <p style={{ fontSize: 13, color: "#626053", margin: "0 0 20px" }}>
+        <p style={{ fontSize: 13, color: "var(--color-gray-600)", margin: "0 0 20px" }}>
           {hasPassword
             ? "Você já tem uma senha definida. Insira uma nova para alterar."
             : "Opcionalmente, defina uma senha para entrar sem precisar de link por e-mail."}
@@ -167,8 +167,8 @@ export function SegurancaClient({
             style={{
               padding: "12px 20px",
               borderRadius: 8,
-              background: "#272618",
-              color: "#FCFBF8",
+              background: "var(--color-gray-900)",
+              color: "var(--color-cream)",
               border: "none",
               fontSize: 14,
               fontWeight: 600,
@@ -185,10 +185,10 @@ export function SegurancaClient({
 
       {/* 2FA placeholder */}
       <div style={{ ...cardStyle, opacity: 0.5 }}>
-        <h2 style={{ fontSize: 15, fontWeight: 600, color: "#272618", margin: "0 0 4px" }}>
+        <h2 style={{ fontSize: 15, fontWeight: 600, color: "var(--color-gray-900)", margin: "0 0 4px" }}>
           Autenticação em dois fatores
         </h2>
-        <p style={{ fontSize: 13, color: "#626053", margin: 0 }}>
+        <p style={{ fontSize: 13, color: "var(--color-gray-600)", margin: 0 }}>
           Em breve.
         </p>
       </div>

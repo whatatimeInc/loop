@@ -100,7 +100,7 @@ export function FolderFrame({
           />
           <path
             d="M180.669 89.2264L117.691 70.884C111.341 69.0345 104.692 72.6758 102.84 79.0171L80.5429 155.357C78.6907 161.698 82.3372 168.338 88.6874 170.188L151.665 188.53C158.015 190.38 164.665 186.739 166.517 180.397L188.814 104.057C190.666 97.716 187.019 91.076 180.669 89.2264Z"
-            fill="#E0DDC1"
+            fill="var(--color-olive-100)"
           />
         </g>
         <defs>
@@ -139,14 +139,14 @@ export function FolderFrame({
           <rect x="26.834" width="137" height="169" rx="24" fill="white" />
           <path
             d="M110.5 68.3333C110.5 69.0406 110.219 69.7189 109.719 70.219C109.219 70.719 108.541 71 107.834 71H83.8337C83.1264 71 82.4481 70.719 81.948 70.219C81.4479 69.7189 81.167 69.0406 81.167 68.3333V53.6667C81.167 52.9594 81.4479 52.2811 81.948 51.781C82.4481 51.281 83.1264 51 83.8337 51H89.167L91.8337 47H99.8337L102.5 51H107.834C108.541 51 109.219 51.281 109.719 51.781C110.219 52.2811 110.5 52.9594 110.5 53.6667V68.3333Z"
-            stroke="#AEADA4"
+            stroke="var(--color-gray-400)"
             strokeWidth="2"
             strokeLinecap="round"
             strokeLinejoin="round"
           />
           <path
             d="M95.8337 65.6667C98.7792 65.6667 101.167 63.2789 101.167 60.3333C101.167 57.3878 98.7792 55 95.8337 55C92.8881 55 90.5003 57.3878 90.5003 60.3333C90.5003 63.2789 92.8881 65.6667 95.8337 65.6667Z"
-            stroke="#AEADA4"
+            stroke="var(--color-gray-400)"
             strokeWidth="2"
             strokeLinecap="round"
             strokeLinejoin="round"
@@ -171,7 +171,7 @@ export function FolderFrame({
       >
         <path
           d="M162.236 233.998H10.4345C5.13181 233.998 0.833984 229.719 0.833984 224.44V85.5577C0.833984 80.2786 5.13181 76 10.4345 76H51.4857C54.9235 76 58.251 77.2042 60.8839 79.4041C74.2235 90.5459 116.682 125.219 116.682 125.219L168.635 171.494C170.67 173.307 171.834 175.899 171.834 178.618V224.442C171.834 229.721 167.536 234 162.233 234L162.236 233.998Z"
-          fill="#272618"
+          fill="var(--color-gray-900)"
         />
       </svg>
 
@@ -185,7 +185,7 @@ export function FolderFrame({
             top: `${(188 / CANVAS_H) * 100}%`,
             zIndex: 4,
             fontFamily: "Nerfos, cursive",
-            color: "#FCFBF8",
+            color: "var(--color-cream)",
             fontSize: `${width * (20 / 220)}px`,
             lineHeight: 1,
             pointerEvents: "none",
@@ -211,8 +211,8 @@ export function FolderFrame({
           width: `${(32 / CANVAS_W) * width}px`,
           height: `${(32 / CANVAS_W) * width}px`,
           borderRadius: "9999px",
-          background: "#FCFBF8",
-          border: `1px solid #8E8857`,
+          background: "var(--color-cream)",
+          border: `1px solid var(--color-olive-600)`,
           boxShadow: "0 1px 2px rgba(10,13,18,0.05)",
           display: "flex",
           alignItems: "center",
@@ -228,7 +228,7 @@ export function FolderFrame({
             height="55%"
             viewBox="0 0 24 24"
             fill="none"
-            stroke="#272618"
+            stroke="var(--color-gray-900)"
             strokeWidth="2"
             strokeLinecap="round"
             strokeLinejoin="round"

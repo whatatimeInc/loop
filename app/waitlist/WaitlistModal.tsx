@@ -17,28 +17,28 @@ function IconCarreira() {
       </defs>
       <g style={{ isolation: "isolate" }}>
         <g clipPath="url(#car-cp0)">
-          <path stroke="#272618" strokeWidth=".5" strokeMiterlimit="10" d="M1.8,32.7V1.7c0,0,27,15.6,27,15.6v31c0,0-27-15.6-27-15.6M29.5,16.9L1.1.5v32.6c0,0,28.3,16.4,28.3,16.4V16.9"/>
+          <path stroke="var(--color-gray-900)" strokeWidth=".5" strokeMiterlimit="10" d="M1.8,32.7V1.7c0,0,27,15.6,27,15.6v31c0,0-27-15.6-27-15.6M29.5,16.9L1.1.5v32.6c0,0,28.3,16.4,28.3,16.4V16.9"/>
         </g>
-        <polygon points="1 33.1 1.1 .5 29.5 16.9 29.4 49.5 1 33.1" fill="none" stroke="#272618" strokeWidth=".5" strokeMiterlimit="10"/>
+        <polygon points="1 33.1 1.1 .5 29.5 16.9 29.4 49.5 1 33.1" fill="none" stroke="var(--color-gray-900)" strokeWidth=".5" strokeMiterlimit="10"/>
       </g>
       <g style={{ isolation: "isolate" }}>
         <g clipPath="url(#car-cp1)">
-          <path stroke="#272618" strokeWidth=".5" strokeMiterlimit="10" d="M11.8,32.7V1.7c0,0,27,15.6,27,15.6v31c0,0-27-15.6-27-15.6M39.5,16.9L11.1.5v32.6c0,0,28.3,16.4,28.3,16.4V16.9"/>
+          <path stroke="var(--color-gray-900)" strokeWidth=".5" strokeMiterlimit="10" d="M11.8,32.7V1.7c0,0,27,15.6,27,15.6v31c0,0-27-15.6-27-15.6M39.5,16.9L11.1.5v32.6c0,0,28.3,16.4,28.3,16.4V16.9"/>
         </g>
-        <polygon points="11.1 33.1 11.1 .5 39.5 16.9 39.4 49.5 11.1 33.1" fill="none" stroke="#272618" strokeWidth=".5" strokeMiterlimit="10"/>
+        <polygon points="11.1 33.1 11.1 .5 39.5 16.9 39.4 49.5 11.1 33.1" fill="none" stroke="var(--color-gray-900)" strokeWidth=".5" strokeMiterlimit="10"/>
       </g>
       <g style={{ isolation: "isolate" }}>
         <g clipPath="url(#car-cp2)">
-          <path stroke="#272618" strokeWidth=".5" strokeMiterlimit="10" d="M21.8,32.7V1.7c0,0,27,15.6,27,15.6v31c0,0-27-15.6-27-15.6M49.5,16.9L21.2.5v32.6c0,0,28.3,16.4,28.3,16.4V16.9"/>
+          <path stroke="var(--color-gray-900)" strokeWidth=".5" strokeMiterlimit="10" d="M21.8,32.7V1.7c0,0,27,15.6,27,15.6v31c0,0-27-15.6-27-15.6M49.5,16.9L21.2.5v32.6c0,0,28.3,16.4,28.3,16.4V16.9"/>
         </g>
-        <polygon points="21.1 33.1 21.2 .5 49.5 16.9 49.4 49.5 21.1 33.1" fill="none" stroke="#272618" strokeWidth=".5" strokeMiterlimit="10"/>
+        <polygon points="21.1 33.1 21.2 .5 49.5 16.9 49.4 49.5 21.1 33.1" fill="none" stroke="var(--color-gray-900)" strokeWidth=".5" strokeMiterlimit="10"/>
       </g>
     </svg>
   );
 }
 function IconModa() {
   return (
-    <svg width="24" height="24" viewBox="0 0 48.9 48.5" fill="#272618" xmlns="http://www.w3.org/2000/svg">
+    <svg width="24" height="24" viewBox="0 0 48.9 48.5" fill="var(--color-gray-900)" xmlns="http://www.w3.org/2000/svg">
       <path d="M24.7,2.8l21.4,21.4-21.4,21.4L3.3,24.2,24.7,2.8M24.7,0L.5,24.2l24.2,24.2,24.2-24.2L24.7,0h0Z"/>
       <path d="M34.8,14.1v20.2H14.6V14.1h20.2M36.8,12.1H12.6v24.2h24.2V12.1h0Z"/>
       <path d="M24.7,14.9l9.3,9.3-9.3,9.3-9.3-9.3,9.3-9.3M24.7,12.1l-12.1,12.1,12.1,12.1,12.1-12.1-12.1-12.1h0Z"/>
@@ -48,7 +48,7 @@ function IconModa() {
 function IconSaude() {
   return (
     <svg width="24" height="24" viewBox="0 0 42.8 43.5" fill="none" xmlns="http://www.w3.org/2000/svg">
-      <g stroke="#272618" strokeWidth="2" strokeMiterlimit="10">
+      <g stroke="var(--color-gray-900)" strokeWidth="2" strokeMiterlimit="10">
         <line x1="21.3" y1="0" x2="21.3" y2="12"/>
         <line x1="8.6" y1="4.2" x2="15.6" y2="13.9"/>
         <line x1=".7" y1="15.1" x2="12.1" y2="18.8"/>
@@ -73,28 +73,28 @@ function IconTecnologia() {
       </defs>
       <g style={{ isolation: "isolate" }}>
         <g clipPath="url(#tec-cp0)">
-          <path stroke="#272618" strokeWidth=".5" strokeMiterlimit="10" d="M1.9,34.5l27.5-16,27.7,16-27.5,16L1.9,34.5M58.5,34.5l-29.1-16.8L.5,34.5l29.1,16.8,28.9-16.8"/>
+          <path stroke="var(--color-gray-900)" strokeWidth=".5" strokeMiterlimit="10" d="M1.9,34.5l27.5-16,27.7,16-27.5,16L1.9,34.5M58.5,34.5l-29.1-16.8L.5,34.5l29.1,16.8,28.9-16.8"/>
         </g>
-        <polygon points=".5 34.5 29.4 17.7 58.5 34.5 29.6 51.3 .5 34.5" fill="none" stroke="#272618" strokeWidth=".5" strokeMiterlimit="10"/>
+        <polygon points=".5 34.5 29.4 17.7 58.5 34.5 29.6 51.3 .5 34.5" fill="none" stroke="var(--color-gray-900)" strokeWidth=".5" strokeMiterlimit="10"/>
       </g>
       <g style={{ isolation: "isolate" }}>
         <g clipPath="url(#tec-cp1)">
-          <path stroke="#272618" strokeWidth=".5" strokeMiterlimit="10" d="M1.9,25.9l27.5-16,27.7,16-27.5,16L1.9,25.9M58.5,25.9L29.4,9.1.5,25.9l29.1,16.8,28.9-16.8"/>
+          <path stroke="var(--color-gray-900)" strokeWidth=".5" strokeMiterlimit="10" d="M1.9,25.9l27.5-16,27.7,16-27.5,16L1.9,25.9M58.5,25.9L29.4,9.1.5,25.9l29.1,16.8,28.9-16.8"/>
         </g>
-        <polygon points=".5 25.9 29.4 9.1 58.5 25.9 29.6 42.7 .5 25.9" fill="none" stroke="#272618" strokeWidth=".5" strokeMiterlimit="10"/>
+        <polygon points=".5 25.9 29.4 9.1 58.5 25.9 29.6 42.7 .5 25.9" fill="none" stroke="var(--color-gray-900)" strokeWidth=".5" strokeMiterlimit="10"/>
       </g>
       <g style={{ isolation: "isolate" }}>
         <g clipPath="url(#tec-cp2)">
-          <path stroke="#272618" strokeWidth=".5" strokeMiterlimit="10" d="M1.9,17.3L29.4,1.3l27.7,16-27.5,16L1.9,17.3M58.5,17.3L29.4.5.5,17.3l29.1,16.8,28.9-16.8"/>
+          <path stroke="var(--color-gray-900)" strokeWidth=".5" strokeMiterlimit="10" d="M1.9,17.3L29.4,1.3l27.7,16-27.5,16L1.9,17.3M58.5,17.3L29.4.5.5,17.3l29.1,16.8,28.9-16.8"/>
         </g>
-        <polygon points=".5 17.3 29.4 .5 58.5 17.3 29.6 34.1 .5 17.3" fill="none" stroke="#272618" strokeWidth=".5" strokeMiterlimit="10"/>
+        <polygon points=".5 17.3 29.4 .5 58.5 17.3 29.6 34.1 .5 17.3" fill="none" stroke="var(--color-gray-900)" strokeWidth=".5" strokeMiterlimit="10"/>
       </g>
     </svg>
   );
 }
 function IconCriatividade() {
   return (
-    <svg width="24" height="24" viewBox="0 0 40.5 40" fill="#272618" xmlns="http://www.w3.org/2000/svg">
+    <svg width="24" height="24" viewBox="0 0 40.5 40" fill="var(--color-gray-900)" xmlns="http://www.w3.org/2000/svg">
       <path d="M20.5,2c9.9,0,18,8.1,18,18s-8.1,18-18,18S2.5,29.9,2.5,20,10.5,2,20.5,2M20.5,0C9.4,0,.5,8.9.5,20s9,20,20,20,20-9,20-20S31.5,0,20.5,0h0Z"/>
       <path d="M20.5,18c5.5,0,10,4.5,10,10s-4.5,10-10,10-10-4.5-10-10,4.5-10,10-10M20.5,16c-6.6,0-12,5.4-12,12s5.4,12,12,12,12-5.4,12-12-5.4-12-12-12h0Z"/>
       <path d="M20.5,26c3.3,0,6,2.7,6,6s-2.7,6-6,6-6-2.7-6-6,2.7-6,6-6M20.5,24c-4.4,0-8,3.6-8,8s3.6,8,8,8,8-3.6,8-8-3.6-8-8-8h0Z"/>
@@ -103,7 +103,7 @@ function IconCriatividade() {
 }
 function IconGastronomia() {
   return (
-    <svg width="24" height="24" viewBox="0 0 60 40" fill="#272618" xmlns="http://www.w3.org/2000/svg">
+    <svg width="24" height="24" viewBox="0 0 60 40" fill="var(--color-gray-900)" xmlns="http://www.w3.org/2000/svg">
       <path d="M20,2c9.9,0,18,8.1,18,18s-8.1,18-18,18S2,29.9,2,20,10.1,2,20,2M20,0C9,0,0,9,0,20s9,20,20,20,20-9,20-20S31,0,20,0h0Z"/>
       <path d="M40,2c9.9,0,18,8.1,18,18s-8.1,18-18,18-18-8.1-18-18S30.1,2,40,2M40,0c-11,0-20,9-20,20s9,20,20,20,20-9,20-20S51,0,40,0h0Z"/>
     </svg>
@@ -112,8 +112,8 @@ function IconGastronomia() {
 function IconArquitetura() {
   return (
     <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
-      <path d="M3 21h18M5 21V9l7-6 7 6v12" stroke="#272618" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
-      <rect x="10" y="14" width="4" height="7" rx="0.5" stroke="#272618" strokeWidth="1.5"/>
+      <path d="M3 21h18M5 21V9l7-6 7 6v12" stroke="var(--color-gray-900)" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+      <rect x="10" y="14" width="4" height="7" rx="0.5" stroke="var(--color-gray-900)" strokeWidth="1.5"/>
     </svg>
   );
 }
@@ -157,9 +157,9 @@ function FloatingInput({
       style={{
         position: "relative",
         height: 48,
-        background: "#FCFBF8",
+        background: "var(--color-cream)",
         borderRadius: 8,
-        outline: `1px solid ${focused ? "#272618" : "#DAD9D5"}`,
+        outline: `1px solid ${focused ? "var(--color-gray-900)" : "var(--color-gray-200)"}`,
         boxShadow: "0 1px 2px rgba(10,13,18,0.05)",
         overflow: "hidden",
         cursor: "text",
@@ -176,7 +176,7 @@ function FloatingInput({
           transform: lifted ? "none" : "translateY(-50%)",
           fontSize: lifted ? 10 : 14,
           lineHeight: lifted ? "12px" : "20px",
-          color: "#626053",
+          color: "var(--color-gray-600)",
           transition: "all 0.15s ease",
           pointerEvents: "none",
           userSelect: "none",
@@ -217,7 +217,7 @@ function FloatingInput({
       {valid && (
         <div style={{ position: "absolute", right: 14, top: "50%", transform: "translateY(-50%)" }}>
           <svg width="16" height="11" viewBox="0 0 16 11" fill="none">
-            <path d="M1 5.5l4.5 4.5L15 1" stroke="#68A279" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+            <path d="M1 5.5l4.5 4.5L15 1" stroke="var(--color-success)" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
           </svg>
         </div>
       )}
@@ -345,7 +345,7 @@ export function WaitlistModal({ open, onClose, referralCode }: Props) {
               zIndex: 201,
               width: "100%",
               maxWidth: 420,
-              background: "#F4F2EB",
+              background: "var(--color-gray-100)",
               borderRadius: "16px 0 0 16px",
               display: "flex",
               flexDirection: "column",
@@ -362,9 +362,9 @@ export function WaitlistModal({ open, onClose, referralCode }: Props) {
                 display: "flex",
                 alignItems: "center",
                 justifyContent: "space-between",
-                borderBottom: "1px solid #DAD9D5",
+                borderBottom: "1px solid var(--color-gray-200)",
                 position: "relative",
-                background: "#F4F2EB",
+                background: "var(--color-gray-100)",
               }}
             >
               {/* Back arrow — hidden on step 1 / done */}
@@ -387,7 +387,7 @@ export function WaitlistModal({ open, onClose, referralCode }: Props) {
                 aria-label="Voltar"
               >
                 <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
-                  <path d="M19 12H5M10 7l-5 5 5 5" stroke="#272618" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                  <path d="M19 12H5M10 7l-5 5 5 5" stroke="var(--color-gray-900)" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
                 </svg>
               </button>
 
@@ -409,12 +409,12 @@ export function WaitlistModal({ open, onClose, referralCode }: Props) {
                   display: "flex",
                   alignItems: "center",
                   justifyContent: "center",
-                  color: "#272618",
+                  color: "var(--color-gray-900)",
                 }}
                 aria-label="Fechar"
               >
                 <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
-                  <path d="M18 6L6 18M6 6l12 12" stroke="#272618" strokeWidth="2" strokeLinecap="round"/>
+                  <path d="M18 6L6 18M6 6l12 12" stroke="var(--color-gray-900)" strokeWidth="2" strokeLinecap="round"/>
                 </svg>
               </button>
             </div>
@@ -441,7 +441,7 @@ export function WaitlistModal({ open, onClose, referralCode }: Props) {
                         style={{
                           fontSize: 14,
                           fontWeight: 300,
-                          color: "#626053",
+                          color: "var(--color-gray-600)",
                           fontFamily: "var(--font-host-grotesk)",
                           margin: 0,
                           lineHeight: "20px",
@@ -453,7 +453,7 @@ export function WaitlistModal({ open, onClose, referralCode }: Props) {
                         style={{
                           fontSize: 40,
                           fontWeight: 400,
-                          color: "#272618",
+                          color: "var(--color-gray-900)",
                           fontFamily: "var(--font-nerfos), var(--font-host-grotesk)",
                           margin: 0,
                           lineHeight: "44px",
@@ -467,7 +467,7 @@ export function WaitlistModal({ open, onClose, referralCode }: Props) {
                     {/* White card */}
                     <div
                       style={{
-                        background: "#FFFFFF",
+                        background: "var(--color-bg-white)",
                         borderRadius: 8,
                         padding: 24,
                         display: "flex",
@@ -477,14 +477,14 @@ export function WaitlistModal({ open, onClose, referralCode }: Props) {
                     >
                       {/* Position */}
                       <div style={{ display: "flex", flexDirection: "column", gap: 4 }}>
-                        <span style={{ fontSize: 12, color: "#626053", lineHeight: "16px" }}>
+                        <span style={{ fontSize: 12, color: "var(--color-gray-600)", lineHeight: "16px" }}>
                           Sua posição na fila
                         </span>
                         <span
                           style={{
                             fontSize: 30,
                             fontWeight: 500,
-                            color: "#272618",
+                            color: "var(--color-gray-900)",
                             fontFamily: "var(--font-host-grotesk)",
                             lineHeight: "36px",
                           }}
@@ -498,14 +498,14 @@ export function WaitlistModal({ open, onClose, referralCode }: Props) {
 
                       {/* Referral */}
                       <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
-                        <span style={{ fontSize: 12, color: "#626053", lineHeight: "16px" }}>
+                        <span style={{ fontSize: 12, color: "var(--color-gray-600)", lineHeight: "16px" }}>
                           Indique e avance na fila
                         </span>
                         <span
                           style={{
                             fontSize: 12,
                             fontWeight: 600,
-                            color: "#8E8857",
+                            color: "var(--color-olive-600)",
                             lineHeight: "16px",
                             wordBreak: "break-all",
                           }}
@@ -529,9 +529,9 @@ export function WaitlistModal({ open, onClose, referralCode }: Props) {
                             gap: 6,
                             padding: "6px 12px",
                             borderRadius: 6,
-                            border: "1px solid #8E8857",
-                            background: "#FCFBF8",
-                            color: "#8E8857",
+                            border: "1px solid var(--color-olive-600)",
+                            background: "var(--color-cream)",
+                            color: "var(--color-olive-600)",
                             fontSize: 13,
                             fontWeight: 500,
                             cursor: "pointer",
@@ -540,8 +540,8 @@ export function WaitlistModal({ open, onClose, referralCode }: Props) {
                           }}
                         >
                           <svg width="14" height="14" viewBox="0 0 24 24" fill="none">
-                            <rect x="9" y="9" width="13" height="13" rx="2" stroke="#8E8857" strokeWidth="1.8"/>
-                            <path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1" stroke="#8E8857" strokeWidth="1.8" strokeLinecap="round"/>
+                            <rect x="9" y="9" width="13" height="13" rx="2" stroke="var(--color-olive-600)" strokeWidth="1.8"/>
+                            <path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1" stroke="var(--color-olive-600)" strokeWidth="1.8" strokeLinecap="round"/>
                           </svg>
                           {copied ? "Link copiado!" : "Copiar link"}
                         </button>
@@ -549,8 +549,8 @@ export function WaitlistModal({ open, onClose, referralCode }: Props) {
                     </div>
 
                     {/* Email confirmation */}
-                    <p style={{ fontSize: 14, color: "#626053", margin: 0, lineHeight: "20px" }}>
-                      Enviamos um e-mail para <strong style={{ color: "#272618" }}>{email}</strong>.{" "}
+                    <p style={{ fontSize: 14, color: "var(--color-gray-600)", margin: 0, lineHeight: "20px" }}>
+                      Enviamos um e-mail para <strong style={{ color: "var(--color-gray-900)" }}>{email}</strong>.{" "}
                       Você pode fechar essa aba com segurança.
                     </p>
                   </motion.div>
@@ -575,7 +575,7 @@ export function WaitlistModal({ open, onClose, referralCode }: Props) {
                         style={{
                           fontSize: 24,
                           fontWeight: 300,
-                          color: "#272618",
+                          color: "var(--color-gray-900)",
                           fontFamily: "var(--font-host-grotesk)",
                           lineHeight: "32px",
                           margin: 0,
@@ -583,7 +583,7 @@ export function WaitlistModal({ open, onClose, referralCode }: Props) {
                       >
                         Entrar na lista de espera
                       </h2>
-                      <p style={{ fontSize: 14, color: "#626053", margin: 0, lineHeight: "20px" }}>
+                      <p style={{ fontSize: 14, color: "var(--color-gray-600)", margin: 0, lineHeight: "20px" }}>
                         Preencha os campos abaixo para garantir sua vaga.
                       </p>
                     </div>
@@ -622,8 +622,8 @@ export function WaitlistModal({ open, onClose, referralCode }: Props) {
                           width: 16,
                           height: 16,
                           borderRadius: 4,
-                          border: `1px solid ${agreed ? "#272618" : "#DAD9D5"}`,
-                          background: agreed ? "#272618" : "white",
+                          border: `1px solid ${agreed ? "var(--color-gray-900)" : "var(--color-gray-200)"}`,
+                          background: agreed ? "var(--color-gray-900)" : "white",
                           display: "flex",
                           alignItems: "center",
                           justifyContent: "center",
@@ -633,17 +633,17 @@ export function WaitlistModal({ open, onClose, referralCode }: Props) {
                       >
                         {agreed && (
                           <svg width="10" height="8" viewBox="0 0 10 8" fill="none">
-                            <path d="M1 4l3 3 5-6" stroke="#FCFBF8" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round"/>
+                            <path d="M1 4l3 3 5-6" stroke="var(--color-cream)" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round"/>
                           </svg>
                         )}
                       </div>
-                      <span style={{ fontSize: 12, color: "#626053", lineHeight: "16px" }}>
+                      <span style={{ fontSize: 12, color: "var(--color-gray-600)", lineHeight: "16px" }}>
                         Concordo com os{" "}
-                        <a href="/termos" target="_blank" style={{ color: "#626053", textDecoration: "underline" }}>
+                        <a href="/termos" target="_blank" style={{ color: "var(--color-gray-600)", textDecoration: "underline" }}>
                           Termos e Condições
                         </a>
                         {" "}do Loop.Talk e aceito a{" "}
-                        <a href="/privacidade" target="_blank" style={{ color: "#626053", textDecoration: "underline" }}>
+                        <a href="/privacidade" target="_blank" style={{ color: "var(--color-gray-600)", textDecoration: "underline" }}>
                           Política de Privacidade
                         </a>
                         .
@@ -651,7 +651,7 @@ export function WaitlistModal({ open, onClose, referralCode }: Props) {
                     </label>
 
                     {referralCode && (
-                      <p style={{ fontSize: 12, color: "#807F71", textAlign: "center", margin: 0 }}>
+                      <p style={{ fontSize: 12, color: "var(--color-gray-500)", textAlign: "center", margin: 0 }}>
                         Você foi convidado(a) por um membro da lista.
                       </p>
                     )}
@@ -676,7 +676,7 @@ export function WaitlistModal({ open, onClose, referralCode }: Props) {
                       style={{
                         fontSize: 24,
                         fontWeight: 300,
-                        color: "#272618",
+                        color: "var(--color-gray-900)",
                         fontFamily: "var(--font-host-grotesk)",
                         lineHeight: "32px",
                         margin: 0,
@@ -701,7 +701,7 @@ export function WaitlistModal({ open, onClose, referralCode }: Props) {
                               padding: "0 18px",
                               height: 64,
                               borderRadius: 12,
-                              background: selected ? tokens.lime : "#FFFFFF",
+                              background: selected ? tokens.lime : "var(--color-bg-white)",
                               border: "none",
                               cursor: "pointer",
                               textAlign: "left",
@@ -710,7 +710,7 @@ export function WaitlistModal({ open, onClose, referralCode }: Props) {
                             }}
                           >
                             <Icon />
-                            <span style={{ fontSize: 15, fontWeight: selected ? 600 : 400, color: "#272618" }}>
+                            <span style={{ fontSize: 15, fontWeight: selected ? 600 : 400, color: "var(--color-gray-900)" }}>
                               {label}
                             </span>
                           </button>
@@ -731,13 +731,13 @@ export function WaitlistModal({ open, onClose, referralCode }: Props) {
               {/* Two-segment progress bar — both yellow when done */}
               <div style={{ display: "flex", height: 4 }}>
                 <div style={{ flex: 1, background: tokens.lime }} />
-                <div style={{ flex: 1, background: done || step === 2 ? tokens.lime : "#DAD9D5", transition: "background 0.3s" }} />
+                <div style={{ flex: 1, background: done || step === 2 ? tokens.lime : "var(--color-gray-200)", transition: "background 0.3s" }} />
               </div>
               {/* Button area */}
               <div
                 style={{
                   padding: 16,
-                  background: "rgba(255,255,255,0.50)",
+                  background: "color-mix(in srgb, var(--color-bg-white) 50%, transparent)",
                   backdropFilter: "blur(20px)",
                   WebkitBackdropFilter: "blur(20px)",
                 }}
@@ -748,8 +748,8 @@ export function WaitlistModal({ open, onClose, referralCode }: Props) {
                     style={{
                       width: "100%",
                       padding: "12px 20px",
-                      background: "#272618",
-                      color: "#FCFBF8",
+                      background: "var(--color-gray-900)",
+                      color: "var(--color-cream)",
                       border: "none",
                       borderRadius: 8,
                       fontSize: 16,
@@ -767,9 +767,9 @@ export function WaitlistModal({ open, onClose, referralCode }: Props) {
                     style={{
                       width: "100%",
                       padding: "12px 20px",
-                      background: ctaActive ? "#272618" : "#DAD9D5",
-                      color: ctaActive ? "#FCFBF8" : "#AEADA4",
-                      border: "1px solid " + (ctaActive ? "#272618" : "#DAD9D5"),
+                      background: ctaActive ? "var(--color-gray-900)" : "var(--color-gray-200)",
+                      color: ctaActive ? "var(--color-cream)" : "var(--color-gray-400)",
+                      border: "1px solid " + (ctaActive ? "var(--color-gray-900)" : "var(--color-gray-200)"),
                       borderRadius: 8,
                       fontSize: 16,
                       fontWeight: 600,
@@ -787,7 +787,7 @@ export function WaitlistModal({ open, onClose, referralCode }: Props) {
                       : submitting
                       ? "Entrando na lista…"
                       : "Entrar na lista de espera"}
-                    {!submitting && <ArrowRight color={ctaActive ? "#FCFBF8" : "#AEADA4"} />}
+                    {!submitting && <ArrowRight color={ctaActive ? "var(--color-cream)" : "var(--color-gray-400)"} />}
                   </button>
                 )}
               </div>

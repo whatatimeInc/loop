@@ -6,12 +6,12 @@ import { Logo } from "@/components/Logo";
 import { useDashboard } from "./DashboardShell";
 import { tokens } from "@/components/ui/tokens";
 
-const DARK  = "#272618";
-const MUTED = "#626053";
-const FAINT = "#AEADA4";
+const DARK  = "var(--color-gray-900)";
+const MUTED = "var(--color-gray-600)";
+const FAINT = "var(--color-gray-400)";
 const LIME = tokens.lime;
-const BG    = "#FCFBF8";
-const BEIGE = "#F4F2EB";
+const BG    = "var(--color-cream)";
+const BEIGE = "var(--color-gray-100)";
 const BORDER = "#E4E2D9";
 
 function IcoHome()     { return <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>; }
@@ -75,7 +75,7 @@ export function DashboardSidebar() {
                   flex: 1, padding: "6px 8px", borderRadius: 6, border: "none",
                   fontSize: 12, fontWeight: 600, cursor: "pointer", fontFamily: "inherit",
                   background: mode === m ? (m === "mentor" ? LIME : DARK) : "transparent",
-                  color: mode === m ? (m === "mentor" ? "#3E3B12" : "#FCFBF8") : MUTED,
+                  color: mode === m ? (m === "mentor" ? "#3E3B12" : "var(--color-cream)") : MUTED,
                   transition: "all 0.15s",
                 }}
               >

@@ -60,7 +60,7 @@ function IcoChat({ unread }: { unread: number }) {
         <path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z" />
       </svg>
       {unread > 0 && (
-        <span style={{ position: "absolute", top: -5, right: -5, width: 16, height: 16, borderRadius: "50%", background: "#C0392B", color: "#fff", fontSize: 10, fontWeight: 700, display: "flex", alignItems: "center", justifyContent: "center" }}>
+        <span style={{ position: "absolute", top: -5, right: -5, width: 16, height: 16, borderRadius: "50%", background: "#C0392B", color: "var(--color-bg-white)", fontSize: 10, fontWeight: 700, display: "flex", alignItems: "center", justifyContent: "center" }}>
           {unread}
         </span>
       )}
@@ -77,13 +77,13 @@ function IcoPhone() {
 }
 
 function IcoSignal({ quality }: { quality: "good" | "fair" | "poor" }) {
-  const c = quality === "good" ? "#68A279" : quality === "fair" ? "#F5A623" : "#C0392B";
+  const c = quality === "good" ? "var(--color-success)" : quality === "fair" ? "#F5A623" : "#C0392B";
   const heights = [6, 10, 14];
   return (
     <div style={{ display: "flex", alignItems: "flex-end", gap: 2 }}>
       {heights.map((h, i) => {
         const active = quality === "good" ? true : quality === "fair" ? i < 2 : i < 1;
-        return <div key={i} style={{ width: 3, height: h, borderRadius: 1, background: active ? c : "rgba(255,255,255,0.25)" }} />;
+        return <div key={i} style={{ width: 3, height: h, borderRadius: 1, background: active ? c : "color-mix(in srgb, var(--color-bg-white) 25%, transparent)" }} />;
       })}
     </div>
   );
@@ -122,11 +122,11 @@ function ChatSidebar({
   return (
     <div style={{
       width: 280, height: "100%", background: "#111", display: "flex", flexDirection: "column",
-      borderLeft: "1px solid rgba(255,255,255,0.08)", fontFamily: "Inter, sans-serif",
+      borderLeft: "1px solid color-mix(in srgb, var(--color-bg-white) 8%, transparent)", fontFamily: "Inter, sans-serif",
     }}>
-      <div style={{ padding: "16px 16px 12px", borderBottom: "1px solid rgba(255,255,255,0.08)", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+      <div style={{ padding: "16px 16px 12px", borderBottom: "1px solid color-mix(in srgb, var(--color-bg-white) 8%, transparent)", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
         <span style={{ fontSize: 14, fontWeight: 600, color: "#F0EFEB" }}>Chat da sessão</span>
-        <button onClick={onClose} style={{ background: "none", border: "none", color: "#807F71", cursor: "pointer", fontSize: 18, lineHeight: 1 }}>×</button>
+        <button onClick={onClose} style={{ background: "none", border: "none", color: "var(--color-gray-500)", cursor: "pointer", fontSize: 18, lineHeight: 1 }}>×</button>
       </div>
       <div style={{ flex: 1, overflowY: "auto", padding: "12px 12px", display: "flex", flexDirection: "column", gap: 8 }}>
         {messages.map((m) => {
@@ -135,10 +135,10 @@ function ChatSidebar({
             <div key={m.id} style={{ display: "flex", justifyContent: mine ? "flex-end" : "flex-start" }}>
               <div style={{
                 maxWidth: "80%", padding: "8px 12px", borderRadius: mine ? "12px 12px 2px 12px" : "12px 12px 12px 2px",
-                background: mine ? tokens.lime : "rgba(255,255,255,0.1)",
-                color: mine ? "#272618" : "#F0EFEB", fontSize: 13,
+                background: mine ? tokens.lime : "color-mix(in srgb, var(--color-bg-white) 10%, transparent)",
+                color: mine ? "var(--color-gray-900)" : "#F0EFEB", fontSize: 13,
               }}>
-                {!mine && <div style={{ fontSize: 11, color: "#807F71", marginBottom: 4 }}>{m.senderName}</div>}
+                {!mine && <div style={{ fontSize: 11, color: "var(--color-gray-500)", marginBottom: 4 }}>{m.senderName}</div>}
                 {m.text}
               </div>
             </div>
@@ -146,18 +146,18 @@ function ChatSidebar({
         })}
         <div ref={endRef} />
       </div>
-      <div style={{ padding: "12px", borderTop: "1px solid rgba(255,255,255,0.08)", display: "flex", gap: 8 }}>
+      <div style={{ padding: "12px", borderTop: "1px solid color-mix(in srgb, var(--color-bg-white) 8%, transparent)", display: "flex", gap: 8 }}>
         <input
           value={draft}
           onChange={(e) => setDraft(e.target.value)}
           onKeyDown={(e) => e.key === "Enter" && !e.shiftKey && send()}
           placeholder="Mensagem..."
           style={{
-            flex: 1, background: "rgba(255,255,255,0.08)", border: "none", borderRadius: 8,
+            flex: 1, background: "color-mix(in srgb, var(--color-bg-white) 8%, transparent)", border: "none", borderRadius: 8,
             padding: "8px 12px", color: "#F0EFEB", fontSize: 13, fontFamily: "Inter, sans-serif", outline: "none",
           }}
         />
-        <button onClick={send} style={{ padding: "8px 12px", background: tokens.lime, border: "none", borderRadius: 8, color: "#272618", fontWeight: 700, cursor: "pointer", fontSize: 13 }}>→</button>
+        <button onClick={send} style={{ padding: "8px 12px", background: tokens.lime, border: "none", borderRadius: 8, color: "var(--color-gray-900)", fontWeight: 700, cursor: "pointer", fontSize: 13 }}>→</button>
       </div>
     </div>
   );
@@ -170,12 +170,12 @@ function EndModal({ onConfirm, onCancel }: { onConfirm: () => void; onCancel: ()
     <div style={{ position: "fixed", inset: 0, background: "rgba(0,0,0,0.7)", zIndex: 200, display: "flex", alignItems: "center", justifyContent: "center" }}>
       <div style={{ background: "#1E1E1E", borderRadius: 16, padding: "28px 32px", maxWidth: 340, width: "90%", fontFamily: "Inter, sans-serif" }}>
         <p style={{ fontSize: 18, fontWeight: 700, color: "#F0EFEB", margin: "0 0 8px" }}>Encerrar sessão?</p>
-        <p style={{ fontSize: 14, color: "#807F71", margin: "0 0 24px" }}>Esta ação encerrará a chamada para todos os participantes.</p>
+        <p style={{ fontSize: 14, color: "var(--color-gray-500)", margin: "0 0 24px" }}>Esta ação encerrará a chamada para todos os participantes.</p>
         <div style={{ display: "flex", gap: 10 }}>
-          <button onClick={onCancel} style={{ flex: 1, padding: "12px", background: "transparent", border: "1px solid rgba(255,255,255,0.2)", borderRadius: 8, color: "#F0EFEB", cursor: "pointer", fontSize: 14 }}>
+          <button onClick={onCancel} style={{ flex: 1, padding: "12px", background: "transparent", border: "1px solid color-mix(in srgb, var(--color-bg-white) 20%, transparent)", borderRadius: 8, color: "#F0EFEB", cursor: "pointer", fontSize: 14 }}>
             Continuar
           </button>
-          <button onClick={onConfirm} style={{ flex: 1, padding: "12px", background: "#C0392B", border: "none", borderRadius: 8, color: "#fff", fontWeight: 700, cursor: "pointer", fontSize: 14 }}>
+          <button onClick={onConfirm} style={{ flex: 1, padding: "12px", background: "#C0392B", border: "none", borderRadius: 8, color: "var(--color-bg-white)", fontWeight: 700, cursor: "pointer", fontSize: 14 }}>
             Encerrar
           </button>
         </div>
@@ -192,7 +192,7 @@ function ExtensionBanner({ onRequest, pending }: { onRequest: () => void; pendin
   return (
     <div style={{
       position: "absolute", top: 48, left: 0, right: 0, zIndex: 50,
-      background: "rgba(26,26,26,0.92)", borderBottom: "1px solid rgba(255,255,255,0.08)",
+      background: "rgba(26,26,26,0.92)", borderBottom: "1px solid color-mix(in srgb, var(--color-bg-white) 8%, transparent)",
       padding: "12px 20px", display: "flex", alignItems: "center", justifyContent: "space-between", gap: 16,
       fontFamily: "Inter, sans-serif",
     }}>
@@ -203,13 +203,13 @@ function ExtensionBanner({ onRequest, pending }: { onRequest: () => void; pendin
           disabled={pending}
           style={{
             padding: "8px 16px", background: tokens.lime, border: "none", borderRadius: 8,
-            color: "#272618", fontSize: 13, fontWeight: 700, cursor: pending ? "not-allowed" : "pointer",
+            color: "var(--color-gray-900)", fontSize: 13, fontWeight: 700, cursor: pending ? "not-allowed" : "pointer",
             opacity: pending ? 0.5 : 1,
           }}
         >
           {pending ? "Aguardando..." : "Pedir mais tempo"}
         </button>
-        <button onClick={() => setDismissed(true)} style={{ background: "none", border: "none", color: "#807F71", cursor: "pointer", fontSize: 13 }}>
+        <button onClick={() => setDismissed(true)} style={{ background: "none", border: "none", color: "var(--color-gray-500)", cursor: "pointer", fontSize: 13 }}>
           Fechar
         </button>
       </div>
@@ -229,21 +229,21 @@ function ExtensionRequestModal({ persona, onSelect, onDismiss }: {
         <div style={{ display: "flex", gap: 8, marginBottom: 16 }}>
           {([5, 10, 15] as const).map((m) => (
             <button key={m} onClick={() => onSelect(m)} style={{
-              flex: 1, padding: "14px 0", background: "transparent", border: "2px solid rgba(255,255,255,0.2)",
+              flex: 1, padding: "14px 0", background: "transparent", border: "2px solid color-mix(in srgb, var(--color-bg-white) 20%, transparent)",
               borderRadius: 10, color: "#F0EFEB", fontSize: 14, fontWeight: 700, cursor: "pointer",
               transition: "border-color 0.15s",
             }}
               onMouseEnter={(e) => (e.currentTarget.style.borderColor = tokens.lime)}
-              onMouseLeave={(e) => (e.currentTarget.style.borderColor = "rgba(255,255,255,0.2)")}
+              onMouseLeave={(e) => (e.currentTarget.style.borderColor = "color-mix(in srgb, var(--color-bg-white) 20%, transparent)")}
             >
               +{m} min
             </button>
           ))}
         </div>
-        <p style={{ fontSize: 12, color: "#807F71", margin: "0 0 16px", textAlign: "center" }}>
+        <p style={{ fontSize: 12, color: "var(--color-gray-500)", margin: "0 0 16px", textAlign: "center" }}>
           Esta sessão é um presente — sem cobrança adicional.
         </p>
-        <button onClick={onDismiss} style={{ background: "none", border: "none", color: "#807F71", fontSize: 13, cursor: "pointer", width: "100%", textAlign: "center" }}>
+        <button onClick={onDismiss} style={{ background: "none", border: "none", color: "var(--color-gray-500)", fontSize: 13, cursor: "pointer", width: "100%", textAlign: "center" }}>
           Não, obrigado
         </button>
       </div>
@@ -264,8 +264,8 @@ function ExtensionIncomingModal({ ext, otherName, onAccept, onDecline }: {
           {otherName} quer adicionar {ext.minutes_added} minutos. Aceitar?
         </p>
         <div style={{ display: "flex", gap: 10 }}>
-          <button onClick={onDecline} style={{ flex: 1, padding: "12px", background: "transparent", border: "1px solid rgba(255,255,255,0.2)", borderRadius: 8, color: "#F0EFEB", cursor: "pointer", fontSize: 14 }}>Recusar</button>
-          <button onClick={onAccept} style={{ flex: 1, padding: "12px", background: tokens.lime, border: "none", borderRadius: 8, color: "#272618", fontWeight: 700, cursor: "pointer", fontSize: 14 }}>Aceitar</button>
+          <button onClick={onDecline} style={{ flex: 1, padding: "12px", background: "transparent", border: "1px solid color-mix(in srgb, var(--color-bg-white) 20%, transparent)", borderRadius: 8, color: "#F0EFEB", cursor: "pointer", fontSize: 14 }}>Recusar</button>
+          <button onClick={onAccept} style={{ flex: 1, padding: "12px", background: tokens.lime, border: "none", borderRadius: 8, color: "var(--color-gray-900)", fontWeight: 700, cursor: "pointer", fontSize: 14 }}>Aceitar</button>
         </div>
       </div>
     </div>
@@ -538,11 +538,11 @@ export function VideoCall({
           style={{
             position: "absolute", bottom: 80, right: 16,
             width: 160, height: 90, borderRadius: 8,
-            overflow: "hidden", border: "1px solid rgba(255,255,255,0.12)",
+            overflow: "hidden", border: "1px solid color-mix(in srgb, var(--color-bg-white) 12%, transparent)",
             background: "#333", zIndex: 10, cursor: "move",
           }}
         >
-          <span style={{ position: "absolute", bottom: 4, left: 0, right: 0, textAlign: "center", fontSize: 10, color: "rgba(255,255,255,0.5)", zIndex: 2, pointerEvents: "none" }}>Você</span>
+          <span style={{ position: "absolute", bottom: 4, left: 0, right: 0, textAlign: "center", fontSize: 10, color: "color-mix(in srgb, var(--color-bg-white) 50%, transparent)", zIndex: 2, pointerEvents: "none" }}>Você</span>
         </div>
 
         {/* Top bar */}
@@ -553,9 +553,9 @@ export function VideoCall({
           padding: "0 16px",
           opacity: controlsVisible ? 1 : 0, transition: "opacity 0.3s",
         }}>
-          <span style={{ fontSize: 13, fontWeight: 700, color: "rgba(255,255,255,0.3)", letterSpacing: 1 }}>LOOP.TALK</span>
+          <span style={{ fontSize: 13, fontWeight: 700, color: "color-mix(in srgb, var(--color-bg-white) 30%, transparent)", letterSpacing: 1 }}>LOOP.TALK</span>
           <div style={{ display: "flex", flexDirection: "column", alignItems: "center" }}>
-            <span style={{ fontSize: 12, color: "rgba(255,255,255,0.6)" }}>{sessionLabel}</span>
+            <span style={{ fontSize: 12, color: "color-mix(in srgb, var(--color-bg-white) 60%, transparent)" }}>{sessionLabel}</span>
             <span style={{ fontSize: 16, fontWeight: isAlmostOver ? 700 : 400, color: isAlmostOver ? "#F5A623" : "#F0EFEB", fontFamily: "monospace" }}>
               {formatTime(remainingMs)}
             </span>
@@ -582,7 +582,7 @@ export function VideoCall({
       {/* ── Bottom control bar (always visible) ──────────────────────────────── */}
       <div style={{
         position: "absolute", bottom: 0, left: 0, right: chatOpen ? 280 : 0, height: 72,
-        background: "rgba(0,0,0,0.6)", borderTop: "1px solid rgba(255,255,255,0.08)",
+        background: "rgba(0,0,0,0.6)", borderTop: "1px solid color-mix(in srgb, var(--color-bg-white) 8%, transparent)",
         display: "flex", alignItems: "center", justifyContent: "space-between",
         padding: "0 20px", zIndex: 30,
       }}>
@@ -604,13 +604,13 @@ export function VideoCall({
               style={{
                 display: "flex", flexDirection: "column", alignItems: "center", gap: 3,
                 padding: "8px 12px", borderRadius: 8, border: "none", cursor: "pointer",
-                background: active ? "rgba(192,57,43,0.3)" : "rgba(255,255,255,0.08)",
+                background: active ? "rgba(192,57,43,0.3)" : "color-mix(in srgb, var(--color-bg-white) 8%, transparent)",
                 color: active ? "#F87171" : "#F0EFEB",
                 transition: "background 0.15s",
               }}
             >
               {icon}
-              <span style={{ fontSize: 10, color: "#807F71" }}>{label}</span>
+              <span style={{ fontSize: 10, color: "var(--color-gray-500)" }}>{label}</span>
             </button>
           ))}
         </div>
@@ -620,7 +620,7 @@ export function VideoCall({
           style={{
             display: "flex", flexDirection: "column", alignItems: "center", gap: 3,
             padding: "8px 16px", borderRadius: 8, border: "none", cursor: "pointer",
-            background: "rgba(192,57,43,0.85)", color: "#fff",
+            background: "rgba(192,57,43,0.85)", color: "var(--color-bg-white)",
           }}
         >
           <IcoPhone />

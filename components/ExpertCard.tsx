@@ -42,7 +42,7 @@ export function ExpertCard({ expert, fixedWidth = false }: ExpertCardProps) {
         <div
           className="absolute inset-0 backdrop-blur-[20px]"
           style={{
-            background: "linear-gradient(180deg, rgba(255,255,255,0) 53%, rgba(255,255,255,0.43) 67%, rgba(255,255,255,0.90) 100%)",
+            background: "linear-gradient(180deg, rgb(from var(--color-bg-white) r g b / 0) 53%, color-mix(in srgb, var(--color-bg-white) 43%, transparent) 67%, color-mix(in srgb, var(--color-bg-white) 90%, transparent) 100%)",
             maskImage: "linear-gradient(180deg, transparent 45%, black 72%)",
           }}
         />

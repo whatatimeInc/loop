@@ -55,7 +55,7 @@ export default async function DashboardLayout({
 
   return (
     <DashboardShell profile={profile}>
-      <div style={{ display: "flex", minHeight: "100vh", background: "#FCFBF8" }}>
+      <div style={{ display: "flex", minHeight: "100vh", background: "var(--color-cream)" }}>
         <DashboardSidebar />
         <div style={{ flex: 1, display: "flex", flexDirection: "column", overflow: "auto" }}>
           <DashboardHeader />

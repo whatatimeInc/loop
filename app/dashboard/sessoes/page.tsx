@@ -5,12 +5,12 @@ import { createClient } from "@/lib/supabase/client";
 import { useDashboard } from "../DashboardShell";
 import { tokens } from "@/components/ui/tokens";
 
-const DARK   = "#272618";
-const MUTED  = "#626053";
-const FAINT  = "#AEADA4";
+const DARK   = "var(--color-gray-900)";
+const MUTED  = "var(--color-gray-600)";
+const FAINT  = "var(--color-gray-400)";
 const LIME = tokens.lime;
-const CARD   = "#FFFFFF";
-const BEIGE  = "#F4F2EB";
+const CARD   = "var(--color-bg-white)";
+const BEIGE  = "var(--color-gray-100)";
 const BORDER = "#E4E2D9";
 const RED    = "#D93B3B";
 const GREEN  = "#5FAD8E";

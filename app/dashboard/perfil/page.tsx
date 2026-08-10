@@ -14,10 +14,10 @@ export default async function DashboardPerfilPage() {
   return (
     <div style={{ maxWidth: 720 }}>
       <div style={{ marginBottom: 32 }}>
-        <h1 style={{ fontSize: 24, fontWeight: 700, color: "#272618", margin: "0 0 8px" }}>
+        <h1 style={{ fontSize: 24, fontWeight: 700, color: "var(--color-gray-900)", margin: "0 0 8px" }}>
           Perfil público
         </h1>
-        <p style={{ fontSize: 14, color: "#626053", margin: 0 }}>
+        <p style={{ fontSize: 14, color: "var(--color-gray-600)", margin: 0 }}>
           Estas informações aparecem na sua página pública para visitantes.
         </p>
       </div>

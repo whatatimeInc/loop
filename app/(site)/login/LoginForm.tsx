@@ -47,8 +47,8 @@ function InlineInput({
         style={{
           position: "relative",
           height: 52,
-          background: "#FCFBF8",
-          border: `1px solid ${error ? "#EB6A67" : focused ? "#272618" : "#DAD9D5"}`,
+          background: "var(--color-cream)",
+          border: `1px solid ${error ? "var(--color-error)" : focused ? "var(--color-gray-900)" : "var(--color-gray-200)"}`,
           borderRadius: 8,
           boxShadow: "0px 1px 2px rgba(10,13,18,0.05)",
         }}
@@ -62,7 +62,7 @@ function InlineInput({
             top: floated ? 9 : 17,
             fontSize: floated ? 10 : 14,
             fontWeight: floated ? 600 : 400,
-            color: floated ? "#626053" : "#AEADA4",
+            color: floated ? "var(--color-gray-600)" : "var(--color-gray-400)",
             lineHeight: 1,
           }}
         >
@@ -86,21 +86,21 @@ function InlineInput({
             background: "transparent",
             outline: "none",
             fontSize: 14,
-            color: "#272618",
+            color: "var(--color-gray-900)",
             fontFamily: "inherit",
             boxSizing: "border-box",
           }}
         />
       </div>
       {error && (
-        <p style={{ fontSize: 12, color: "#EB6A67", marginTop: 4 }}>{error}</p>
+        <p style={{ fontSize: 12, color: "var(--color-error)", marginTop: 4 }}>{error}</p>
       )}
     </div>
   );
 }
 
 const cardStyle: React.CSSProperties = {
-  background: "#FFFFFF",
+  background: "var(--color-bg-white)",
   borderRadius: 16,
   border: "1px solid #E4E2D9",
   padding: "32px",
@@ -110,8 +110,8 @@ const primaryBtn: React.CSSProperties = {
   width: "100%",
   padding: "14px 20px",
   borderRadius: 8,
-  background: "#272618",
-  color: "#FCFBF8",
+  background: "var(--color-gray-900)",
+  color: "var(--color-cream)",
   border: "none",
   fontSize: 15,
   fontWeight: 600,
@@ -124,7 +124,7 @@ const ghostBtn: React.CSSProperties = {
   border: "none",
   cursor: "pointer",
   fontSize: 13,
-  color: "#626053",
+  color: "var(--color-gray-600)",
   fontFamily: "inherit",
   padding: 0,
   textDecoration: "underline",
@@ -211,7 +211,7 @@ export function LoginForm() {
   const divider = (
     <div style={{ display: "flex", alignItems: "center", gap: 12, margin: "20px 0" }}>
       <div style={{ flex: 1, height: 1, background: "#E4E2D9" }} />
-      <span style={{ fontSize: 12, color: "#AEADA4" }}>ou</span>
+      <span style={{ fontSize: 12, color: "var(--color-gray-400)" }}>ou</span>
       <div style={{ flex: 1, height: 1, background: "#E4E2D9" }} />
     </div>
   );
@@ -233,19 +233,19 @@ export function LoginForm() {
               margin: "0 auto 20px",
             }}
           >
-            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#272618" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="var(--color-gray-900)" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
               <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z" />
               <polyline points="22,6 12,13 2,6" />
             </svg>
           </div>
-          <h2 style={{ fontSize: 20, fontWeight: 500, color: "#272618", margin: "0 0 12px", fontFamily: "var(--font-host-grotesk)" }}>
+          <h2 style={{ fontSize: 20, fontWeight: 500, color: "var(--color-gray-900)", margin: "0 0 12px", fontFamily: "var(--font-host-grotesk)" }}>
             {linkPurpose === "forgot" ? "Link enviado" : "Verifique seu e-mail"}
           </h2>
-          <p style={{ fontSize: 14, color: "#626053", lineHeight: 1.6, margin: "0 0 20px" }}>
+          <p style={{ fontSize: 14, color: "var(--color-gray-600)", lineHeight: 1.6, margin: "0 0 20px" }}>
             {linkPurpose === "forgot"
               ? "Enviamos um link para redefinir o acesso para "
               : "Enviamos um link de acesso para "}
-            <strong style={{ color: "#272618" }}>{email}</strong>.
+            <strong style={{ color: "var(--color-gray-900)" }}>{email}</strong>.
           </p>
           <button
             onClick={() => { setStep("email"); setPassword(""); setError(""); }}
@@ -272,15 +272,15 @@ export function LoginForm() {
                 justifyContent: "space-between",
                 padding: "14px",
                 borderRadius: 8,
-                background: "#F4F2EB",
-                border: "1px solid #DAD9D5",
+                background: "var(--color-gray-100)",
+                border: "1px solid var(--color-gray-200)",
               }}
             >
-              <span style={{ fontSize: 14, color: "#272618" }}>{email}</span>
+              <span style={{ fontSize: 14, color: "var(--color-gray-900)" }}>{email}</span>
               <button
                 type="button"
                 onClick={() => { setStep("email"); setPassword(""); setError(""); }}
-                style={{ ...ghostBtn, fontSize: 12, color: "#AEADA4" }}
+                style={{ ...ghostBtn, fontSize: 12, color: "var(--color-gray-400)" }}
               >
                 Alterar
               </button>
@@ -345,10 +345,10 @@ export function LoginForm() {
             padding: "12px 16px",
             borderRadius: 8,
             border: "1.5px solid #E4E2D9",
-            background: "#FFFFFF",
+            background: "var(--color-bg-white)",
             fontSize: 14,
             fontWeight: 600,
-            color: "#272618",
+            color: "var(--color-gray-900)",
             cursor: googleLoading ? "not-allowed" : "pointer",
             fontFamily: "inherit",
             opacity: googleLoading ? 0.6 : 1,
@@ -381,9 +381,9 @@ export function LoginForm() {
         </form>
       </div>
 
-      <p style={{ textAlign: "center", fontSize: 14, color: "#626053", marginTop: 20 }}>
+      <p style={{ textAlign: "center", fontSize: 14, color: "var(--color-gray-600)", marginTop: 20 }}>
         Não tem conta?{" "}
-        <Link href="/cadastro" style={{ fontWeight: 600, color: "#272618", textDecoration: "none" }}>
+        <Link href="/cadastro" style={{ fontWeight: 600, color: "var(--color-gray-900)", textDecoration: "none" }}>
           Criar conta
         </Link>
       </p>
@@ -396,7 +396,7 @@ function Wrapper({ children }: { children: React.ReactNode }) {
     <div
       style={{
         minHeight: "100vh",
-        background: "#F4F2EB",
+        background: "var(--color-gray-100)",
         display: "flex",
         alignItems: "center",
         justifyContent: "center",
@@ -406,7 +406,7 @@ function Wrapper({ children }: { children: React.ReactNode }) {
       <div style={{ maxWidth: 400, width: "100%" }}>
         <div style={{ display: "flex", flexDirection: "column", alignItems: "center", marginBottom: 32 }}>
           <Logo size="header" />
-          <p style={{ fontSize: 14, color: "#626053", marginTop: 10 }}>
+          <p style={{ fontSize: 14, color: "var(--color-gray-600)", marginTop: 10 }}>
             Boas vindas de volta
           </p>
         </div>

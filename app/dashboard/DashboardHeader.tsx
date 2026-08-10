@@ -6,10 +6,10 @@ import { createClient } from "@/lib/supabase/client";
 import { useDashboard } from "./DashboardShell";
 import { tokens } from "@/components/ui/tokens";
 
-const DARK   = "#272618";
-const MUTED  = "#626053";
+const DARK   = "var(--color-gray-900)";
+const MUTED  = "var(--color-gray-600)";
 const BORDER = "#E4E2D9";
-const BEIGE  = "#F4F2EB";
+const BEIGE  = "var(--color-gray-100)";
 
 const TITLES: Record<string, string> = {
   "/dashboard":                 "Home",
@@ -64,7 +64,7 @@ export function DashboardHeader() {
       height: 64, flexShrink: 0,
       borderBottom: `1px solid ${BORDER}`,
       display: "flex", alignItems: "center", justifyContent: "space-between",
-      padding: "0 40px", background: "#FCFBF8",
+      padding: "0 40px", background: "var(--color-cream)",
     }}>
       {/* Title / greeting */}
       <div>

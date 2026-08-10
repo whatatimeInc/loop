@@ -11,16 +11,16 @@ import { tokens } from "@/components/ui/tokens";
 // ─── tokens ───────────────────────────────────────────────────────────────────
 
 const DARK      = "#272518";
-const PANEL_BG  = "#FFFFFF";
-const PANEL_BDR = "#E0DDC1";
+const PANEL_BG  = "var(--color-bg-white)";
+const PANEL_BDR = "var(--color-olive-100)";
 const LIME = tokens.lime;
-const BEIGE_BG  = "#F4F2EB";
-const BEIGE_MID = "#E0DDC1";
-const BEIGE_CRD = "#FCFBF8";
+const BEIGE_BG  = "var(--color-gray-100)";
+const BEIGE_MID = "var(--color-olive-100)";
+const BEIGE_CRD = "var(--color-cream)";
 const TXT_DARK  = "#272518";
-const TXT_MUTED = "#807F71";
-const TXT_LIGHT = "#FCFBF8";
-const CARD_BG   = "#FFFFFF";
+const TXT_MUTED = "var(--color-gray-500)";
+const TXT_LIGHT = "var(--color-cream)";
+const CARD_BG   = "var(--color-bg-white)";
 
 // ─── helpers ──────────────────────────────────────────────────────────────────
 
@@ -189,7 +189,7 @@ function StepIndicator({ current }: { current: number }) {
             <div style={{
               height: 6,
               borderRadius: 999,
-              background: done ? LIME : active ? DARK : "#DAD9D5",
+              background: done ? LIME : active ? DARK : "var(--color-gray-200)",
               transition: "background 0.3s",
             }} />
             <span style={{
@@ -473,7 +473,7 @@ function StepLogin({ onLogin }: { onLogin: (name: string) => void }) {
           }}
         >
           {loading === "apple" ? (
-            <span style={{ fontSize: 13, color: "#A39E79" }}>Conectando…</span>
+            <span style={{ fontSize: 13, color: "var(--color-olive-400)" }}>Conectando…</span>
           ) : (
             <><AppleIcon /> Continuar com Apple</>
           )}
@@ -909,7 +909,7 @@ function StepConfirmacao({ expert, duracao, data, horario }: {
     display: "flex", flexDirection: "column", alignItems: "center", gap: 2,
   };
   const tileLabel: React.CSSProperties = {
-    fontSize: 10, fontWeight: 600, color: "#626053",
+    fontSize: 10, fontWeight: 600, color: "var(--color-gray-600)",
     lineHeight: "12px", textAlign: "center", margin: 0,
   };
   const tileValue: React.CSSProperties = {
@@ -921,7 +921,7 @@ function StepConfirmacao({ expert, duracao, data, horario }: {
     <div style={{ display: "flex", justifyContent: "center" }}>
       <div style={{
         width: "100%", maxWidth: 400,
-        background: "#FFFFFF",
+        background: "var(--color-bg-white)",
         borderRadius: 12,
         outline: `1px solid ${BEIGE_MID}`,
         outlineOffset: -1,
@@ -950,7 +950,7 @@ function StepConfirmacao({ expert, duracao, data, horario }: {
             <p style={{ textAlign: "center", fontSize: 16, fontWeight: 400, color: TXT_DARK, margin: 0 }}>
               Sessão confirmada
             </p>
-            <p style={{ textAlign: "center", fontSize: 14, color: "#626053", lineHeight: "20px", margin: 0 }}>
+            <p style={{ textAlign: "center", fontSize: 14, color: "var(--color-gray-600)", lineHeight: "20px", margin: 0 }}>
               Enviamos a confirmação e o link da reunião para o seu e-mail.
             </p>
           </div>
@@ -971,7 +971,7 @@ function StepConfirmacao({ expert, duracao, data, horario }: {
                 <Image src={`/mentors/${expert.slug}/profile.webp`} alt={expert.nome} fill className="object-cover object-top" sizes="56px" />
               </div>
               <div style={{ flex: 1 }}>
-                <p style={{ fontSize: 10, fontWeight: 600, color: "#626053", lineHeight: "12px", margin: 0 }}>
+                <p style={{ fontSize: 10, fontWeight: 600, color: "var(--color-gray-600)", lineHeight: "12px", margin: 0 }}>
                   {expert.categoria}
                 </p>
                 <p style={{ fontSize: 14, color: TXT_DARK, lineHeight: "20px", margin: 0 }}>
@@ -1002,7 +1002,7 @@ function StepConfirmacao({ expert, duracao, data, horario }: {
             padding: "0 16px",
             display: "flex", justifyContent: "space-between", alignItems: "center",
           }}>
-            <p style={{ fontSize: 10, fontWeight: 600, color: "#626053", margin: 0 }}>Pagamento</p>
+            <p style={{ fontSize: 10, fontWeight: 600, color: "var(--color-gray-600)", margin: 0 }}>Pagamento</p>
             <div style={{ display: "flex", alignItems: "center", gap: 8, padding: "12px 0" }}>
               <span style={{ fontSize: 14, color: TXT_DARK }}>Crédito • 0000</span>
               <div style={{ width: 34, height: 24, borderRadius: 4, overflow: "hidden" }}>
@@ -1020,7 +1020,7 @@ function StepConfirmacao({ expert, duracao, data, horario }: {
               display: "flex", alignItems: "center", justifyContent: "center",
               padding: "12px 20px",
               background: DARK, borderRadius: 8,
-              fontSize: 16, fontWeight: 600, color: "#FCFBF8",
+              fontSize: 16, fontWeight: 600, color: "var(--color-cream)",
               textDecoration: "none",
             }}
           >
@@ -1032,7 +1032,7 @@ function StepConfirmacao({ expert, duracao, data, horario }: {
               display: "flex", alignItems: "center", justifyContent: "center",
               padding: "12px 20px",
               background: BEIGE_CRD, borderRadius: 8,
-              outline: "1px solid #8E8857", outlineOffset: -1,
+              outline: "1px solid var(--color-olive-600)", outlineOffset: -1,
               fontSize: 16, fontWeight: 600, color: TXT_DARK,
               textDecoration: "none",
             }}

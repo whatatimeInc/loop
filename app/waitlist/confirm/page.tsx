@@ -30,7 +30,7 @@ export default async function WaitlistConfirmPage() {
   return (
     <div
       className="min-h-screen flex flex-col"
-      style={{ background: "#F4F2EB" }}
+      style={{ background: "var(--color-gray-100)" }}
     >
       {/* Header */}
       <header className="flex items-center justify-between px-6 py-5">
@@ -44,8 +44,8 @@ export default async function WaitlistConfirmPage() {
           {/* Position card */}
           <div
             style={{
-              background: "#fff",
-              border: "1px solid #E0DDC1",
+              background: "var(--color-bg-white)",
+              border: "1px solid var(--color-olive-100)",
               borderRadius: 14,
               padding: "32px 28px",
               textAlign: "center",
@@ -54,7 +54,7 @@ export default async function WaitlistConfirmPage() {
               gap: 16,
             }}
           >
-            <p style={{ fontSize: 13, fontWeight: 600, color: "#807F71", letterSpacing: "0.06em", textTransform: "uppercase" }}>
+            <p style={{ fontSize: 13, fontWeight: 600, color: "var(--color-gray-500)", letterSpacing: "0.06em", textTransform: "uppercase" }}>
               Você está na posição
             </p>
             <div
@@ -68,7 +68,7 @@ export default async function WaitlistConfirmPage() {
             >
               #{profile.waitlist_position}
             </div>
-            <p style={{ fontSize: 15, color: "#626053" }}>
+            <p style={{ fontSize: 15, color: "var(--color-gray-600)" }}>
               Olá, {profile.name?.split(" ")[0] ?? ""}! Você está reservado(a).{" "}
               Avisaremos por e-mail quando for a sua vez.
             </p>
@@ -89,7 +89,7 @@ export default async function WaitlistConfirmPage() {
               <p style={{ fontSize: 15, fontWeight: 600, color: "#272518", marginBottom: 4 }}>
                 Suba na lista indicando amigos
               </p>
-              <p style={{ fontSize: 13, color: "#514F41" }}>
+              <p style={{ fontSize: 13, color: "var(--color-gray-700)" }}>
                 Cada indicação que entrar na lista move você <strong>5 posições para cima</strong> (até a posição 10).
                 Você já tem <strong>{profile.referral_count}</strong>{" "}
                 {profile.referral_count === 1 ? "indicação" : "indicações"}.
@@ -110,7 +110,7 @@ export default async function WaitlistConfirmPage() {
       {/* Footer */}
       <footer
         className="px-6 py-4 text-center text-xs"
-        style={{ color: "#807F71", borderTop: "1px solid #E0DDC1" }}
+        style={{ color: "var(--color-gray-500)", borderTop: "1px solid var(--color-olive-100)" }}
       >
         © {new Date().getFullYear()} Loop.Talk — Todos os direitos reservados
       </footer>

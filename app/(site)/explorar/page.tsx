@@ -44,7 +44,7 @@ export default function Explorar() {
   const categoriasFiltradas = categoriaAtiva ? [categoriaAtiva] : categorias;
 
   return (
-    <div className="min-h-screen" style={{ background: "#FCFBF8" }}>
+    <div className="min-h-screen" style={{ background: "var(--color-cream)" }}>
 
       {/* ── HERO ──────────────────────────────────────────────── */}
       <section className="pt-28 pb-12 px-6">
@@ -58,7 +58,7 @@ export default function Explorar() {
             >
               Fale com quem sabe. Agora.
             </h1>
-            <p className="text-base" style={{ color: "#373525" }}>
+            <p className="text-base" style={{ color: "var(--color-gray-800)" }}>
               Especialistas que mudam negócios, vidas e histórias a um clique de você.
             </p>
           </div>
@@ -69,7 +69,7 @@ export default function Explorar() {
             onSubmit={(e) => e.preventDefault()}
           >
             <div className="relative" style={{ width: 320 }}>
-              <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 pointer-events-none" style={{ color: "#807F71" }} />
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 pointer-events-none" style={{ color: "var(--color-gray-500)" }} />
               <input
                 type="text"
                 placeholder="Buscar mentor"
@@ -77,7 +77,7 @@ export default function Explorar() {
                 onChange={(e) => setBusca(e.target.value)}
                 className="w-full h-11 pl-9 pr-4 rounded border text-sm focus:outline-none focus:ring-2"
                 style={{
-                  background: "#FFFFFF",
+                  background: "var(--color-bg-white)",
                   borderColor: "#E9EAEB",
                   color: "#272518",
                 }}
@@ -107,19 +107,19 @@ export default function Explorar() {
                 onClick={() => setCategoriaAtiva(cat === categoriaAtiva ? null : cat)}
                 className="flex items-center gap-2 px-4 py-2.5 rounded text-sm font-semibold backdrop-blur-[20px]"
                 style={{
-                  background: ativo ? "#272518" : "rgba(255,255,255,0.40)",
-                  color: ativo ? "#FDFDFD" : "#272518",
+                  background: ativo ? "#272518" : "color-mix(in srgb, var(--color-bg-white) 40%, transparent)",
+                  color: ativo ? "var(--color-gray-25)" : "#272518",
                   transition: "background 0.25s cubic-bezier(0.22,1,0.36,1), color 0.25s cubic-bezier(0.22,1,0.36,1)",
                 }}
                 onMouseEnter={(e) => {
                   if (!ativo) {
-                    e.currentTarget.style.background = "rgba(255,255,255,0.72)";
+                    e.currentTarget.style.background = "color-mix(in srgb, var(--color-bg-white) 72%, transparent)";
                   } else {
                     e.currentTarget.style.background = "#2a2926";
                   }
                 }}
                 onMouseLeave={(e) => {
-                  e.currentTarget.style.background = ativo ? "#272518" : "rgba(255,255,255,0.40)";
+                  e.currentTarget.style.background = ativo ? "#272518" : "color-mix(in srgb, var(--color-bg-white) 40%, transparent)";
                 }}
               >
                 {categoriaIcones[cat]}
@@ -134,12 +134,12 @@ export default function Explorar() {
       {modoFiltrado && (
         <section className="px-6 pb-12">
           <div className="max-w-[1194px] mx-auto">
-            <p className="text-sm mb-6" style={{ color: "#626053" }}>
+            <p className="text-sm mb-6" style={{ color: "var(--color-gray-600)" }}>
               {expertsFiltrados.length} resultado{expertsFiltrados.length !== 1 ? "s" : ""}
               {busca && ` para "${busca}"`}
             </p>
             {expertsFiltrados.length === 0 ? (
-              <p className="text-center py-16" style={{ color: "#807F71" }}>
+              <p className="text-center py-16" style={{ color: "var(--color-gray-500)" }}>
                 Nenhum creator encontrado.
               </p>
             ) : (
@@ -199,7 +199,7 @@ export default function Explorar() {
         <div className="max-w-[1194px] mx-auto">
           <div
             className="flex flex-col md:flex-row items-center justify-between gap-10 rounded-xl px-12 py-12"
-            style={{ background: "#E0DDC1" }}
+            style={{ background: "var(--color-olive-100)" }}
           >
             <div className="flex-1">
               <h2
@@ -208,7 +208,7 @@ export default function Explorar() {
               >
                 Seja um mentor e inspire pessoas
               </h2>
-              <p className="text-sm" style={{ color: "#514F41" }}>
+              <p className="text-sm" style={{ color: "var(--color-gray-700)" }}>
                 Conecte-se virtualmente, aconselhe e ganhe até R$ 100.000 em um mês.
               </p>
             </div>

@@ -43,14 +43,14 @@ export function ContaHeader({
         justifyContent: "space-between",
         padding: "20px 48px",
         borderBottom: "1px solid #E4E2D9",
-        background: "#FCFBF8",
+        background: "var(--color-cream)",
       }}
     >
       <h1
         style={{
           fontSize: 18,
           fontWeight: 500,
-          color: "#272618",
+          color: "var(--color-gray-900)",
           margin: 0,
           fontFamily: "var(--font-host-grotesk)",
         }}
@@ -71,7 +71,7 @@ export function ContaHeader({
             justifyContent: "center",
             fontSize: 13,
             fontWeight: 700,
-            color: "#272618",
+            color: "var(--color-gray-900)",
             overflow: "hidden",
             flexShrink: 0,
           }}
@@ -84,7 +84,7 @@ export function ContaHeader({
           )}
         </div>
 
-        <span style={{ fontSize: 14, color: "#272618", fontWeight: 500 }}>
+        <span style={{ fontSize: 14, color: "var(--color-gray-900)", fontWeight: 500 }}>
           {[name, lastName].filter(Boolean).join(" ") || "Usuário"}
         </span>
 
@@ -96,7 +96,7 @@ export function ContaHeader({
             borderRadius: 6,
             padding: "6px 12px",
             fontSize: 13,
-            color: "#626053",
+            color: "var(--color-gray-600)",
             cursor: "pointer",
             fontFamily: "inherit",
           }}

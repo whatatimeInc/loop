@@ -19,9 +19,9 @@ function formatPrice(preco: number) {
 function SocialPill({ href, label, children }: { href: string; label: string; children: React.ReactNode }) {
   return (
     <a href={href} aria-label={label} style={{
-      width: 32, height: 32, background: "#E0DDC1", borderRadius: "50%",
+      width: 32, height: 32, background: "var(--color-olive-100)", borderRadius: "50%",
       display: "flex", alignItems: "center", justifyContent: "center",
-      textDecoration: "none", color: "#272618", flexShrink: 0,
+      textDecoration: "none", color: "var(--color-gray-900)", flexShrink: 0,
     }}>
       {children}
     </a>
@@ -57,9 +57,9 @@ export function BookingSidebar({ expert }: Props) {
   return (
     <div
       style={{
-        background: "#F4F2EB",
+        background: "var(--color-gray-100)",
         borderRadius: 12,
-        outline: "1px solid #DAD9D5",
+        outline: "1px solid var(--color-gray-200)",
         outlineOffset: -1,
         padding: "40px 24px",
         display: "flex",
@@ -101,7 +101,7 @@ export function BookingSidebar({ expert }: Props) {
                   height: 72,
                   borderRadius: 4,
                   border: "none",
-                  background: ativo ? tokens.lime : "#fff",
+                  background: ativo ? tokens.lime : "var(--color-bg-white)",
                   display: "flex",
                   flexDirection: "column",
                   alignItems: "center",
@@ -110,10 +110,10 @@ export function BookingSidebar({ expert }: Props) {
                   cursor: "pointer",
                 }}
               >
-                <span style={{ fontSize: 16, fontWeight: 400, color: "#272618" }}>
+                <span style={{ fontSize: 16, fontWeight: 400, color: "var(--color-gray-900)" }}>
                   {min} min
                 </span>
-                <span style={{ fontSize: 12, color: "#807F71" }}>
+                <span style={{ fontSize: 12, color: "var(--color-gray-500)" }}>
                   R$ {formatPrice(preco)}
                 </span>
               </button>
@@ -128,11 +128,11 @@ export function BookingSidebar({ expert }: Props) {
             alignItems: "center",
             justifyContent: "center",
             padding: "12px 20px",
-            background: "#272618",
+            background: "var(--color-gray-900)",
             borderRadius: 8,
             fontSize: 16,
             fontWeight: 600,
-            color: "#FCFBF8",
+            color: "var(--color-cream)",
             textDecoration: "none",
           }}
         >

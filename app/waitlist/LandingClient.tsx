@@ -46,7 +46,7 @@ const KEYFRAMES = `
 
 // ─── ARROW ICON ───────────────────────────────────────────────────────────────
 
-function ArrowIcon({ color = "#272618" }: { color?: string }) {
+function ArrowIcon({ color = "var(--color-gray-900)" }: { color?: string }) {
   return (
     <svg width="20" height="20" viewBox="0 0 20 20" fill="none" aria-hidden>
       <path
@@ -76,7 +76,7 @@ function MobileNav({ onCTA }: { onCTA: () => void }) {
         display: "flex",
         alignItems: "center",
         justifyContent: "space-between",
-        background: "rgba(255,255,255,0.50)",
+        background: "color-mix(in srgb, var(--color-bg-white) 50%, transparent)",
         backdropFilter: "blur(20px)",
         WebkitBackdropFilter: "blur(20px)",
       }}
@@ -90,7 +90,7 @@ function MobileNav({ onCTA }: { onCTA: () => void }) {
           cursor: "pointer",
           fontSize: 14,
           fontWeight: 600,
-          color: "#272618",
+          color: "var(--color-gray-900)",
           fontFamily: "inherit",
         }}
       >
@@ -153,7 +153,7 @@ function HeroSection({ onCTA, isMobile }: { onCTA: () => void; isMobile: boolean
               display: "flex",
               alignItems: "center",
               justifyContent: "space-between",
-              background: "rgba(255,255,255,0.50)",
+              background: "color-mix(in srgb, var(--color-bg-white) 50%, transparent)",
               backdropFilter: "blur(20px)",
               WebkitBackdropFilter: "blur(20px)",
               borderRadius: 12,
@@ -185,7 +185,7 @@ function HeroSection({ onCTA, isMobile }: { onCTA: () => void; isMobile: boolean
                   borderRadius: 8,
                   fontSize: 16,
                   fontWeight: 600,
-                  color: "#272618",
+                  color: "var(--color-gray-900)",
                   cursor: "pointer",
                   fontFamily: "inherit",
                 }}
@@ -219,7 +219,7 @@ function HeroSection({ onCTA, isMobile }: { onCTA: () => void; isMobile: boolean
               style={{
                 fontSize: isMobile ? 24 : 30,
                 fontWeight: 500,
-                color: "#FCFBF8",
+                color: "var(--color-cream)",
                 fontFamily: "var(--font-host-grotesk)",
                 lineHeight: isMobile ? "30px" : "32px",
                 margin: 0,
@@ -227,7 +227,7 @@ function HeroSection({ onCTA, isMobile }: { onCTA: () => void; isMobile: boolean
             >
               Algumas conversas não têm preço. As suas têm.
             </h1>
-            <p style={{ fontSize: isMobile ? 14 : 16, color: "#FCFBF8", lineHeight: isMobile ? "20px" : 1.5, margin: 0 }}>
+            <p style={{ fontSize: isMobile ? 14 : 16, color: "var(--color-cream)", lineHeight: isMobile ? "20px" : 1.5, margin: 0 }}>
               A plataforma para te conectar com sua audiência valorizando seu tempo.
             </p>
           </div>
@@ -248,13 +248,13 @@ function HeroSection({ onCTA, isMobile }: { onCTA: () => void; isMobile: boolean
                 borderRadius: 8,
                 fontSize: 16,
                 fontWeight: 600,
-                color: "#272618",
+                color: "var(--color-gray-900)",
                 cursor: "pointer",
                 fontFamily: "inherit",
               }}
             >
               Entrar na lista de espera
-              <ArrowIcon color="#272618" />
+              <ArrowIcon color="var(--color-gray-900)" />
             </button>
           )}
         </div>
@@ -277,7 +277,7 @@ function ImpactSection({ isMobile }: { isMobile: boolean }) {
         style={{
           fontSize: isMobile ? 32 : 48,
           fontWeight: 500,
-          color: "#272618",
+          color: "var(--color-gray-900)",
           fontFamily: "var(--font-host-grotesk)",
           lineHeight: 1.1,
           margin: 0,
@@ -304,7 +304,7 @@ function ProfileCardIllustration() {
           animation: "fadeSlideUp 0.8s ease-out 0.3s both",
         }}
       >
-        <div style={{ width: 137, height: 169, position: "absolute", left: 30, top: 47, background: "#AEADA4" }} />
+        <div style={{ width: 137, height: 169, position: "absolute", left: 30, top: 47, background: "var(--color-gray-400)" }} />
         <div style={{ width: 137, height: 169, position: "absolute", left: 25, top: 46, background: tokens.lime }} />
         <div
           style={{
@@ -319,7 +319,7 @@ function ProfileCardIllustration() {
             justifyContent: "center",
           }}
         >
-          <svg width="52" height="52" viewBox="0 0 24 24" fill="#AEADA4">
+          <svg width="52" height="52" viewBox="0 0 24 24" fill="var(--color-gray-400)">
             <circle cx="12" cy="8" r="3.5" />
             <path d="M20 21a8 8 0 1 0-16 0" />
           </svg>
@@ -331,15 +331,15 @@ function ProfileCardIllustration() {
             position: "absolute",
             left: 0,
             top: 93,
-            background: "#272618",
+            background: "var(--color-gray-900)",
             padding: "34px 14px 0",
             display: "flex",
             flexDirection: "column",
             gap: 4,
           }}
         >
-          <span style={{ fontSize: 11, fontWeight: 600, color: "#FCFBF8", letterSpacing: "0.04em" }}>Loop.Talk</span>
-          <span style={{ fontSize: 26, fontWeight: 400, color: "#FCFBF8", fontFamily: "var(--font-host-grotesk)", lineHeight: 1 }}>
+          <span style={{ fontSize: 11, fontWeight: 600, color: "var(--color-cream)", letterSpacing: "0.04em" }}>Loop.Talk</span>
+          <span style={{ fontSize: 26, fontWeight: 400, color: "var(--color-cream)", fontFamily: "var(--font-host-grotesk)", lineHeight: 1 }}>
             Thadeu Diz
           </span>
         </div>
@@ -362,14 +362,14 @@ function DaysIllustration() {
               style={{
                 width: hi ? 104 : 96,
                 height: hi ? 104 : 96,
-                background: hi ? tokens.limeLight : "#E0DDC1",
+                background: hi ? tokens.limeLight : "var(--color-olive-100)",
                 borderRadius: 4,
                 display: "flex",
                 alignItems: "center",
                 justifyContent: "center",
                 fontSize: 20,
                 fontWeight: 600,
-                color: "#272618",
+                color: "var(--color-gray-900)",
                 flexShrink: 0,
               }}
             >
@@ -396,12 +396,12 @@ function PriceIllustration() {
       }}
     >
       <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-        <span style={{ fontSize: 14, color: "#272618" }}>R$</span>
-        <span style={{ fontSize: 28, fontWeight: 500, color: "#272618", fontFamily: "var(--font-host-grotesk)" }}>120</span>
-        <span style={{ fontSize: 14, color: "#272618" }}>/hora</span>
+        <span style={{ fontSize: 14, color: "var(--color-gray-900)" }}>R$</span>
+        <span style={{ fontSize: 28, fontWeight: 500, color: "var(--color-gray-900)", fontFamily: "var(--font-host-grotesk)" }}>120</span>
+        <span style={{ fontSize: 14, color: "var(--color-gray-900)" }}>/hora</span>
       </div>
       <div style={{ position: "relative", width: 250, height: 15 }}>
-        <div style={{ position: "absolute", inset: 0, background: "#DAD9D5", borderRadius: 99 }} />
+        <div style={{ position: "absolute", inset: 0, background: "var(--color-gray-200)", borderRadius: 99 }} />
         <div
           style={{
             position: "absolute",
@@ -420,7 +420,7 @@ function PriceIllustration() {
             transform: "translateY(-50%)",
             width: 24,
             height: 48,
-            background: "rgba(224,221,193,0.4)",
+            background: "color-mix(in srgb, var(--color-olive-100) 40%, transparent)",
             borderRadius: 99,
             border: "1px solid white",
             backdropFilter: "blur(4px)",
@@ -485,7 +485,7 @@ function HowItWorksSection({ isMobile }: { isMobile: boolean }) {
                 flexShrink: 0,
                 width: "calc(100vw - 56px)",
                 scrollSnapAlign: "start",
-                background: "#FCFBF8",
+                background: "var(--color-cream)",
                 borderRadius: 12,
                 overflow: "hidden",
                 display: "flex",
@@ -508,7 +508,7 @@ function HowItWorksSection({ isMobile }: { isMobile: boolean }) {
                   style={{
                     fontSize: 24,
                     fontWeight: 300,
-                    color: "#272618",
+                    color: "var(--color-gray-900)",
                     fontFamily: "var(--font-host-grotesk)",
                     lineHeight: 1.1,
                     margin: 0,
@@ -516,7 +516,7 @@ function HowItWorksSection({ isMobile }: { isMobile: boolean }) {
                 >
                   {title}
                 </h3>
-                <p style={{ fontSize: 15, color: "#272618", lineHeight: 1.5, margin: 0 }}>{desc}</p>
+                <p style={{ fontSize: 15, color: "var(--color-gray-900)", lineHeight: 1.5, margin: 0 }}>{desc}</p>
               </div>
               <div style={{ transform: "scale(0.85)", transformOrigin: "bottom center", width: "100%" }}>
                 {illustration}
@@ -539,7 +539,7 @@ function HowItWorksSection({ isMobile }: { isMobile: boolean }) {
                 width: i === activeIndex ? 20 : 6,
                 height: 6,
                 borderRadius: 99,
-                background: i === activeIndex ? "#272618" : "#DAD9D5",
+                background: i === activeIndex ? "var(--color-gray-900)" : "var(--color-gray-200)",
                 transition: "all 0.2s ease",
                 cursor: "pointer",
               }}
@@ -560,7 +560,7 @@ function HowItWorksSection({ isMobile }: { isMobile: boolean }) {
               flex: 1,
               height: 468,
               paddingTop: 32,
-              background: "#FCFBF8",
+              background: "var(--color-cream)",
               borderRadius: 12,
               overflow: "hidden",
               display: "flex",
@@ -574,7 +574,7 @@ function HowItWorksSection({ isMobile }: { isMobile: boolean }) {
                 style={{
                   fontSize: 30,
                   fontWeight: 300,
-                  color: "#272618",
+                  color: "var(--color-gray-900)",
                   fontFamily: "var(--font-host-grotesk)",
                   lineHeight: 1.07,
                   margin: 0,
@@ -582,7 +582,7 @@ function HowItWorksSection({ isMobile }: { isMobile: boolean }) {
               >
                 {title}
               </h3>
-              <p style={{ fontSize: 16, color: "#272618", lineHeight: 1.5, margin: 0 }}>{desc}</p>
+              <p style={{ fontSize: 16, color: "var(--color-gray-900)", lineHeight: 1.5, margin: 0 }}>{desc}</p>
             </div>
             {illustration}
           </div>
@@ -605,16 +605,16 @@ const CATEGORIES: { label: string; icon: React.ReactNode }[] = [
           <clipPath id="mq-car-cp2"><polygon points="21.1 33.1 21.2 .5 49.5 16.9 49.4 49.5 21.1 33.1"/></clipPath>
         </defs>
         <g style={{ isolation: "isolate" as const }}>
-          <g clipPath="url(#mq-car-cp0)"><path stroke="#272618" strokeWidth=".5" strokeMiterlimit="10" d="M1.8,32.7V1.7c0,0,27,15.6,27,15.6v31c0,0-27-15.6-27-15.6M29.5,16.9L1.1.5v32.6c0,0,28.3,16.4,28.3,16.4V16.9"/></g>
-          <polygon points="1 33.1 1.1 .5 29.5 16.9 29.4 49.5 1 33.1" fill="none" stroke="#272618" strokeWidth=".5" strokeMiterlimit="10"/>
+          <g clipPath="url(#mq-car-cp0)"><path stroke="var(--color-gray-900)" strokeWidth=".5" strokeMiterlimit="10" d="M1.8,32.7V1.7c0,0,27,15.6,27,15.6v31c0,0-27-15.6-27-15.6M29.5,16.9L1.1.5v32.6c0,0,28.3,16.4,28.3,16.4V16.9"/></g>
+          <polygon points="1 33.1 1.1 .5 29.5 16.9 29.4 49.5 1 33.1" fill="none" stroke="var(--color-gray-900)" strokeWidth=".5" strokeMiterlimit="10"/>
         </g>
         <g style={{ isolation: "isolate" as const }}>
-          <g clipPath="url(#mq-car-cp1)"><path stroke="#272618" strokeWidth=".5" strokeMiterlimit="10" d="M11.8,32.7V1.7c0,0,27,15.6,27,15.6v31c0,0-27-15.6-27-15.6M39.5,16.9L11.1.5v32.6c0,0,28.3,16.4,28.3,16.4V16.9"/></g>
-          <polygon points="11.1 33.1 11.1 .5 39.5 16.9 39.4 49.5 11.1 33.1" fill="none" stroke="#272618" strokeWidth=".5" strokeMiterlimit="10"/>
+          <g clipPath="url(#mq-car-cp1)"><path stroke="var(--color-gray-900)" strokeWidth=".5" strokeMiterlimit="10" d="M11.8,32.7V1.7c0,0,27,15.6,27,15.6v31c0,0-27-15.6-27-15.6M39.5,16.9L11.1.5v32.6c0,0,28.3,16.4,28.3,16.4V16.9"/></g>
+          <polygon points="11.1 33.1 11.1 .5 39.5 16.9 39.4 49.5 11.1 33.1" fill="none" stroke="var(--color-gray-900)" strokeWidth=".5" strokeMiterlimit="10"/>
         </g>
         <g style={{ isolation: "isolate" as const }}>
-          <g clipPath="url(#mq-car-cp2)"><path stroke="#272618" strokeWidth=".5" strokeMiterlimit="10" d="M21.8,32.7V1.7c0,0,27,15.6,27,15.6v31c0,0-27-15.6-27-15.6M49.5,16.9L21.2.5v32.6c0,0,28.3,16.4,28.3,16.4V16.9"/></g>
-          <polygon points="21.1 33.1 21.2 .5 49.5 16.9 49.4 49.5 21.1 33.1" fill="none" stroke="#272618" strokeWidth=".5" strokeMiterlimit="10"/>
+          <g clipPath="url(#mq-car-cp2)"><path stroke="var(--color-gray-900)" strokeWidth=".5" strokeMiterlimit="10" d="M21.8,32.7V1.7c0,0,27,15.6,27,15.6v31c0,0-27-15.6-27-15.6M49.5,16.9L21.2.5v32.6c0,0,28.3,16.4,28.3,16.4V16.9"/></g>
+          <polygon points="21.1 33.1 21.2 .5 49.5 16.9 49.4 49.5 21.1 33.1" fill="none" stroke="var(--color-gray-900)" strokeWidth=".5" strokeMiterlimit="10"/>
         </g>
       </svg>
     ),
@@ -623,7 +623,7 @@ const CATEGORIES: { label: string; icon: React.ReactNode }[] = [
     label: "Saúde e Bem-Estar",
     icon: (
       <svg width="24" height="24" viewBox="0 0 42.8 43.5" fill="none">
-        <g stroke="#272618" strokeWidth="2" strokeMiterlimit="10">
+        <g stroke="var(--color-gray-900)" strokeWidth="2" strokeMiterlimit="10">
           <line x1="21.3" y1="0" x2="21.3" y2="12"/>
           <line x1="8.6" y1="4.2" x2="15.6" y2="13.9"/>
           <line x1=".7" y1="15.1" x2="12.1" y2="18.8"/>
@@ -648,16 +648,16 @@ const CATEGORIES: { label: string; icon: React.ReactNode }[] = [
           <clipPath id="mq-tec-cp2"><polygon points=".5 17.3 29.4 .5 58.5 17.3 29.6 34.1 .5 17.3"/></clipPath>
         </defs>
         <g style={{ isolation: "isolate" as const }}>
-          <g clipPath="url(#mq-tec-cp0)"><path stroke="#272618" strokeWidth=".5" strokeMiterlimit="10" d="M1.9,34.5l27.5-16,27.7,16-27.5,16L1.9,34.5M58.5,34.5l-29.1-16.8L.5,34.5l29.1,16.8,28.9-16.8"/></g>
-          <polygon points=".5 34.5 29.4 17.7 58.5 34.5 29.6 51.3 .5 34.5" fill="none" stroke="#272618" strokeWidth=".5" strokeMiterlimit="10"/>
+          <g clipPath="url(#mq-tec-cp0)"><path stroke="var(--color-gray-900)" strokeWidth=".5" strokeMiterlimit="10" d="M1.9,34.5l27.5-16,27.7,16-27.5,16L1.9,34.5M58.5,34.5l-29.1-16.8L.5,34.5l29.1,16.8,28.9-16.8"/></g>
+          <polygon points=".5 34.5 29.4 17.7 58.5 34.5 29.6 51.3 .5 34.5" fill="none" stroke="var(--color-gray-900)" strokeWidth=".5" strokeMiterlimit="10"/>
         </g>
         <g style={{ isolation: "isolate" as const }}>
-          <g clipPath="url(#mq-tec-cp1)"><path stroke="#272618" strokeWidth=".5" strokeMiterlimit="10" d="M1.9,25.9l27.5-16,27.7,16-27.5,16L1.9,25.9M58.5,25.9L29.4,9.1.5,25.9l29.1,16.8,28.9-16.8"/></g>
-          <polygon points=".5 25.9 29.4 9.1 58.5 25.9 29.6 42.7 .5 25.9" fill="none" stroke="#272618" strokeWidth=".5" strokeMiterlimit="10"/>
+          <g clipPath="url(#mq-tec-cp1)"><path stroke="var(--color-gray-900)" strokeWidth=".5" strokeMiterlimit="10" d="M1.9,25.9l27.5-16,27.7,16-27.5,16L1.9,25.9M58.5,25.9L29.4,9.1.5,25.9l29.1,16.8,28.9-16.8"/></g>
+          <polygon points=".5 25.9 29.4 9.1 58.5 25.9 29.6 42.7 .5 25.9" fill="none" stroke="var(--color-gray-900)" strokeWidth=".5" strokeMiterlimit="10"/>
         </g>
         <g style={{ isolation: "isolate" as const }}>
-          <g clipPath="url(#mq-tec-cp2)"><path stroke="#272618" strokeWidth=".5" strokeMiterlimit="10" d="M1.9,17.3L29.4,1.3l27.7,16-27.5,16L1.9,17.3M58.5,17.3L29.4.5.5,17.3l29.1,16.8,28.9-16.8"/></g>
-          <polygon points=".5 17.3 29.4 .5 58.5 17.3 29.6 34.1 .5 17.3" fill="none" stroke="#272618" strokeWidth=".5" strokeMiterlimit="10"/>
+          <g clipPath="url(#mq-tec-cp2)"><path stroke="var(--color-gray-900)" strokeWidth=".5" strokeMiterlimit="10" d="M1.9,17.3L29.4,1.3l27.7,16-27.5,16L1.9,17.3M58.5,17.3L29.4.5.5,17.3l29.1,16.8,28.9-16.8"/></g>
+          <polygon points=".5 17.3 29.4 .5 58.5 17.3 29.6 34.1 .5 17.3" fill="none" stroke="var(--color-gray-900)" strokeWidth=".5" strokeMiterlimit="10"/>
         </g>
       </svg>
     ),
@@ -665,7 +665,7 @@ const CATEGORIES: { label: string; icon: React.ReactNode }[] = [
   {
     label: "Moda e Lifestyle",
     icon: (
-      <svg width="24" height="24" viewBox="0 0 48.9 48.5" fill="#272618">
+      <svg width="24" height="24" viewBox="0 0 48.9 48.5" fill="var(--color-gray-900)">
         <path d="M24.7,2.8l21.4,21.4-21.4,21.4L3.3,24.2,24.7,2.8M24.7,0L.5,24.2l24.2,24.2,24.2-24.2L24.7,0h0Z"/>
         <path d="M34.8,14.1v20.2H14.6V14.1h20.2M36.8,12.1H12.6v24.2h24.2V12.1h0Z"/>
         <path d="M24.7,14.9l9.3,9.3-9.3,9.3-9.3-9.3,9.3-9.3M24.7,12.1l-12.1,12.1,12.1,12.1,12.1-12.1-12.1-12.1h0Z"/>
@@ -675,7 +675,7 @@ const CATEGORIES: { label: string; icon: React.ReactNode }[] = [
   {
     label: "Criatividade",
     icon: (
-      <svg width="24" height="24" viewBox="0 0 40.5 40" fill="#272618">
+      <svg width="24" height="24" viewBox="0 0 40.5 40" fill="var(--color-gray-900)">
         <path d="M20.5,2c9.9,0,18,8.1,18,18s-8.1,18-18,18S2.5,29.9,2.5,20,10.5,2,20.5,2M20.5,0C9.4,0,.5,8.9.5,20s9,20,20,20,20-9,20-20S31.5,0,20.5,0h0Z"/>
         <path d="M20.5,18c5.5,0,10,4.5,10,10s-4.5,10-10,10-10-4.5-10-10,4.5-10,10-10M20.5,16c-6.6,0-12,5.4-12,12s5.4,12,12,12,12-5.4,12-12-5.4-12-12-12h0Z"/>
         <path d="M20.5,26c3.3,0,6,2.7,6,6s-2.7,6-6,6-6-2.7-6-6,2.7-6,6-6M20.5,24c-4.4,0-8,3.6-8,8s3.6,8,8,8,8-3.6,8-8-3.6-8-8-8h0Z"/>
@@ -685,7 +685,7 @@ const CATEGORIES: { label: string; icon: React.ReactNode }[] = [
   {
     label: "Gastronomia",
     icon: (
-      <svg width="24" height="24" viewBox="0 0 60 40" fill="#272618">
+      <svg width="24" height="24" viewBox="0 0 60 40" fill="var(--color-gray-900)">
         <path d="M20,2c9.9,0,18,8.1,18,18s-8.1,18-18,18S2,29.9,2,20,10.1,2,20,2M20,0C9,0,0,9,0,20s9,20,20,20,20-9,20-20S31,0,20,0h0Z"/>
         <path d="M40,2c9.9,0,18,8.1,18,18s-8.1,18-18,18-18-8.1-18-18S30.1,2,40,2M40,0c-11,0-20,9-20,20s9,20,20,20,20-9,20-20S51,0,40,0h0Z"/>
       </svg>
@@ -695,8 +695,8 @@ const CATEGORIES: { label: string; icon: React.ReactNode }[] = [
     label: "Casa e Arquitetura",
     icon: (
       <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
-        <path d="M3 21h18M5 21V9l7-6 7 6v12" stroke="#272618" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
-        <rect x="10" y="14" width="4" height="7" rx="0.5" stroke="#272618" strokeWidth="1.5"/>
+        <path d="M3 21h18M5 21V9l7-6 7 6v12" stroke="var(--color-gray-900)" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+        <rect x="10" y="14" width="4" height="7" rx="0.5" stroke="var(--color-gray-900)" strokeWidth="1.5"/>
       </svg>
     ),
   },
@@ -704,8 +704,8 @@ const CATEGORIES: { label: string; icon: React.ReactNode }[] = [
     label: "Arte e Design",
     icon: (
       <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
-        <circle cx="12" cy="12" r="9" stroke="#272618" strokeWidth="1.5"/>
-        <circle cx="12" cy="12" r="3" fill="#272618"/>
+        <circle cx="12" cy="12" r="9" stroke="var(--color-gray-900)" strokeWidth="1.5"/>
+        <circle cx="12" cy="12" r="3" fill="var(--color-gray-900)"/>
       </svg>
     ),
   },
@@ -719,7 +719,7 @@ function CategoriesSection({ isMobile }: { isMobile: boolean }) {
           style={{
             fontSize: isMobile ? 32 : 48,
             fontWeight: 500,
-            color: "#272618",
+            color: "var(--color-gray-900)",
             fontFamily: "var(--font-host-grotesk)",
             lineHeight: 1.1,
             margin: "0 0 16px",
@@ -727,7 +727,7 @@ function CategoriesSection({ isMobile }: { isMobile: boolean }) {
         >
           Acesso real, presença real
         </h2>
-        <p style={{ fontSize: isMobile ? 16 : 20, color: "#272618", margin: 0 }}>
+        <p style={{ fontSize: isMobile ? 16 : 20, color: "var(--color-gray-900)", margin: 0 }}>
           Compartilhe conhecimento via 1:1 com sua audiência.
         </p>
       </div>
@@ -746,7 +746,7 @@ function CategoriesSection({ isMobile }: { isMobile: boolean }) {
               key={i}
               style={{
                 height: 64,
-                background: "#FFFFFF",
+                background: "var(--color-bg-white)",
                 borderRadius: 4,
                 padding: "0 24px",
                 display: "flex",
@@ -809,12 +809,12 @@ function CTABannerSection({ onCTA, isMobile }: { onCTA: () => void; isMobile: bo
             alignItems: "center",
             gap: 8,
             padding: "12px 20px",
-            background: "#272618",
-            border: "1px solid #272618",
+            background: "var(--color-gray-900)",
+            border: "1px solid var(--color-gray-900)",
             borderRadius: 8,
             fontSize: 16,
             fontWeight: 600,
-            color: "#FCFBF8",
+            color: "var(--color-cream)",
             cursor: "pointer",
             fontFamily: "inherit",
             flexShrink: 0,
@@ -822,7 +822,7 @@ function CTABannerSection({ onCTA, isMobile }: { onCTA: () => void; isMobile: bo
           }}
         >
           Entrar na lista de espera
-          <ArrowIcon color="#FCFBF8" />
+          <ArrowIcon color="var(--color-cream)" />
         </button>
       </div>
     </section>
@@ -836,7 +836,7 @@ function LandingFooter({ onCTA, isMobile }: { onCTA: () => void; isMobile: boole
     <footer style={{ padding: isMobile ? "0 16px 16px" : "0 24px 24px" }}>
       <div
         style={{
-          background: "#272618",
+          background: "var(--color-gray-900)",
           borderRadius: 16,
           padding: isMobile ? "32px 24px 0" : "40px 40px 0",
         }}
@@ -855,7 +855,7 @@ function LandingFooter({ onCTA, isMobile }: { onCTA: () => void; isMobile: boole
           <div style={{ display: "flex", flexDirection: "column", gap: isMobile ? 24 : 40 }}>
             <div style={{ display: "flex", flexDirection: "column", gap: 16, alignItems: "flex-start" }}>
               <Logo size="footer" style={{ color: "var(--color-lime)" }} />
-              <p style={{ fontSize: 16, color: "#AEADA4", lineHeight: 1.5, margin: 0, maxWidth: 340 }}>
+              <p style={{ fontSize: 16, color: "var(--color-gray-400)", lineHeight: 1.5, margin: 0, maxWidth: 340 }}>
                 A plataforma para te conectar com sua audiência valorizando seu tempo.
               </p>
             </div>
@@ -872,14 +872,14 @@ function LandingFooter({ onCTA, isMobile }: { onCTA: () => void; isMobile: boole
                   borderRadius: 8,
                   fontSize: 16,
                   fontWeight: 600,
-                  color: "#272618",
+                  color: "var(--color-gray-900)",
                   cursor: "pointer",
                   fontFamily: "inherit",
                   alignSelf: "flex-start",
                 }}
               >
                 Solicitar acesso
-                <ArrowIcon color="#272618" />
+                <ArrowIcon color="var(--color-gray-900)" />
               </button>
             )}
           </div>
@@ -893,7 +893,7 @@ function LandingFooter({ onCTA, isMobile }: { onCTA: () => void; isMobile: boole
                 width: 48,
                 height: 48,
                 borderRadius: "50%",
-                background: "#514F41",
+                background: "var(--color-gray-700)",
                 display: "flex",
                 alignItems: "center",
                 justifyContent: "center",
@@ -901,10 +901,10 @@ function LandingFooter({ onCTA, isMobile }: { onCTA: () => void; isMobile: boole
                 flexShrink: 0,
               }}
             >
-              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#FCFBF8" strokeWidth="2">
+              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="var(--color-cream)" strokeWidth="2">
                 <rect x="2" y="2" width="20" height="20" rx="5" ry="5" />
                 <circle cx="12" cy="12" r="4" />
-                <circle cx="17.5" cy="6.5" r="1" fill="#FCFBF8" stroke="none" />
+                <circle cx="17.5" cy="6.5" r="1" fill="var(--color-cream)" stroke="none" />
               </svg>
             </a>
             <a
@@ -914,7 +914,7 @@ function LandingFooter({ onCTA, isMobile }: { onCTA: () => void; isMobile: boole
                 width: 48,
                 height: 48,
                 borderRadius: "50%",
-                background: "#514F41",
+                background: "var(--color-gray-700)",
                 display: "flex",
                 alignItems: "center",
                 justifyContent: "center",
@@ -922,7 +922,7 @@ function LandingFooter({ onCTA, isMobile }: { onCTA: () => void; isMobile: boole
                 flexShrink: 0,
               }}
             >
-              <svg width="22" height="22" viewBox="0 0 24 24" fill="#FCFBF8">
+              <svg width="22" height="22" viewBox="0 0 24 24" fill="var(--color-cream)">
                 <path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-2-2 2 2 0 0 0-2 2v7h-4v-7a6 6 0 0 1 6-6z" />
                 <rect x="2" y="9" width="4" height="12" />
                 <circle cx="4" cy="4" r="2" />
@@ -936,7 +936,7 @@ function LandingFooter({ onCTA, isMobile }: { onCTA: () => void; isMobile: boole
           style={{
             paddingTop: 24,
             paddingBottom: 24,
-            borderTop: "1px solid #514F41",
+            borderTop: "1px solid var(--color-gray-700)",
             display: "flex",
             flexDirection: isMobile ? "column" : "row",
             justifyContent: "space-between",
@@ -944,12 +944,12 @@ function LandingFooter({ onCTA, isMobile }: { onCTA: () => void; isMobile: boole
             gap: isMobile ? 12 : 0,
           }}
         >
-          <span style={{ fontSize: 12, color: "#AEADA4" }}>© 2026 Loop.Talk</span>
+          <span style={{ fontSize: 12, color: "var(--color-gray-400)" }}>© 2026 Loop.Talk</span>
           <div style={{ display: "flex", gap: isMobile ? 20 : 32 }}>
-            <a href="#" style={{ fontSize: 12, color: "#AEADA4", textDecoration: "none" }}>
+            <a href="#" style={{ fontSize: 12, color: "var(--color-gray-400)", textDecoration: "none" }}>
               Termos e Condições
             </a>
-            <a href="#" style={{ fontSize: 12, color: "#AEADA4", textDecoration: "none" }}>
+            <a href="#" style={{ fontSize: 12, color: "var(--color-gray-400)", textDecoration: "none" }}>
               Política de Privacidade
             </a>
           </div>
@@ -971,7 +971,7 @@ function MobileBottomCTA({ onCTA }: { onCTA: () => void }) {
         right: 0,
         zIndex: 50,
         padding: 16,
-        background: "rgba(255,255,255,0.50)",
+        background: "color-mix(in srgb, var(--color-bg-white) 50%, transparent)",
         backdropFilter: "blur(20px)",
         WebkitBackdropFilter: "blur(20px)",
       }}
@@ -990,13 +990,13 @@ function MobileBottomCTA({ onCTA }: { onCTA: () => void }) {
           borderRadius: 8,
           fontSize: 16,
           fontWeight: 600,
-          color: "#272618",
+          color: "var(--color-gray-900)",
           cursor: "pointer",
           fontFamily: "inherit",
         }}
       >
         Entrar na lista de espera
-        <ArrowIcon color="#272618" />
+        <ArrowIcon color="var(--color-gray-900)" />
       </button>
     </div>
   );
@@ -1012,7 +1012,7 @@ export function LandingClient({ referralCode }: { referralCode?: string }) {
   return (
     <div
       style={{
-        background: "#F4F2EB",
+        background: "var(--color-gray-100)",
         minHeight: "100vh",
         overflowX: "hidden",
         paddingBottom: isMobile ? 88 : 0,

@@ -5,12 +5,12 @@ import { createClient } from "@/lib/supabase/client";
 import { useDashboard } from "../DashboardShell";
 import { tokens } from "@/components/ui/tokens";
 
-const DARK   = "#272618";
-const MUTED  = "#626053";
-const FAINT  = "#AEADA4";
+const DARK   = "var(--color-gray-900)";
+const MUTED  = "var(--color-gray-600)";
+const FAINT  = "var(--color-gray-400)";
 const LIME = tokens.lime;
-const CARD   = "#FFFFFF";
-const BEIGE  = "#F4F2EB";
+const CARD   = "var(--color-bg-white)";
+const BEIGE  = "var(--color-gray-100)";
 const BORDER = "#E4E2D9";
 const GREEN  = "#5FAD8E";
 
@@ -163,7 +163,7 @@ export default function PagamentosPage() {
           style={{
             padding: "12px 24px", borderRadius: 8,
             background: saved ? GREEN : DARK,
-            color: saved ? "white" : "#FCFBF8",
+            color: saved ? "white" : "var(--color-cream)",
             fontSize: 14, fontWeight: 600, border: "none",
             cursor: isPending ? "not-allowed" : "pointer",
             fontFamily: "inherit", transition: "background 0.2s",

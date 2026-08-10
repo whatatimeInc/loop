@@ -15,7 +15,7 @@ export default async function SessoesPage() {
         style={{
           fontSize: 24,
           fontWeight: 500,
-          color: "#272618",
+          color: "var(--color-gray-900)",
           marginBottom: 32,
           fontFamily: "var(--font-host-grotesk)",
         }}
@@ -28,7 +28,7 @@ export default async function SessoesPage() {
           style={{
             textAlign: "center",
             padding: "80px 0",
-            color: "#AEADA4",
+            color: "var(--color-gray-400)",
           }}
         >
           <svg
