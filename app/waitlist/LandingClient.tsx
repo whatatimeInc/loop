@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect, useRef } from "react";
 import { Logo } from "@/components/Logo";
-import { WaitlistModal } from "./WaitlistModal";
+import { WaitlistModal } from "@/components/WaitlistModal";
 import { tokens } from "@/components/ui/tokens";
 
 // ─── RESPONSIVE HOOK ──────────────────────────────────────────────────────────
