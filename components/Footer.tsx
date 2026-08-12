@@ -4,8 +4,10 @@ import { useEffect, useState } from "react";
 import Link from "next/link";
 import { Instagram, Linkedin } from "iconoir-react";
 import { Logo } from "@/components/Logo";
-import { LinkButton, ArrowIcon } from "@/components/ui/Button";
+import { Button, LinkButton, ArrowIcon } from "@/components/ui/Button";
 import { tokens, withAlpha } from "@/components/ui/tokens";
+import { useWaitlistModal } from "@/components/WaitlistModalProvider";
+import type { LaunchPhase } from "@/lib/launch";
 
 const HOST_GROTESK = "Host Grotesk, var(--font-host-grotesk), sans-serif";
 const INTER        = "Inter, var(--font-inter), sans-serif";
@@ -56,8 +58,10 @@ function SocialButton({ label, href, Icon }: (typeof SOCIAL)[number]) {
   );
 }
 
-export function Footer() {
+export function Footer({ phase }: { phase: LaunchPhase }) {
   const isMobile = useIsMobile();
+  const { open: openWaitlistModal } = useWaitlistModal();
+  const isPre = phase === "pre";
 
   const legalStyle: React.CSSProperties = {
     fontFamily:     INTER,
@@ -129,29 +133,46 @@ export function Footer() {
                 minWidth:      0,
               }}
             >
-              {/* Dark fill. neutral-primary is the only variant that reads on brand.
-                  The full label needs 396px at the button's 20px type, so mobile
-                  uses a short one rather than wrapping or clipping the pill. */}
-              <LinkButton
-                href="/cadastro"
-                variant="neutral-primary"
-                layout="icon-text"
-                icon={<ArrowIcon />}
-                className={isMobile ? "w-full" : undefined}
-              >
-                {isMobile ? "Criar meu link" : "Create a profile and start monetizing"}
-              </LinkButton>
-              {/* brand-primary's lime fill matches the card, so it reads as the
-                  outlined, transparent button the design calls for. */}
-              <LinkButton
-                href="/explorar"
-                variant="brand-primary"
-                layout="icon-text"
-                icon={<ArrowIcon />}
-                className={isMobile ? "w-full" : undefined}
-              >
-                Find an expert
-              </LinkButton>
+              {isPre ? (
+                // Fase pré: uma ação só, mesmo texto nos dois breakpoints —
+                // "Entrar na lista" cabe em 375px, então não há motivo para
+                // duas labels da mesma ação.
+                <Button
+                  variant="neutral-primary"
+                  layout="icon-text"
+                  icon={<ArrowIcon />}
+                  onClick={openWaitlistModal}
+                  className={isMobile ? "w-full" : undefined}
+                >
+                  Entrar na lista
+                </Button>
+              ) : (
+                <>
+                  {/* Dark fill. neutral-primary is the only variant that reads on brand.
+                      The full label needs 396px at the button's 20px type, so mobile
+                      uses a short one rather than wrapping or clipping the pill. */}
+                  <LinkButton
+                    href="/cadastro"
+                    variant="neutral-primary"
+                    layout="icon-text"
+                    icon={<ArrowIcon />}
+                    className={isMobile ? "w-full" : undefined}
+                  >
+                    {isMobile ? "Criar meu link" : "Create a profile and start monetizing"}
+                  </LinkButton>
+                  {/* brand-primary's lime fill matches the card, so it reads as the
+                      outlined, transparent button the design calls for. */}
+                  <LinkButton
+                    href="/explorar"
+                    variant="brand-primary"
+                    layout="icon-text"
+                    icon={<ArrowIcon />}
+                    className={isMobile ? "w-full" : undefined}
+                  >
+                    Find an expert
+                  </LinkButton>
+                </>
+              )}
             </div>
           </div>
 

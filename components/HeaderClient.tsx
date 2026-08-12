@@ -2,9 +2,11 @@
 
 import { Logo } from "@/components/Logo";
 import Link from "next/link";
-import { LinkButton } from "@/components/ui/Button";
+import { Button, LinkButton } from "@/components/ui/Button";
 import { LogoutButton } from "@/components/LogoutButton";
 import { tokens } from "@/components/ui/tokens";
+import { useWaitlistModal } from "@/components/WaitlistModalProvider";
+import type { LaunchPhase } from "@/lib/launch";
 
 const PILL: React.CSSProperties = {
   background: tokens.lime,
@@ -13,7 +15,10 @@ const PILL: React.CSSProperties = {
   color: tokens.dark,
 };
 
-export function HeaderClient({ isLoggedIn }: { isLoggedIn: boolean }) {
+export function HeaderClient({ isLoggedIn, phase }: { isLoggedIn: boolean; phase: LaunchPhase }) {
+  const { open: openWaitlistModal } = useWaitlistModal();
+  const isPre = phase === "pre";
+
   return (
     <header
       style={{
@@ -78,6 +83,10 @@ export function HeaderClient({ isLoggedIn }: { isLoggedIn: boolean }) {
               </Link>
               <LogoutButton />
             </>
+          ) : isPre ? (
+            <Button variant="neutral-secondary" onClick={openWaitlistModal}>
+              Entrar na lista
+            </Button>
           ) : (
             <LinkButton href="/cadastro" variant="neutral-secondary">
               Criar Loop.Talk
@@ -97,17 +106,35 @@ export function HeaderClient({ isLoggedIn }: { isLoggedIn: boolean }) {
         <a href="/" aria-label="Ir para a Home" style={{ display: "inline-flex" }}>
           <Logo size="header" />
         </a>
-        <Link
-          href="/login"
-          style={{
-            fontSize: 15,
-            fontWeight: 500,
-            color: tokens.dark,
-            textDecoration: "none",
-          }}
-        >
-          Entrar
-        </Link>
+        {isPre ? (
+          <button
+            onClick={openWaitlistModal}
+            style={{
+              fontSize: 15,
+              fontWeight: 500,
+              color: tokens.dark,
+              fontFamily: "inherit",
+              background: "none",
+              border: "none",
+              padding: 0,
+              cursor: "pointer",
+            }}
+          >
+            Entrar na lista
+          </button>
+        ) : (
+          <Link
+            href="/login"
+            style={{
+              fontSize: 15,
+              fontWeight: 500,
+              color: tokens.dark,
+              textDecoration: "none",
+            }}
+          >
+            Entrar
+          </Link>
+        )}
       </nav>
     </header>
   );

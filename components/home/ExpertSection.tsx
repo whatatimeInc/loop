@@ -1,9 +1,11 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import { LinkButton, ArrowIcon } from "@/components/ui/Button";
+import { Button, LinkButton, ArrowIcon } from "@/components/ui/Button";
 import { SwipeCarousel } from "@/components/home/SwipeCarousel";
 import { tokens } from "@/components/ui/tokens";
+import { useWaitlistModal } from "@/components/WaitlistModalProvider";
+import type { LaunchPhase } from "@/lib/launch";
 // Cards reused from the first-generation home — NOT recreated.
 // Their internal animations (folder lift/fan, sliding days, price slider) and their
 // clipping containers live in HowItWorksSection.tsx; we only drive `playing`.
@@ -178,11 +180,13 @@ const numberStyle = (_mobile: boolean): React.CSSProperties => ({
   flexShrink: 0,
 });
 
-export function ExpertSection() {
+export function ExpertSection({ phase }: { phase: LaunchPhase }) {
   const [isMobile, setIsMobile]       = useState(false);
   const [reduceMotion, setReduce]     = useState(false);
   const [activeStep, setActiveStep]   = useState(0);
   const [mounted, setMounted]         = useState(false);
+  const { open: openWaitlistModal }   = useWaitlistModal();
+  const isPre = phase === "pre";
 
   const sectionRef = useRef<HTMLElement>(null);
 
@@ -500,15 +504,27 @@ export function ExpertSection() {
             paddingRight:   padX,
           }}
         >
-          <LinkButton
-            href="/cadastro"
-            variant="brand-primary"
-            layout="icon-text"
-            icon={<ArrowIcon />}
-            className={isMobile ? "w-full" : undefined}
-          >
-            Join Loop.Talk
-          </LinkButton>
+          {isPre ? (
+            <Button
+              variant="brand-primary"
+              layout="icon-text"
+              icon={<ArrowIcon />}
+              onClick={openWaitlistModal}
+              className={isMobile ? "w-full" : undefined}
+            >
+              Entrar na lista de espera
+            </Button>
+          ) : (
+            <LinkButton
+              href="/cadastro"
+              variant="brand-primary"
+              layout="icon-text"
+              icon={<ArrowIcon />}
+              className={isMobile ? "w-full" : undefined}
+            >
+              Join Loop.Talk
+            </LinkButton>
+          )}
         </div>
       </section>
     </>

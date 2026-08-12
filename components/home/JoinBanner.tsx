@@ -1,10 +1,12 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import { LinkButton, ArrowIcon } from "@/components/ui/Button";
+import { Button, LinkButton, ArrowIcon } from "@/components/ui/Button";
 import { Logo } from "@/components/Logo";
 import { tokens } from "@/components/ui/tokens";
 import { useRevealOnView, revealStyle } from "@/components/home/useReveal";
+import { useWaitlistModal } from "@/components/WaitlistModalProvider";
+import type { LaunchPhase } from "@/lib/launch";
 
 const HOST_GROTESK = "Host Grotesk, var(--font-host-grotesk), sans-serif";
 const INTER        = "Inter, var(--font-inter), sans-serif";
@@ -26,6 +28,7 @@ const VARIANT: Record<JoinBannerVariant, {
 const DEFAULT_CHIPS = ["Networking", "Criatividade", "Inspiração"];
 
 export function JoinBanner({
+  phase,
   variant     = "neutral",
   chips       = DEFAULT_CHIPS,
   title       = <>Faça parte do Loop.Talk<br />e inspire pessoas.</>,
@@ -33,6 +36,7 @@ export function JoinBanner({
   ctaLabel    = "Criar Loop.Talk",
   ctaHref     = "/cadastro",
 }: {
+  phase:        LaunchPhase;
   variant?:     JoinBannerVariant;
   chips?:       string[];
   title?:       React.ReactNode;
@@ -43,6 +47,8 @@ export function JoinBanner({
   const [isMobile, setIsMobile] = useState(false);
   const sectionRef = useRef<HTMLElement>(null);
   const revealPhase = useRevealOnView(sectionRef);
+  const { open: openWaitlistModal } = useWaitlistModal();
+  const isPre = phase === "pre";
 
   useEffect(() => {
     const check = () => setIsMobile(window.innerWidth < 768);
@@ -165,15 +171,27 @@ export function JoinBanner({
           </div>
 
           <div style={{ display: "flex", alignSelf: isMobile ? "stretch" : "auto", minWidth: 0 }}>
-            <LinkButton
-              href={ctaHref}
-              variant={look.button}
-              layout="icon-text"
-              icon={<ArrowIcon />}
-              className={isMobile ? "w-full" : undefined}
-            >
-              {ctaLabel}
-            </LinkButton>
+            {isPre ? (
+              <Button
+                variant={look.button}
+                layout="icon-text"
+                icon={<ArrowIcon />}
+                onClick={openWaitlistModal}
+                className={isMobile ? "w-full" : undefined}
+              >
+                Entrar na lista de espera
+              </Button>
+            ) : (
+              <LinkButton
+                href={ctaHref}
+                variant={look.button}
+                layout="icon-text"
+                icon={<ArrowIcon />}
+                className={isMobile ? "w-full" : undefined}
+              >
+                {ctaLabel}
+              </LinkButton>
+            )}
           </div>
         </div>
       </div>

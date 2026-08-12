@@ -1,4 +1,5 @@
 import { type NextRequest, NextResponse } from "next/server";
+import { LAUNCH_PHASE } from "@/lib/launch";
 
 // ── Basic Auth (staging gate) ──────────────────────────────────────────────
 const BA_USER = process.env.BASIC_AUTH_USER ?? "";
@@ -20,10 +21,6 @@ function requireBasicAuth(request: NextRequest): NextResponse | null {
   });
 }
 
-// ── Phase flag ─────────────────────────────────────────────────────────────
-// One central check. No component should branch on LAUNCH_PHASE.
-const LAUNCH_PHASE = process.env.LAUNCH_PHASE === "post" ? "post" : "pre";
-
 // ── Route constants ────────────────────────────────────────────────────────
 const WAITLIST_PREFIX = "/waitlist";
 
@@ -44,22 +41,14 @@ export function proxy(request: NextRequest) {
 
   const { pathname } = request.nextUrl;
 
-  // ── PRE-LAUNCH: only waitlist surface is public ──────────────────────────
+  // ── PRE-LAUNCH: home nova (com CTAs de waitlist) + landing antiga em
+  // /waitlist, ambas públicas. Tudo mais volta pra / ────────────────────────
   if (LAUNCH_PHASE === "pre") {
-    if (pathname === "/") {
-      // Rewrite / → /waitlist internally; URL stays as / for the user
-      const dest = request.nextUrl.clone();
-      dest.pathname = "/waitlist";
-      return NextResponse.rewrite(dest);
+    if (pathname === "/" || pathname.startsWith(WAITLIST_PREFIX)) {
+      return NextResponse.next();
     }
 
-    if (!pathname.startsWith(WAITLIST_PREFIX)) {
-      // Every other path → back to /
-      return NextResponse.redirect(new URL("/", request.url));
-    }
-
-    // /waitlist and /waitlist/* → let through
-    return NextResponse.next();
+    return NextResponse.redirect(new URL("/", request.url));
   }
 
   // ── POST-LAUNCH: deactivate waitlist routes ──────────────────────────────

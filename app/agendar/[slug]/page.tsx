@@ -3,6 +3,8 @@ import { experts } from "@/lib/mockExperts";
 import { BookingFlow } from "@/components/BookingFlow";
 import { Header } from "@/components/Header";
 import { Footer } from "@/components/Footer";
+import { WaitlistModalProvider } from "@/components/WaitlistModalProvider";
+import { LAUNCH_PHASE } from "@/lib/launch";
 
 type Props = {
   params: Promise<{ slug: string }>;
@@ -25,8 +27,8 @@ export default async function AgendarPage({ params, searchParams }: Props) {
     <BookingFlow
       expert={expert}
       duracaoInicial={duracaoInicial}
-      header={<Header />}
-      footer={<Footer />}
+      header={<WaitlistModalProvider><Header phase={LAUNCH_PHASE} /></WaitlistModalProvider>}
+      footer={<WaitlistModalProvider><Footer phase={LAUNCH_PHASE} /></WaitlistModalProvider>}
     />
   );
 }

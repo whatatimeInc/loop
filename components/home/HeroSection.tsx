@@ -1,11 +1,13 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { LinkButton, ArrowIcon } from "@/components/ui/Button";
+import { Button, LinkButton, ArrowIcon } from "@/components/ui/Button";
 import { Logo } from "@/components/Logo";
 import { tokens } from "@/components/ui/tokens";
 import { HERO_CATEGORIES } from "@/lib/categories";
 import { useRevealOnLoad, revealStyle, STAGGER } from "@/components/home/useReveal";
+import { useWaitlistModal } from "@/components/WaitlistModalProvider";
+import type { LaunchPhase } from "@/lib/launch";
 
 // ── Sequência de entrada do Hero — headline primeiro (protege o LCP), o
 // resto segue em stagger a partir daí. Não é ordem de DOM, é ordem de tempo.
@@ -80,9 +82,11 @@ function RotatingWord() {
 
 // ── HeroSection ───────────────────────────────────────────────────────────────
 
-export function HeroSection() {
+export function HeroSection({ phase }: { phase: LaunchPhase }) {
   const [isMobile, setIsMobile] = useState(false);
   const revealPhase = useRevealOnLoad();
+  const { open: openWaitlistModal } = useWaitlistModal();
+  const isPre = phase === "pre";
 
   useEffect(() => {
     const check = () => setIsMobile(window.innerWidth < 768);
@@ -156,24 +160,38 @@ export function HeroSection() {
                 alignSelf:     "stretch",
               }}
             >
-              <LinkButton
-                href="/cadastro"
-                variant="brand-secondary"
-                layout="icon-text"
-                icon={<ArrowIcon />}
-                className="w-full"
-              >
-                Create a free profile
-              </LinkButton>
-              <LinkButton
-                href="/explorar"
-                variant="brand-primary"
-                layout="icon-text"
-                icon={<ArrowIcon />}
-                className="w-full"
-              >
-                Find an expert
-              </LinkButton>
+              {isPre ? (
+                <Button
+                  variant="brand-secondary"
+                  layout="icon-text"
+                  icon={<ArrowIcon />}
+                  onClick={openWaitlistModal}
+                  className="w-full"
+                >
+                  Entrar na lista de espera
+                </Button>
+              ) : (
+                <>
+                  <LinkButton
+                    href="/cadastro"
+                    variant="brand-secondary"
+                    layout="icon-text"
+                    icon={<ArrowIcon />}
+                    className="w-full"
+                  >
+                    Create a free profile
+                  </LinkButton>
+                  <LinkButton
+                    href="/explorar"
+                    variant="brand-primary"
+                    layout="icon-text"
+                    icon={<ArrowIcon />}
+                    className="w-full"
+                  >
+                    Find an expert
+                  </LinkButton>
+                </>
+              )}
             </div>
           </div>
         </div>
@@ -446,12 +464,20 @@ export function HeroSection() {
                 flexWrap:   "nowrap",
               }}
             >
-              <LinkButton href="/cadastro" variant="brand-secondary" layout="icon-text" icon={<ArrowIcon />}>
-                Create a profile and start monetizing
-              </LinkButton>
-              <LinkButton href="/explorar" variant="brand-primary" layout="icon-text" icon={<ArrowIcon />}>
-                Find an expert
-              </LinkButton>
+              {isPre ? (
+                <Button variant="brand-secondary" layout="icon-text" icon={<ArrowIcon />} onClick={openWaitlistModal}>
+                  Entrar na lista de espera
+                </Button>
+              ) : (
+                <>
+                  <LinkButton href="/cadastro" variant="brand-secondary" layout="icon-text" icon={<ArrowIcon />}>
+                    Create a profile and start monetizing
+                  </LinkButton>
+                  <LinkButton href="/explorar" variant="brand-primary" layout="icon-text" icon={<ArrowIcon />}>
+                    Find an expert
+                  </LinkButton>
+                </>
+              )}
             </div>
           </div>
         </div>

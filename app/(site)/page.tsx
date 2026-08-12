@@ -1,5 +1,3 @@
-"use client";
-
 import { HeroSection } from "@/components/home/HeroSection";
 import { CategoriesSection } from "@/components/home/CategoriesSection";
 import { VideoSection } from "@/components/home/VideoSection";
@@ -7,6 +5,7 @@ import { ExpertSection } from "@/components/home/ExpertSection";
 import { BrandsSection } from "@/components/home/BrandsSection";
 import { CreatorsSection } from "@/components/home/CreatorsSection";
 import { JoinBanner } from "@/components/home/JoinBanner";
+import { LAUNCH_PHASE } from "@/lib/launch";
 
 export default function Home() {
   // Sem background próprio: o canvas da rota (SiteCanvas) já pinta, e é ele
@@ -15,7 +14,7 @@ export default function Home() {
     <main>
 
       {/* ── Hero ─────────────────────────────────────────────────────────── */}
-      <HeroSection />
+      <HeroSection phase={LAUNCH_PHASE} />
 
       {/* ── Fatia 2: Categorias ──────────────────────────────────────────── */}
       <CategoriesSection />
@@ -24,16 +23,16 @@ export default function Home() {
       <VideoSection />
 
       {/* ── Fatia 4: Seja um expert (scroll-pin, 3 cards) ────────────────── */}
-      <ExpertSection />
+      <ExpertSection phase={LAUNCH_PHASE} />
 
       {/* ── Fatia 5: Criações dos nossos experts (marcas) ────────────────── */}
-      <BrandsSection />
+      <BrandsSection phase={LAUNCH_PHASE} />
 
       {/* ── Fatia 6: Nossos criadores (cards com hover foto→vídeo) ───────── */}
-      <CreatorsSection />
+      <CreatorsSection phase={LAUNCH_PHASE} />
 
       {/* ── Fatia 7: banner "Faça parte" ─────────────────────────────────── */}
-      <JoinBanner />
+      <JoinBanner phase={LAUNCH_PHASE} />
 
     </main>
   );

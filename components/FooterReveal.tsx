@@ -4,6 +4,7 @@ import { usePathname } from "next/navigation";
 import { useRef } from "react";
 import { Footer } from "@/components/Footer";
 import { useRevealOnView, revealStyle } from "@/components/home/useReveal";
+import type { LaunchPhase } from "@/lib/launch";
 
 /**
  * O Footer é compartilhado por todas as rotas (renderizado no layout). A
@@ -13,7 +14,7 @@ import { useRevealOnView, revealStyle } from "@/components/home/useReveal";
  */
 const HOME_ROUTE = "/";
 
-export function FooterReveal() {
+export function FooterReveal({ phase }: { phase: LaunchPhase }) {
   const pathname = usePathname();
   const isHome = pathname === HOME_ROUTE;
   const ref = useRef<HTMLDivElement>(null);
@@ -21,7 +22,7 @@ export function FooterReveal() {
 
   return (
     <div ref={isHome ? ref : undefined} style={isHome ? revealStyle(revealPhase) : undefined}>
-      <Footer />
+      <Footer phase={phase} />
     </div>
   );
 }

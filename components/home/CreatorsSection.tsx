@@ -7,6 +7,7 @@ import { SwipeCarousel } from "@/components/home/SwipeCarousel";
 import { ExpertGlassCard } from "@/components/ExpertGlassCard";
 import type { Categoria } from "@/lib/mockExperts";
 import { useRevealOnView, revealStyle } from "@/components/home/useReveal";
+import type { LaunchPhase } from "@/lib/launch";
 
 // Placeholder roster — swap for real featured creators when they are picked.
 // TODO: no per-mentor videos exist yet (public/mentors/* only has photos), so
@@ -35,8 +36,9 @@ const CREATORS: {
 const CARD_W     = 343;
 const CARD_RATIO = "343 / 500";
 
-export function CreatorsSection() {
+export function CreatorsSection({ phase }: { phase: LaunchPhase }) {
   const [isMobile, setIsMobile] = useState(false);
+  const isPre = phase === "pre";
   const sectionRef = useRef<HTMLElement>(null);
   const revealPhase = useRevealOnView(sectionRef);
 
@@ -81,17 +83,21 @@ export function CreatorsSection() {
           isMobile={isMobile}
         />
 
-        <div style={{ display: "flex", flexShrink: 0, alignSelf: isMobile ? "stretch" : "auto" }}>
-          <LinkButton
-            href="/cadastro"
-            variant="brand-secondary"
-            layout="icon-text"
-            icon={<ArrowIcon />}
-            className={isMobile ? "w-full" : undefined}
-          >
-            Join Loop.Talk
-          </LinkButton>
-        </div>
+        {/* Fase pré: fatia fica sem CTA -- header sozinho no
+            justify-content:space-between não deixa vão de espaçamento. */}
+        {!isPre && (
+          <div style={{ display: "flex", flexShrink: 0, alignSelf: isMobile ? "stretch" : "auto" }}>
+            <LinkButton
+              href="/cadastro"
+              variant="brand-secondary"
+              layout="icon-text"
+              icon={<ArrowIcon />}
+              className={isMobile ? "w-full" : undefined}
+            >
+              Join Loop.Talk
+            </LinkButton>
+          </div>
+        )}
       </div>
 
       {/* ── Cards ──

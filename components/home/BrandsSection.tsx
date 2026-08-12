@@ -5,6 +5,7 @@ import { LinkButton, ArrowIcon } from "@/components/ui/Button";
 import { SectionHeader } from "@/components/home/SectionHeader";
 import { tokens } from "@/components/ui/tokens";
 import { useRevealOnView, revealStyle } from "@/components/home/useReveal";
+import type { LaunchPhase } from "@/lib/launch";
 
 const HOST_GROTESK = "Host Grotesk, var(--font-host-grotesk), sans-serif";
 
@@ -29,8 +30,9 @@ const BRANDS = [
   "Work & Co",
 ];
 
-export function BrandsSection() {
+export function BrandsSection({ phase }: { phase: LaunchPhase }) {
   const [isMobile, setIsMobile] = useState(false);
+  const isPre = phase === "pre";
   const sectionRef = useRef<HTMLElement>(null);
   const revealPhase = useRevealOnView(sectionRef);
 
@@ -84,21 +86,24 @@ export function BrandsSection() {
             subtitle="Founders, especialistas e criadores que abriram a agenda."
             isMobile={isMobile}
           >
-            {/* Stretches to the text column on mobile — never to the "(04)" edge. */}
-            <div
-              className={isMobile ? "brands-cta" : undefined}
-              style={{ display: "flex", alignSelf: isMobile ? "stretch" : "auto", minWidth: 0 }}
-            >
-              <LinkButton
-                href="/explorar"
-                variant="brand-secondary"
-                layout="icon-text"
-                icon={<ArrowIcon />}
-                className={isMobile ? "w-full" : undefined}
+            {/* Fase pré: fatia fica sem CTA -- SectionHeader trata children
+                como opcional, então isto não deixa vão de espaçamento. */}
+            {!isPre && (
+              <div
+                className={isMobile ? "brands-cta" : undefined}
+                style={{ display: "flex", alignSelf: isMobile ? "stretch" : "auto", minWidth: 0 }}
               >
-                Encontrar experts
-              </LinkButton>
-            </div>
+                <LinkButton
+                  href="/explorar"
+                  variant="brand-secondary"
+                  layout="icon-text"
+                  icon={<ArrowIcon />}
+                  className={isMobile ? "w-full" : undefined}
+                >
+                  Encontrar experts
+                </LinkButton>
+              </div>
+            )}
           </SectionHeader>
         </div>
 
