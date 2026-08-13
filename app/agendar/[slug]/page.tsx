@@ -27,8 +27,8 @@ export default async function AgendarPage({ params, searchParams }: Props) {
     <BookingFlow
       expert={expert}
       duracaoInicial={duracaoInicial}
-      header={<WaitlistModalProvider><Header phase={LAUNCH_PHASE} /></WaitlistModalProvider>}
-      footer={<WaitlistModalProvider><Footer phase={LAUNCH_PHASE} /></WaitlistModalProvider>}
+      header={<WaitlistModalProvider phase={LAUNCH_PHASE}><Header phase={LAUNCH_PHASE} /></WaitlistModalProvider>}
+      footer={<WaitlistModalProvider phase={LAUNCH_PHASE}><Footer phase={LAUNCH_PHASE} /></WaitlistModalProvider>}
     />
   );
 }

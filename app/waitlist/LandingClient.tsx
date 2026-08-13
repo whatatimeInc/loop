@@ -1046,6 +1046,9 @@ export function LandingClient({ referralCode }: { referralCode?: string }) {
       <WaitlistModal
         open={modalOpen}
         onClose={() => setModalOpen(false)}
+        // A landing da waitlist só existe em fase pré — após o flip para
+        // post, a home nova assume esse papel
+        phase="pre"
         referralCode={referralCode}
       />
     </div>

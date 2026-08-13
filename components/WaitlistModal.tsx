@@ -4,6 +4,7 @@ import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Logo } from "@/components/Logo";
 import { tokens } from "@/components/ui/tokens";
+import type { LaunchPhase } from "@/lib/launch";
 
 // ─── CATEGORY ICONS ───────────────────────────────────────────────────────────
 
@@ -240,10 +241,11 @@ function ArrowRight({ color = "currentColor" }: { color?: string }) {
 type Props = {
   open: boolean;
   onClose: () => void;
+  phase: LaunchPhase;
   referralCode?: string;
 };
 
-export function WaitlistModal({ open, onClose, referralCode }: Props) {
+export function WaitlistModal({ open, onClose, phase, referralCode }: Props) {
   const [step, setStep]         = useState<1 | 2>(1);
   const [name, setName]         = useState("");
   const [lastName, setLastName] = useState("");
@@ -283,6 +285,13 @@ export function WaitlistModal({ open, onClose, referralCode }: Props) {
     setSubmitting(true);
     setError(null);
     try {
+      if (phase === "pre") {
+        // Fase pré: sem backend real (Supabase fica pra depois). Só a tela
+        // de sucesso -- nada persiste, os dados somem se o modal reabrir.
+        setDone(true);
+        return;
+      }
+
       const res = await fetch("/waitlist/api/signup", {
         method: "POST",
         headers: { "Content-Type": "application/json" },

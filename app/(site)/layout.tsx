@@ -7,7 +7,7 @@ import { LAUNCH_PHASE } from "@/lib/launch";
 export default function SiteLayout({ children }: { children: React.ReactNode }) {
   return (
     <SiteCanvas>
-      <WaitlistModalProvider>
+      <WaitlistModalProvider phase={LAUNCH_PHASE}>
         <Header phase={LAUNCH_PHASE} />
         <main>{children}</main>
         <FooterReveal phase={LAUNCH_PHASE} />
