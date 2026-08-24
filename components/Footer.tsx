@@ -119,7 +119,7 @@ export function Footer({ phase }: { phase: LaunchPhase }) {
                 margin:     0,
               }}
             >
-              Network without<br />the Networking.
+              Network sem o<br />Networking.
             </h2>
 
             <div
@@ -158,7 +158,7 @@ export function Footer({ phase }: { phase: LaunchPhase }) {
                     icon={<ArrowIcon />}
                     className={isMobile ? "w-full" : undefined}
                   >
-                    {isMobile ? "Criar meu link" : "Create a profile and start monetizing"}
+                    {isMobile ? "Criar meu link" : "Criar perfil e começar a ganhar"}
                   </LinkButton>
                   {/* brand-primary's lime fill matches the card, so it reads as the
                       outlined, transparent button the design calls for. */}
@@ -169,7 +169,7 @@ export function Footer({ phase }: { phase: LaunchPhase }) {
                     icon={<ArrowIcon />}
                     className={isMobile ? "w-full" : undefined}
                   >
-                    Find an expert
+                    Encontrar um expert
                   </LinkButton>
                 </>
               )}

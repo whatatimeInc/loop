@@ -522,7 +522,7 @@ export function ExpertSection({ phase }: { phase: LaunchPhase }) {
               icon={<ArrowIcon />}
               className={isMobile ? "w-full" : undefined}
             >
-              Join Loop.Talk
+              Entrar no Loop.Talk
             </LinkButton>
           )}
         </div>

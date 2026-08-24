@@ -131,7 +131,7 @@ export function HeroSection({ phase }: { phase: LaunchPhase }) {
                   margin:     0,
                 }}
               >
-                Network without<br />the Networking.
+                Network sem o<br />Networking.
               </h1>
               <p
                 style={{
@@ -179,7 +179,7 @@ export function HeroSection({ phase }: { phase: LaunchPhase }) {
                     icon={<ArrowIcon />}
                     className="w-full"
                   >
-                    Create a free profile
+                    Criar perfil grátis
                   </LinkButton>
                   <LinkButton
                     href="/explorar"
@@ -188,7 +188,7 @@ export function HeroSection({ phase }: { phase: LaunchPhase }) {
                     icon={<ArrowIcon />}
                     className="w-full"
                   >
-                    Find an expert
+                    Encontrar um expert
                   </LinkButton>
                 </>
               )}
@@ -436,7 +436,7 @@ export function HeroSection({ phase }: { phase: LaunchPhase }) {
                   margin:     0,
                 }}
               >
-                Network without<br />the Networking.
+                Network sem o<br />Networking.
               </h1>
               <p
                 style={{
@@ -471,10 +471,10 @@ export function HeroSection({ phase }: { phase: LaunchPhase }) {
               ) : (
                 <>
                   <LinkButton href="/cadastro" variant="brand-secondary" layout="icon-text" icon={<ArrowIcon />}>
-                    Create a profile and start monetizing
+                    Criar perfil e começar a ganhar
                   </LinkButton>
                   <LinkButton href="/explorar" variant="brand-primary" layout="icon-text" icon={<ArrowIcon />}>
-                    Find an expert
+                    Encontrar um expert
                   </LinkButton>
                 </>
               )}
