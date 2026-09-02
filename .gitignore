@@ -43,3 +43,6 @@ next-env.d.ts
 
 # fotos originais dos mentores (não versionar)
 photos/
+
+# claude code (local)
+.claude/settings.local.json
