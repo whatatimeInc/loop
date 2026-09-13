@@ -22,7 +22,7 @@ import { tokens } from "@/components/ui/tokens";
 
 const categoriaIcones: Record<string, ReactNode> = {
   "Carreira e Negócios": <IconCategoriaCarreira className="w-5 h-5 flex-shrink-0" />,
-  "Saúde e Bem estar":   <IconCategoriaSaude    className="w-5 h-5 flex-shrink-0" />,
+  "Saúde e Bem Estar":   <IconCategoriaSaude    className="w-5 h-5 flex-shrink-0" />,
   "Criatividade":        <IconCategoriaArte     className="w-5 h-5 flex-shrink-0" />,
   "Gastronomia":         <IconCategoriaGastronomia className="w-5 h-5 flex-shrink-0" />,
   "Estilo de Vida":      <IconCategoriaModa     className="w-5 h-5 flex-shrink-0" />,

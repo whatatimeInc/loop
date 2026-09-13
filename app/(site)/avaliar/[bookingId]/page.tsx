@@ -23,6 +23,10 @@ export default async function AvaliarPage({ params }: Props) {
   if (!session) notFound();
   // Only the guest reviews the mentor.
   if (session.guest_id !== user.id) notFound();
+  // Only finished sessions can be reviewed (a URL guessed from /agenda must not
+  // let a guest publish a review for a session that has not happened yet).
+  const endsMs = new Date(session.starts_at as string).getTime() + (session.duration as number) * 60_000;
+  if (endsMs > Date.now()) redirect("/agenda");
 
   // Counterparty profiles come from the session_participants view; the old
   // profiles embed through the FK returns null for the viewer's own client.

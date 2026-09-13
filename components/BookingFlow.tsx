@@ -195,6 +195,7 @@ function StepHorario({ creator, offer, data, horario, slots, slotTakenMessage, o
   });
   const [availableDays, setAvailableDays] = useState<string[]>([]);
   const [loadingSlots, setLoadingSlots] = useState(false);
+  const [slotsError, setSlotsError] = useState<string | null>(null);
 
   const ano = mes.getFullYear();
   const m   = mes.getMonth();
@@ -207,9 +208,9 @@ function StepHorario({ creator, offer, data, horario, slots, slotTakenMessage, o
     const controller = new AbortController();
     const first = new Date(ano, m, 1);
     fetch(`/api/creators/${creator.slug}/slots?date=${ymd(first)}&duration=${offer.durationMinutes}`, { cache: "no-store", signal: controller.signal })
-      .then((res) => res.json())
-      .then((json) => setAvailableDays(json.availableDays ?? []))
-      .catch((e) => { if (e.name !== "AbortError") setAvailableDays([]); });
+      .then((res) => { if (!res.ok) throw new Error(`slots ${res.status}`); return res.json(); })
+      .then((json) => { if (!controller.signal.aborted) setAvailableDays(json.availableDays ?? []); })
+      .catch((e) => { if (e.name !== "AbortError") { setAvailableDays([]); setSlotsError("Não foi possível carregar a agenda. Tente de novo."); } });
     return () => controller.abort();
   }, [ano, m, creator.slug, offer.durationMinutes]);
 
@@ -218,10 +219,11 @@ function StepHorario({ creator, offer, data, horario, slots, slotTakenMessage, o
     if (!data) { onSlotsChange([]); return; }
     const controller = new AbortController();
     setLoadingSlots(true);
+    setSlotsError(null);
     fetch(`/api/creators/${creator.slug}/slots?date=${ymd(data)}&duration=${offer.durationMinutes}`, { cache: "no-store", signal: controller.signal })
-      .then((res) => res.json())
-      .then((json) => onSlotsChange(json.slots ?? []))
-      .catch((e) => { if (e.name !== "AbortError") onSlotsChange([]); })
+      .then((res) => { if (!res.ok) throw new Error(`slots ${res.status}`); return res.json(); })
+      .then((json) => { if (!controller.signal.aborted) onSlotsChange(json.slots ?? []); })
+      .catch((e) => { if (e.name !== "AbortError") { onSlotsChange([]); setSlotsError("Não foi possível carregar os horários. Tente de novo."); } })
       .finally(() => { if (!controller.signal.aborted) setLoadingSlots(false); });
     return () => controller.abort();
   }, [data, creator.slug, offer.durationMinutes]);
@@ -241,6 +243,11 @@ function StepHorario({ creator, offer, data, horario, slots, slotTakenMessage, o
       <h2 style={{ fontSize: 22, fontWeight: 600, color: TXT_DARK, marginBottom: 6 }}>Quando você quer se encontrar?</h2>
       <p style={{ fontSize: 14, color: TXT_MUTED, marginBottom: 20 }}>Dias com ponto têm horários disponíveis.</p>
 
+      {slotsError && (
+        <div style={{ background: "#FEF2F2", border: "1px solid #FCA5A5", borderRadius: 8, padding: "10px 14px", marginBottom: 16, fontSize: 13, color: "#B91C1C" }}>
+          {slotsError}
+        </div>
+      )}
       {slotTakenMessage && (
         <div style={{
           background: "#FEF2F2", border: "1px solid #FCA5A5", borderRadius: 8,
@@ -375,6 +382,7 @@ function StepLogin({ onLogin }: { onLogin: (user: { id: string; name: string }) 
     setError(null);
     setLoading(true);
     const supabase = createClient();
+    try {
 
     const { data: signInData, error: signInError } = await supabase.auth.signInWithPassword({ email, password });
     if (!signInError && signInData.user) {
@@ -420,6 +428,10 @@ function StepLogin({ onLogin }: { onLogin: (user: { id: string; name: string }) 
       return;
     }
     onLogin({ id: signUpData.user.id, name: name || email.split("@")[0] });
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Não foi possível entrar. Tente novamente.");
+      setLoading(false);
+    }
   }
 
   const inputStyle: React.CSSProperties = {
@@ -678,8 +690,10 @@ export function BookingFlow({ creator, offer, initialUser, header, footer }: {
     }
 
     if (res.status === 201) {
-      const json = await res.json();
-      router.push(`/confirmacao/${json.id}`);
+      const json = await res.json().catch(() => null);
+      if (json?.id) { router.push(`/confirmacao/${json.id}`); return; }
+      setPending(false);
+      setConfirmError("Resposta inesperada do servidor. Tente novamente.");
       return;
     }
 
@@ -695,6 +709,7 @@ export function BookingFlow({ creator, offer, initialUser, header, footer }: {
     if (res.status === 409) {
       setSlotTakenMessage("Esse horário acabou de ser reservado. Escolha outro.");
       setHorario(null);
+      setSlots([]);
       setData((d0) => (d0 ? new Date(d0) : d0));
       setDir(-1);
       setStep(0);

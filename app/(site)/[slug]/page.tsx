@@ -259,22 +259,6 @@ function RealCreatorPage({ creator, reviews }: { creator: Creator; reviews: Crea
                 {reviews.map((review) => <ReviewCard key={review.id} review={review} />)}
               </div>
 
-              {/* Ver todas */}
-              <button style={{
-                alignSelf: "stretch",
-                padding: "12px 20px",
-                background: "#FCFBF8",
-                border: "none",
-                outline: "1px solid #8E8857",
-                outlineOffset: -1,
-                color: "#272618",
-                fontSize: 16,
-                fontWeight: 600,
-                borderRadius: 8,
-                cursor: "pointer",
-              }}>
-                Ver todas
-              </button>
             </>
           ) : (
             <p style={{ fontSize: 14, color: "#626053", lineHeight: "20px", margin: 0 }}>Ainda sem avaliações.</p>
@@ -408,22 +392,6 @@ function RealCreatorPage({ creator, reviews }: { creator: Creator; reviews: Crea
                 {reviews.map((review) => <ReviewCard key={review.id} review={review} />)}
               </div>
 
-              {/* Ver todas */}
-              <button style={{
-                alignSelf: "stretch",
-                padding: "12px 20px",
-                background: "#FCFBF8",
-                border: "none",
-                outline: "1px solid #8E8857",
-                outlineOffset: -1,
-                color: "#272618",
-                fontSize: 16,
-                fontWeight: 600,
-                borderRadius: 8,
-                cursor: "pointer",
-              }}>
-                Ver todas
-              </button>
             </>
           ) : (
             <p style={{ fontSize: 14, color: "#626053", lineHeight: "20px", margin: 0 }}>Ainda sem avaliações.</p>

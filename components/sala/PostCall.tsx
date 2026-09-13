@@ -121,7 +121,7 @@ export function PostCallMentor({ session, actualMinutes }: { session: SessionDat
                 <span style={{ fontSize: 16, fontWeight: 700, color: "#181D27" }}>Valor líquido</span>
                 <span style={{ fontSize: 16, fontWeight: 700, color: "#181D27" }}>{formatBRL(netCents)}</span>
               </div>
-              <p style={{ fontSize: 12, color: "#807F71", margin: "4px 0 0" }}>Repasse na próxima sexta · {nextFriday}</p>
+              <p style={{ fontSize: 12, color: "#807F71", margin: "4px 0 0" }}>Repasses ainda não ativos nesta fase (previsão: sexta, {nextFriday})</p>
             </div>
           </div>
         )}

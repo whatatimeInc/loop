@@ -18,12 +18,20 @@ export function minutesToTime(min: number): string {
 }
 
 /** Offset (ms) of APP_TZ from UTC at a given instant. */
+// Formatters are built once: the slots route calls these thousands of times
+// per request when a creator is available all day.
+const OFFSET_FMT = new Intl.DateTimeFormat("en-US", {
+  timeZone: APP_TZ, hourCycle: "h23",
+  year: "numeric", month: "2-digit", day: "2-digit",
+  hour: "2-digit", minute: "2-digit", second: "2-digit",
+});
+const ZONED_FMT = new Intl.DateTimeFormat("en-US", {
+  timeZone: APP_TZ, hourCycle: "h23",
+  year: "numeric", month: "2-digit", day: "2-digit", hour: "2-digit", minute: "2-digit", weekday: "short",
+});
+
 function tzOffsetMs(at: Date): number {
-  const parts = new Intl.DateTimeFormat("en-US", {
-    timeZone: APP_TZ, hourCycle: "h23",
-    year: "numeric", month: "2-digit", day: "2-digit",
-    hour: "2-digit", minute: "2-digit", second: "2-digit",
-  }).formatToParts(at);
+  const parts = OFFSET_FMT.formatToParts(at);
   const get = (t: string) => Number(parts.find((p) => p.type === t)?.value);
   const asUtc = Date.UTC(get("year"), get("month") - 1, get("day"), get("hour"), get("minute"), get("second"));
   return asUtc - at.getTime();
@@ -42,10 +50,7 @@ export function zonedToUtc(dateStr: string, time: string): Date {
 
 /** Wall-clock parts of an instant in APP_TZ. */
 export function utcToZoned(at: Date): { dateStr: string; minutes: number; weekday: number } {
-  const parts = new Intl.DateTimeFormat("en-US", {
-    timeZone: APP_TZ, hourCycle: "h23",
-    year: "numeric", month: "2-digit", day: "2-digit", hour: "2-digit", minute: "2-digit", weekday: "short",
-  }).formatToParts(at);
+  const parts = ZONED_FMT.formatToParts(at);
   const get = (t: string) => parts.find((p) => p.type === t)?.value ?? "";
   const weekday = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"].indexOf(get("weekday"));
   return {

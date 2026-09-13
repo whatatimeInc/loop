@@ -244,7 +244,7 @@ export function ConfirmacaoFlow({ session }: { session: ConfirmacaoSessao }) {
               </div>
               <div>
                 <p className="text-sm font-semibold text-gray-900">Entre na sala no horário</p>
-                <p className="text-xs text-gray-500 mt-0.5">O botão abaixo libera 10 minutos antes do início.</p>
+                <p className="text-xs text-gray-500 mt-0.5">O botão abaixo libera pouco antes do início.</p>
               </div>
             </div>
             <div className="flex items-start gap-3">
