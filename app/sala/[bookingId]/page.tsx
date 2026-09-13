@@ -5,6 +5,8 @@ import { SalaClient } from "@/components/sala/SalaClient";
 
 type Props = { params: Promise<{ bookingId: string }> };
 
+const EARLY_ENTRY_MINUTES = Number(process.env.SALA_EARLY_ENTRY_MINUTES ?? "10") || 10;
+
 export default async function SalaPage({ params }: Props) {
   const { bookingId } = await params;
 
@@ -19,6 +21,7 @@ export default async function SalaPage({ params }: Props) {
     .from("sessions")
     .select(`
       id, mentor_id, guest_id, starts_at, duration, status,
+      price, notes,
       daily_room_url, daily_room_name, session_started_at,
       mentor:profiles!sessions_mentor_id_fkey(id, name, last_name, username, photo_url),
       guest:profiles!sessions_guest_id_fkey(id, name, last_name, username, photo_url)
@@ -58,8 +61,9 @@ export default async function SalaPage({ params }: Props) {
     );
   }
 
-  // Too early: more than 10 min before start
-  if (minutesBefore > 10) {
+  // Too early: more than EARLY_ENTRY_MINUTES before start (10 in production;
+  // SALA_EARLY_ENTRY_MINUTES lets a demo enter a session booked for later today)
+  if (minutesBefore > EARLY_ENTRY_MINUTES) {
     return (
       <SalaClient
         session={session as never}
