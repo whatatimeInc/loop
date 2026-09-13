@@ -49,7 +49,9 @@ function formatMmSs(ms: number) {
 
 function formatScheduledTime(isoStr: string) {
   const d = new Date(isoStr);
-  const tz = Intl.DateTimeFormat().resolvedOptions().timeZone;
+  // Fixed zone: the server renders this too, and a browser-resolved zone would
+  // differ from the server's and break hydration. The product is Brazil-only.
+  const tz = "America/Sao_Paulo";
   const time = d.toLocaleTimeString("pt-BR", { hour: "2-digit", minute: "2-digit", timeZone: tz });
   const date = d.toLocaleDateString("pt-BR", { day: "2-digit", month: "long", timeZone: tz });
   const tzLabel = d.toLocaleTimeString("pt-BR", { timeZoneName: "short", timeZone: tz }).split(" ").pop() ?? "";
@@ -101,11 +103,13 @@ export function WaitingRoom({
   session,
   persona,
   otherJoined,
+  roomReady,
   onEnter,
 }: {
   session: SessionData;
   persona: Persona;
   otherJoined: boolean;
+  roomReady: boolean;
   onEnter: () => void;
 }) {
   const other = persona === "mentor" ? session.guest : session.mentor;
@@ -201,20 +205,40 @@ export function WaitingRoom({
         </div>
 
         {/* Enter button */}
-        <button
-          onClick={onEnter}
-          disabled={!canEnter}
-          style={{
-            width: "100%", padding: "14px 24px",
-            background: canEnter ? tokens.lime : "color-mix(in srgb, var(--color-bg-white) 8%, transparent)",
-            border: "none", borderRadius: 8,
-            color: canEnter ? "var(--color-gray-900)" : "var(--color-gray-500)",
-            fontSize: 16, fontWeight: 700, cursor: canEnter ? "pointer" : "not-allowed",
-            transition: "all 0.2s",
-          }}
-        >
-          Entrar na sala
-        </button>
+        {roomReady ? (
+          <button
+            onClick={onEnter}
+            disabled={!canEnter}
+            style={{
+              width: "100%", padding: "14px 24px",
+              background: canEnter ? tokens.lime : "color-mix(in srgb, var(--color-bg-white) 8%, transparent)",
+              border: "none", borderRadius: 8,
+              color: canEnter ? "var(--color-gray-900)" : "var(--color-gray-500)",
+              fontSize: 16, fontWeight: 700, cursor: canEnter ? "pointer" : "not-allowed",
+              transition: "all 0.2s",
+            }}
+          >
+            Entrar na sala
+          </button>
+        ) : (
+          <div style={{ width: "100%", display: "flex", flexDirection: "column", gap: 8 }}>
+            <button
+              disabled
+              style={{
+                width: "100%", padding: "14px 24px",
+                background: "color-mix(in srgb, var(--color-bg-white) 8%, transparent)",
+                border: "none", borderRadius: 8,
+                color: "var(--color-gray-500)",
+                fontSize: 16, fontWeight: 700, cursor: "not-allowed",
+              }}
+            >
+              Entrar na sala
+            </button>
+            <p style={{ fontSize: 13, color: "var(--color-gray-500)", textAlign: "center", margin: 0 }}>
+              A sala de vídeo ainda não foi provisionada. Tente novamente em instantes.
+            </p>
+          </div>
+        )}
       </div>
     </div>
   );

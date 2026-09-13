@@ -15,6 +15,8 @@ export type SessionData = {
   starts_at: string;
   duration: number;
   status: string;
+  price: number | null;
+  notes: string | null;
   daily_room_url: string | null;
   daily_room_name: string | null;
   session_started_at: string | null;

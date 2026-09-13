@@ -143,7 +143,7 @@ export default function PagamentosPage() {
           }}
         />
         <p style={{ fontSize: 12, color: FAINT, margin: "8px 0 0" }}>
-          O pagamento é processado via Pagar.me. Você receberá na chave informada após a sessão.
+          Os repasses ainda não estão ativos nesta fase. Cadastre sua chave Pix para quando forem.
         </p>
       </SectionCard>
 

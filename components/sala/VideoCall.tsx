@@ -314,6 +314,10 @@ export function VideoCall({
   const [showExtRequestModal, setShowExtRequestModal] = useState(false);
   const [incomingExt, setIncomingExt] = useState<TimeExtension | null>(null);
 
+  // Latest chatOpen for handlers that must not re-run the call effect
+  const chatOpenRef = useRef(false);
+  useEffect(() => { chatOpenRef.current = chatOpen; }, [chatOpen]);
+
   // Timer — decrements every second
   useEffect(() => {
     const interval = setInterval(() => {
@@ -418,7 +422,7 @@ export function VideoCall({
           ts: Date.now(),
         };
         setMessages((prev) => [...prev, msg]);
-        if (!chatOpen) setUnreadCount((c) => c + 1);
+        if (!chatOpenRef.current) setUnreadCount((c) => c + 1);
       }
       if (data.type === "time-extension-request" && data.ext) {
         setIncomingExt(data.ext);
@@ -441,7 +445,7 @@ export function VideoCall({
     return () => {
       call.leave().catch(() => {}).finally(() => call.destroy());
     };
-  }, [session.daily_room_url, token, chatOpen, onConnectionLost]);
+  }, [session.daily_room_url, token, onConnectionLost]);
 
   // Controls
   function toggleMic() {

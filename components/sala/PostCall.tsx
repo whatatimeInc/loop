@@ -62,7 +62,7 @@ function StarRating({ value, onChange }: { value: number; onChange: (v: number) 
 export function PostCallMentor({ session, actualMinutes }: { session: SessionData; actualMinutes: number }) {
   const [copied, setCopied] = useState(false);
   // Earnings from price field (stored in centavos)
-  const grossCents = (session as unknown as { price?: number }).price ?? 0;
+  const grossCents = session.price ?? 0;
   const feeCents = Math.round(grossCents * 0.2);
   const netCents = grossCents - feeCents;
 

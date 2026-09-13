@@ -22,10 +22,28 @@ type Session = {
   duration: number;
   price: number;
   status: string;
+  notes: string | null;
   daily_room_url: string | null;
+  guest_id: string;
+  mentor_id: string;
   guest?: { name: string | null; photo_url: string | null };
   mentor?: { name: string | null; username: string | null; photo_url: string | null };
 };
+
+type Participant = { id: string; name: string | null; username: string | null; photo_url: string | null };
+
+// Counterparty profiles come from the session_participants view; the old
+// profiles embed through the FK returns null for the browser client.
+async function fetchParticipants(
+  sb: ReturnType<typeof createClient>, ids: string[],
+): Promise<Map<string, Participant>> {
+  const map = new Map<string, Participant>();
+  const unique = [...new Set(ids.filter(Boolean))];
+  if (unique.length === 0) return map;
+  const { data } = await sb.from("session_participants").select("id, name, username, photo_url").in("id", unique);
+  for (const p of (data ?? []) as Participant[]) map.set(p.id, p);
+  return map;
+}
 
 function fmtBRL(cents: number) {
   return (cents / 100).toLocaleString("pt-BR", { style: "currency", currency: "BRL" });
@@ -46,11 +64,14 @@ function Avatar({ name, photoUrl, size = 32 }: { name?: string | null; photoUrl?
   );
 }
 
+function endOf(session: Session) {
+  return new Date(session.starts_at).getTime() + session.duration * 60 * 1000;
+}
+
 function SessionCard({ session, role }: { session: Session; role: "mentor" | "guest" }) {
   const other = role === "mentor" ? session.guest : session.mentor;
   const otherName = other?.name ?? "—";
-  const isPast = new Date(session.starts_at) < new Date();
-  const isActive = session.status === "agendada" && !isPast;
+  const isActive = session.status === "agendada" && endOf(session) > Date.now();
 
   return (
     <div style={{ display: "flex", alignItems: "center", gap: 12, padding: "14px 16px", background: CARD, borderRadius: 10, border: `1px solid ${BORDER}` }}>
@@ -58,16 +79,19 @@ function SessionCard({ session, role }: { session: Session; role: "mentor" | "gu
       <div style={{ flex: 1, minWidth: 0 }}>
         <p style={{ fontSize: 14, fontWeight: 600, color: DARK, margin: "0 0 2px", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{otherName}</p>
         <p style={{ fontSize: 12, color: MUTED, margin: 0 }}>{fmtDate(session.starts_at)} · {session.duration} min · {fmtBRL(session.price)}</p>
+        {session.notes && (
+          <p style={{ fontSize: 12, color: FAINT, margin: "4px 0 0" }}>
+            <span style={{ fontStyle: "italic" }}>Mensagem do convidado:</span> {session.notes}
+          </p>
+        )}
       </div>
-      {isActive && session.daily_room_url && (
-        <a
-          href={session.daily_room_url}
-          target="_blank"
-          rel="noreferrer"
+      {isActive && (
+        <Link
+          href={`/sala/${session.id}`}
           style={{ padding: "7px 14px", borderRadius: 8, background: LIME, color: "#3E3B12", fontSize: 13, fontWeight: 600, textDecoration: "none", flexShrink: 0 }}
         >
           Entrar
-        </a>
+        </Link>
       )}
       {!isActive && (
         <span style={{ fontSize: 12, color: session.status === "cancelada" ? RED : FAINT }}>{session.status}</span>
@@ -87,12 +111,14 @@ function MentorHome() {
   useEffect(() => {
     const sb = createClient();
     sb.from("sessions")
-      .select("*, guest:guest_id(name, photo_url)")
+      .select("*")
       .eq("mentor_id", profile.id)
       .order("starts_at")
-      .then(({ data }) => {
+      .then(async ({ data }) => {
         const rows = (data ?? []) as Session[];
-        setSessions(rows.filter(s => s.status === "agendada" && new Date(s.starts_at) >= new Date()).slice(0, 3));
+        const guests = await fetchParticipants(sb, rows.map(s => s.guest_id));
+        const withGuest = rows.map(s => ({ ...s, guest: guests.get(s.guest_id) ?? undefined }));
+        setSessions(withGuest.filter(s => s.status === "agendada" && endOf(s) > Date.now()).slice(0, 3));
         setTotalSessions(rows.filter(s => s.status === "concluída").length);
         setTotalReceived(rows.filter(s => s.status === "concluída").reduce((sum, s) => sum + s.price, 0));
       });
@@ -203,13 +229,16 @@ function GuestHome() {
   useEffect(() => {
     const sb = createClient();
     sb.from("sessions")
-      .select("*, mentor:mentor_id(name, username, photo_url)")
+      .select("*")
       .eq("guest_id", profile.id)
       .eq("status", "agendada")
-      .gte("starts_at", new Date().toISOString())
       .order("starts_at")
-      .limit(5)
-      .then(({ data }) => setSessions((data ?? []) as Session[]));
+      .then(async ({ data }) => {
+        const rows = (data ?? []) as Session[];
+        const mentors = await fetchParticipants(sb, rows.map(s => s.mentor_id));
+        const withMentor = rows.map(s => ({ ...s, mentor: mentors.get(s.mentor_id) ?? undefined }));
+        setSessions(withMentor.filter(s => endOf(s) > Date.now()).slice(0, 5));
+      });
   }, [profile.id]);
 
   return (

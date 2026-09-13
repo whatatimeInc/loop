@@ -1,10 +1,41 @@
 import Image from "next/image";
 import Link from "next/link";
-import { Expert } from "@/lib/mockExperts";
+import type { Creator } from "@/lib/creators";
 import { Check } from "iconoir-react";
 
-function formatPrice(preco: number) {
-  return preco.toLocaleString("pt-BR", { minimumFractionDigits: 2 });
+function formatPrice(cents: number) {
+  return (cents / 100).toLocaleString("pt-BR", { minimumFractionDigits: 2 });
+}
+
+/** First letters of the first two name words, e.g. "Ana Beatriz Silva" → "AB". */
+function initialsOf(name: string) {
+  return (
+    name
+      .trim()
+      .split(/\s+/)
+      .slice(0, 2)
+      .map((parte) => parte[0] ?? "")
+      .join("")
+      .toUpperCase() || "?"
+  );
+}
+
+/**
+ * next/image only accepts same-origin paths or hosts allow-listed in
+ * next.config.ts (randomuser.me, *.supabase.co). Local seed photos are absolute
+ * URLs on our own origin — strip it so the image stays same-origin; anything
+ * else on an unknown host falls back to a plain <img>.
+ */
+function resolvePhoto(photoUrl: string): { src: string; useNextImage: boolean } {
+  // "//host/…" is protocol-relative (remote) — never hand it to next/image.
+  if (photoUrl.startsWith("/") && !photoUrl.startsWith("//")) {
+    return { src: photoUrl, useNextImage: true };
+  }
+  const origin = process.env.NEXT_PUBLIC_SITE_URL?.replace(/\/+$/, "");
+  if (origin && (photoUrl === origin || photoUrl.startsWith(`${origin}/`))) {
+    return { src: photoUrl.slice(origin.length) || "/", useNextImage: true };
+  }
+  return { src: photoUrl, useNextImage: false };
 }
 
 function BookmarkIcon() {
@@ -16,27 +47,52 @@ function BookmarkIcon() {
 }
 
 interface ExpertCardProps {
-  expert: Expert;
+  creator: Creator;
   /** Largura fixa para scroll horizontal. Omita para adaptar ao grid. */
   fixedWidth?: boolean;
 }
 
-export function ExpertCard({ expert, fixedWidth = false }: ExpertCardProps) {
+export function ExpertCard({ creator, fixedWidth = false }: ExpertCardProps) {
+  const cheapestOffer = creator.offers.length > 0
+    ? creator.offers.reduce((menor, o) => (o.priceCents < menor.priceCents ? o : menor))
+    : null;
+  const foto = creator.photoUrl ? resolvePhoto(creator.photoUrl) : null;
+
   return (
     <div className={fixedWidth ? "flex-shrink-0 w-[260px]" : "w-full"}>
       <Link
-        href={`/${expert.slug}`}
+        href={`/${creator.slug}`}
         className="block relative rounded-xl overflow-hidden group"
         style={{ height: "400px" }}
       >
         {/* Foto ocupa o card inteiro */}
-        <Image
-          src={expert.foto}
-          alt={expert.nome}
-          fill
-          className="object-cover object-top group-hover:scale-105 transition-transform duration-500"
-          sizes="(max-width: 768px) 50vw, 280px"
-        />
+        {foto ? (
+          foto.useNextImage ? (
+            <Image
+              src={foto.src}
+              alt={creator.name}
+              fill
+              className="object-cover object-top group-hover:scale-105 transition-transform duration-500"
+              sizes="(max-width: 768px) 50vw, 280px"
+            />
+          ) : (
+            // eslint-disable-next-line @next/next/no-img-element
+            <img
+              src={foto.src}
+              alt={creator.name}
+              className="absolute inset-0 w-full h-full object-cover object-top group-hover:scale-105 transition-transform duration-500"
+            />
+          )
+        ) : (
+          <div
+            className="absolute inset-0 flex items-center justify-center group-hover:scale-105 transition-transform duration-500"
+            style={{ background: "var(--color-lime)" }}
+          >
+            <span className="text-3xl font-semibold" style={{ color: "#272518" }}>
+              {initialsOf(creator.name)}
+            </span>
+          </div>
+        )}
 
         {/* Overlay blur + gradiente branco na parte inferior */}
         <div
@@ -48,11 +104,13 @@ export function ExpertCard({ expert, fixedWidth = false }: ExpertCardProps) {
         />
 
         {/* Badge Popular */}
-        <div className="absolute top-4 left-4 z-20">
-          <span className="bg-white/80 backdrop-blur-sm text-gray-900 text-xs font-semibold px-3 py-1 rounded-full">
-            Popular
-          </span>
-        </div>
+        {creator.reviewCount >= 3 && (
+          <div className="absolute top-4 left-4 z-20">
+            <span className="bg-white/80 backdrop-blur-sm text-gray-900 text-xs font-semibold px-3 py-1 rounded-full">
+              Popular
+            </span>
+          </div>
+        )}
 
         {/* Bookmark */}
         <button
@@ -68,7 +126,7 @@ export function ExpertCard({ expert, fixedWidth = false }: ExpertCardProps) {
           {/* Nome + badge verificado */}
           <div className="flex items-center gap-2 mb-1">
             <p className="text-gray-900 font-normal text-base truncate leading-tight">
-              {expert.nome}
+              {creator.name}
             </p>
             <span className="flex-shrink-0 w-6 h-6 rounded-full bg-lime flex items-center justify-center">
               <Check className="w-3.5 h-3.5 text-dark" />
@@ -77,20 +135,28 @@ export function ExpertCard({ expert, fixedWidth = false }: ExpertCardProps) {
 
           {/* Preço */}
           <p className="text-gray-900 text-sm mb-1">
-            R$ {formatPrice(expert.preco)}
-            <span className="text-gray-500"> / sessão</span>
+            {cheapestOffer ? (
+              <>
+                R$ {formatPrice(cheapestOffer.priceCents)}
+                <span className="text-gray-500"> / sessão</span>
+              </>
+            ) : (
+              "Sob consulta"
+            )}
           </p>
 
           {/* Bio */}
           <p className="text-gray-600 text-xs leading-relaxed line-clamp-2 mb-1.5">
-            {expert.bio}
+            {creator.bio ?? creator.headline ?? ""}
           </p>
 
           {/* Categoria */}
-          <div className="flex items-center gap-1.5">
-            <span className="w-1.5 h-1.5 rounded-full bg-gray-500 flex-shrink-0" />
-            <span className="text-gray-600 text-xs truncate">{expert.categoria}</span>
-          </div>
+          {creator.category && (
+            <div className="flex items-center gap-1.5">
+              <span className="w-1.5 h-1.5 rounded-full bg-gray-500 flex-shrink-0" />
+              <span className="text-gray-600 text-xs truncate">{creator.category}</span>
+            </div>
+          )}
         </div>
       </Link>
     </div>

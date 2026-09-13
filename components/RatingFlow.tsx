@@ -1,11 +1,22 @@
 "use client";
 
 import { useState } from "react";
-import { useParams, useRouter } from "next/navigation";
-import Image from "next/image";
+import { useRouter } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
-import { experts } from "@/lib/mockExperts";
+import { utcToZoned } from "@/lib/slots";
 import { StarSolid } from "iconoir-react";
+
+// ─── props (loaded by app/(site)/avaliar/[bookingId]/page.tsx) ────────────────
+
+export type RatingSessao = {
+  id: string;               // sessions.id (uuid)
+  mentorName: string;       // "First Last"
+  mentorFirstName: string;
+  mentorUsername: string;   // profile slug
+  mentorPhotoUrl: string | null;
+  durationMinutes: number;
+  startsAt: string;         // ISO instant
+};
 
 // ─── rótulos por nota ─────────────────────────────────────────────────────────
 
@@ -27,6 +38,20 @@ const SUGESTOES = [
   "Me ajudou a avançar",
   "Recomendaria a todos",
 ];
+
+const MESES_CURTO = ["jan", "fev", "mar", "abr", "mai", "jun", "jul", "ago", "set", "out", "nov", "dez"];
+
+function formatDataCurta(iso: string) {
+  const z = utcToZoned(new Date(iso));
+  const [, mes, dia] = z.dateStr.split("-").map(Number);
+  return `${dia} ${MESES_CURTO[mes - 1]}`;
+}
+
+/** The API stores one text field — fold the picked tags into it. */
+function textoDaAvaliacao(comentario: string, tags: string[]): string | null {
+  const partes = [comentario.trim(), tags.join(", ")].filter(Boolean);
+  return partes.length > 0 ? partes.join("\n\n") : null;
+}
 
 // ─── componente de estrelas ───────────────────────────────────────────────────
 
@@ -56,8 +81,8 @@ function Estrelas({ valor, onChange }: { valor: number; onChange: (n: number) =>
 
 // ─── step 1: avaliação do mentor ─────────────────────────────────────────────
 
-function StepAvaliarMentor({ expert, onProximo }: {
-  expert: NonNullable<ReturnType<typeof experts.find>>;
+function StepAvaliarMentor({ session, onProximo }: {
+  session: RatingSessao;
   onProximo: (nota: number, tags: string[], comentario: string) => void;
 }) {
   const [nota, setNota] = useState(0);
@@ -71,21 +96,28 @@ function StepAvaliarMentor({ expert, onProximo }: {
   }
 
   const podeProsseguir = nota > 0;
+  const initials = session.mentorName.split(" ").filter(Boolean).map((w) => w[0]).join("").slice(0, 2).toUpperCase();
 
   return (
     <div className="flex flex-col items-center text-center">
       {/* Foto + nome */}
-      <div className="relative w-20 h-20 rounded-full overflow-hidden mb-3 ring-4 ring-lime/30">
-        <Image
-          src={`/mentors/${expert.slug}/profile.webp`}
-          alt={expert.nome}
-          fill
-          className="object-cover"
-          sizes="80px"
-        />
+      <div className="relative w-20 h-20 rounded-full overflow-hidden mb-3 ring-4 ring-lime/30 bg-gray-100">
+        {session.mentorPhotoUrl ? (
+          <img
+            src={session.mentorPhotoUrl}
+            alt={session.mentorName}
+            className="absolute inset-0 w-full h-full object-cover"
+          />
+        ) : (
+          <div className="absolute inset-0 flex items-center justify-center text-lg font-bold text-gray-500">
+            {initials}
+          </div>
+        )}
       </div>
-      <p className="text-xs text-gray-400 mb-0.5">{expert.categoria}</p>
-      <h2 className="text-xl font-bold text-gray-900 mb-1">{expert.nome}</h2>
+      <p className="text-xs text-gray-400 mb-0.5">
+        Sessão de {session.durationMinutes} min · {formatDataCurta(session.startsAt)}
+      </p>
+      <h2 className="text-xl font-bold text-gray-900 mb-1">{session.mentorName}</h2>
       <p className="text-sm text-gray-500 mb-8">Como foi sua sessão?</p>
 
       {/* Estrelas */}
@@ -167,7 +199,11 @@ function StepAvaliarMentor({ expert, onProximo }: {
 
 // ─── step 2: o mentor avalia você (perspectiva do seguidor) ──────────────────
 
-function StepAvaliarVoce({ onEnviar }: { onEnviar: () => void }) {
+function StepAvaliarVoce({ onEnviar, enviando, erro }: {
+  onEnviar: () => void;
+  enviando: boolean;
+  erro: string | null;
+}) {
   const [nota, setNota] = useState(0);
   const [comentario, setComentario] = useState("");
 
@@ -219,17 +255,24 @@ function StepAvaliarVoce({ onEnviar }: { onEnviar: () => void }) {
         )}
       </AnimatePresence>
 
+      {erro && (
+        <p className="w-full mt-6 text-sm text-red-600 bg-red-50 border border-red-100 rounded-lg px-4 py-3">
+          {erro}
+        </p>
+      )}
+
       <button
         onClick={onEnviar}
-        disabled={nota === 0}
+        disabled={nota === 0 || enviando}
         className="w-full mt-8 py-4 rounded-lg bg-gray-900 text-white font-bold text-sm disabled:opacity-40 disabled:cursor-not-allowed hover:bg-gray-800 transition-all"
       >
-        Enviar avaliações
+        {enviando ? "Enviando..." : "Enviar avaliações"}
       </button>
 
       <button
         onClick={onEnviar}
-        className="mt-3 text-xs text-gray-400 hover:text-gray-600 transition-colors"
+        disabled={enviando}
+        className="mt-3 text-xs text-gray-400 hover:text-gray-600 transition-colors disabled:opacity-40"
       >
         Pular esta etapa
       </button>
@@ -239,8 +282,8 @@ function StepAvaliarVoce({ onEnviar }: { onEnviar: () => void }) {
 
 // ─── step 3: obrigado ─────────────────────────────────────────────────────────
 
-function StepObrigado({ expert, notaMentor, router }: {
-  expert: NonNullable<ReturnType<typeof experts.find>>;
+function StepObrigado({ session, notaMentor, router }: {
+  session: RatingSessao;
   notaMentor: number;
   router: ReturnType<typeof useRouter>;
 }) {
@@ -285,16 +328,18 @@ function StepObrigado({ expert, notaMentor, router }: {
           className="mt-4 mb-8 bg-lime/10 border border-lime/30 rounded-lg px-5 py-4 max-w-xs"
         >
           <p className="text-sm text-gray-700">
-            Que tal recomendar {expert.nome} para um amigo?
+            Que tal recomendar {session.mentorName} para um amigo?
           </p>
           <button
             onClick={() => {
               if (navigator.share) {
-                navigator.share({
-                  title: `Sessão com ${expert.nome} no Loop.Talk`,
-                  text: `Tive uma sessão incrível com ${expert.nome}! Recomendo muito.`,
-                  url: window.location.origin + `/${expert.slug}`,
-                });
+                navigator
+                  .share({
+                    title: `Sessão com ${session.mentorName} no Loop.Talk`,
+                    text: `Tive uma sessão incrível com ${session.mentorName}! Recomendo muito.`,
+                    url: window.location.origin + `/${session.mentorUsername}`,
+                  })
+                  .catch(() => {});
               }
             }}
             className="mt-3 flex items-center gap-2 mx-auto text-xs font-semibold text-dark bg-lime px-4 py-2 rounded-full hover:bg-lime/90 transition-all"
@@ -312,10 +357,10 @@ function StepObrigado({ expert, notaMentor, router }: {
 
       <div className="flex flex-col gap-3 w-full">
         <button
-          onClick={() => router.push(`/${expert.slug}`)}
+          onClick={() => router.push(`/${session.mentorUsername}`)}
           className="w-full py-4 rounded-lg bg-gray-900 text-white font-bold text-sm hover:bg-gray-800 transition-all"
         >
-          Ver perfil de {expert.nome}
+          Ver perfil de {session.mentorName}
         </button>
         <button
           onClick={() => router.push("/explorar")}
@@ -337,23 +382,37 @@ const variants = {
 };
 const transition = { duration: 0.22, ease: "easeInOut" as const };
 
-export function RatingFlow() {
-  const { bookingId } = useParams<{ bookingId: string }>();
+export function RatingFlow({ session }: { session: RatingSessao }) {
   const router = useRouter();
-
-  const match = bookingId?.match(/^(.+)-\d{13}$/);
-  const slug = match?.[1] ?? "";
-  const expert = experts.find((e) => e.slug === slug);
 
   const [step, setStep] = useState(0);
   const [notaMentor, setNotaMentor] = useState(0);
+  const [tags, setTags] = useState<string[]>([]);
+  const [comentario, setComentario] = useState("");
+  const [enviando, setEnviando] = useState(false);
+  const [erro, setErro] = useState<string | null>(null);
 
-  if (!expert) {
-    return (
-      <div className="min-h-screen bg-cream flex items-center justify-center">
-        <p className="text-gray-400">Sessão não encontrada.</p>
-      </div>
-    );
+  async function enviar() {
+    if (enviando) return;
+    setEnviando(true);
+    setErro(null);
+    try {
+      const res = await fetch(`/api/sessions/${session.id}/review`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ rating: notaMentor, text: textoDaAvaliacao(comentario, tags) }),
+      });
+      if (!res.ok) {
+        const payload = (await res.json().catch(() => null)) as { error?: string } | null;
+        setErro(payload?.error ?? "Não foi possível enviar sua avaliação. Tente novamente.");
+        return;
+      }
+      setStep(2);
+    } catch {
+      setErro("Não foi possível enviar sua avaliação. Verifique sua conexão e tente novamente.");
+    } finally {
+      setEnviando(false);
+    }
   }
 
   return (
@@ -375,9 +434,11 @@ export function RatingFlow() {
           {step === 0 && (
             <motion.div key="mentor" variants={variants} initial="enter" animate="center" exit="exit" transition={transition}>
               <StepAvaliarMentor
-                expert={expert}
-                onProximo={(nota, _tags, _comentario) => {
+                session={session}
+                onProximo={(nota, novasTags, novoComentario) => {
                   setNotaMentor(nota);
+                  setTags(novasTags);
+                  setComentario(novoComentario);
                   setStep(1);
                 }}
               />
@@ -385,12 +446,12 @@ export function RatingFlow() {
           )}
           {step === 1 && (
             <motion.div key="voce" variants={variants} initial="enter" animate="center" exit="exit" transition={transition}>
-              <StepAvaliarVoce onEnviar={() => setStep(2)} />
+              <StepAvaliarVoce onEnviar={enviar} enviando={enviando} erro={erro} />
             </motion.div>
           )}
           {step === 2 && (
             <motion.div key="obrigado" variants={variants} initial="enter" animate="center" exit="exit" transition={transition}>
-              <StepObrigado expert={expert} notaMentor={notaMentor} router={router} />
+              <StepObrigado session={session} notaMentor={notaMentor} router={router} />
             </motion.div>
           )}
         </AnimatePresence>

@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import Link from "next/link";
 import { createClient } from "@/lib/supabase/client";
 import { useDashboard } from "../DashboardShell";
 import { tokens } from "@/components/ui/tokens";
@@ -21,9 +22,26 @@ type Session = {
   duration: number;
   price: number;
   status: string;
+  notes: string | null;
   daily_room_url: string | null;
+  guest_id: string;
   guest: { name: string | null; photo_url: string | null } | null;
 };
+
+type Participant = { id: string; name: string | null; username: string | null; photo_url: string | null };
+
+// Counterparty profiles come from the session_participants view; the old
+// profiles embed through the FK returns null for the browser client.
+async function fetchParticipants(
+  sb: ReturnType<typeof createClient>, ids: string[],
+): Promise<Map<string, Participant>> {
+  const map = new Map<string, Participant>();
+  const unique = [...new Set(ids.filter(Boolean))];
+  if (unique.length === 0) return map;
+  const { data } = await sb.from("session_participants").select("id, name, username, photo_url").in("id", unique);
+  for (const p of (data ?? []) as Participant[]) map.set(p.id, p);
+  return map;
+}
 
 function fmtBRL(c: number) {
   return (c / 100).toLocaleString("pt-BR", { style: "currency", currency: "BRL" });
@@ -47,10 +65,14 @@ const STATUS_COLOR: Record<string, string> = {
   cancelada: RED,
 };
 
+function endOf(session: Session) {
+  return new Date(session.starts_at).getTime() + session.duration * 60 * 1000;
+}
+
 function SessionRow({ session, onCancel }: { session: Session; onCancel: (id: string) => void }) {
   const guestName = session.guest?.name ?? "Guest";
-  const isPast = new Date(session.starts_at) < new Date();
-  const isUpcoming = session.status === "agendada" && !isPast;
+  const canJoin = session.status === "agendada" && endOf(session) > Date.now();
+  const canCancel = session.status === "agendada" && new Date(session.starts_at).getTime() > Date.now();
 
   return (
     <div style={{
@@ -64,6 +86,11 @@ function SessionRow({ session, onCancel }: { session: Session; onCancel: (id: st
         <p style={{ fontSize: 14, fontWeight: 600, color: DARK, margin: "0 0 2px", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{guestName}</p>
         <p style={{ fontSize: 12, color: MUTED, margin: 0 }}>{fmtDate(session.starts_at)}</p>
         <p style={{ fontSize: 12, color: FAINT, margin: "2px 0 0" }}>{session.duration} min · {fmtBRL(session.price)}</p>
+        {session.notes && (
+          <p style={{ fontSize: 12, color: FAINT, margin: "4px 0 0" }}>
+            <span style={{ fontStyle: "italic" }}>Mensagem do convidado:</span> {session.notes}
+          </p>
+        )}
       </div>
 
       <span style={{ fontSize: 12, fontWeight: 500, color: STATUS_COLOR[session.status] ?? FAINT, textTransform: "capitalize", flexShrink: 0 }}>
@@ -71,17 +98,15 @@ function SessionRow({ session, onCancel }: { session: Session; onCancel: (id: st
       </span>
 
       <div style={{ display: "flex", gap: 8, flexShrink: 0 }}>
-        {isUpcoming && session.daily_room_url && (
-          <a
-            href={session.daily_room_url}
-            target="_blank"
-            rel="noreferrer"
+        {canJoin && (
+          <Link
+            href={`/sala/${session.id}`}
             style={{ padding: "7px 14px", borderRadius: 8, background: LIME, color: "#3E3B12", fontSize: 13, fontWeight: 600, textDecoration: "none" }}
           >
             Entrar
-          </a>
+          </Link>
         )}
-        {isUpcoming && (
+        {canCancel && (
           <button
             onClick={() => onCancel(session.id)}
             style={{ padding: "7px 12px", borderRadius: 8, background: BEIGE, border: "none", color: MUTED, fontSize: 13, cursor: "pointer", fontFamily: "inherit" }}
@@ -104,14 +129,14 @@ export default function AgendaPage() {
     const sb = createClient();
     const { data } = await sb
       .from("sessions")
-      .select("*, guest:guest_id(name, photo_url)")
+      .select("*")
       .eq("mentor_id", profile.id)
       .order("starts_at", { ascending: false });
 
-    const rows = (data ?? []) as Session[];
-    const now = new Date();
-    setUpcoming(rows.filter(s => s.status === "agendada" && new Date(s.starts_at) >= now));
-    setHistory(rows.filter(s => s.status !== "agendada" || new Date(s.starts_at) < now));
+    const guests = await fetchParticipants(sb, ((data ?? []) as Session[]).map(s => s.guest_id));
+    const rows = ((data ?? []) as Session[]).map(s => ({ ...s, guest: guests.get(s.guest_id) ?? null }));
+    setUpcoming(rows.filter(s => s.status === "agendada" && endOf(s) > Date.now()));
+    setHistory(rows.filter(s => s.status !== "agendada" || endOf(s) <= Date.now()));
     setLoading(false);
   }
 
