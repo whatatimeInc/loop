@@ -5,7 +5,6 @@ import {
 } from "react";
 import DailyIframe, {
   DailyCall,
-  DailyEventObjectParticipant,
   DailyEventObjectParticipantLeft,
   DailyEventObjectNetworkQualityEvent,
 } from "@daily-co/daily-js";
@@ -350,100 +349,135 @@ export function VideoCall({
 
   // Daily.co call setup
   useEffect(() => {
-    if (!session.daily_room_url) return;
+    const roomUrl = session.daily_room_url;
+    if (!roomUrl) return;
+    let cancelled = false;
+    let handle: DailyCall | null = null;
 
-    const call = DailyIframe.createCallObject({
-      audioSource: true,
-      videoSource: true,
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      dailyConfig: { experimentalChromeVideoMuteLightOff: true } as any,
-    });
-    callRef.current = call;
+    (async () => {
+      // Daily allows one call object per page and destroy() only frees the
+      // slot once its teardown finishes, so wait for any leftover instance
+      // before creating ours (a remount would otherwise throw and blank the page).
+      const leftover = DailyIframe.getCallInstance();
+      if (leftover) { try { await leftover.destroy(); } catch { /* already gone */ } }
+      if (cancelled) return;
 
-    call.join({
-      url: session.daily_room_url,
-      token: token ?? undefined,
-    }).catch(console.error);
+      const call = DailyIframe.createCallObject({
+        audioSource: true,
+        videoSource: true,
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        dailyConfig: { experimentalChromeVideoMuteLightOff: true } as any,
+      });
+      callRef.current = call;
 
-    // Attach remote video to main container
-    call.on("participant-joined", (event: DailyEventObjectParticipant) => {
-      if (!event.participant.local && videoContainerRef.current) {
-        const track = Object.values(event.participant.tracks).find((t) => t?.track != null)?.track ?? null;
-        if (track) {
-          const video = document.createElement("video");
-          video.srcObject = new MediaStream([track]);
-          video.autoplay = true;
-          video.playsInline = true;
-          video.style.cssText = "width:100%;height:100%;object-fit:cover;position:absolute;inset:0;";
-          video.dataset.sessionId = event.participant.session_id;
-          videoContainerRef.current.appendChild(video);
+      call.join({
+        url: roomUrl,
+        token: token ?? undefined,
+      }).catch(console.error);
+
+      // Remote video: tracks arrive AFTER participant-joined (the track is
+      // still "loading" at join time), so attach on track-started and replace
+      // the element when the track changes. Remote audio also needs an element
+      // in call-object mode, or the other side is silent.
+      const attachRemote = (participant: { session_id: string; local: boolean }, track: MediaStreamTrack) => {
+        const container = videoContainerRef.current;
+        if (!container || participant.local) return;
+        const selector = `[data-session-id="${participant.session_id}"][data-kind="${track.kind}"]`;
+        let el = container.querySelector<HTMLMediaElement>(selector);
+        if (!el) {
+          el = document.createElement(track.kind === "video" ? "video" : "audio");
+          el.autoplay = true;
+          el.dataset.sessionId = participant.session_id;
+          el.dataset.kind = track.kind;
+          if (el instanceof HTMLVideoElement) {
+            el.playsInline = true;
+            el.style.cssText = "width:100%;height:100%;object-fit:cover;position:absolute;inset:0;";
+          }
+          container.appendChild(el);
         }
-      }
-    });
+        el.srcObject = new MediaStream([track]);
+        el.play().catch(() => {});
+      };
 
-    call.on("participant-left", (event: DailyEventObjectParticipantLeft) => {
-      if (videoContainerRef.current) {
-        const vid = videoContainerRef.current.querySelector(`[data-session-id="${event.participant.session_id}"]`);
-        vid?.remove();
-      }
-    });
+      call.on("participant-left", (event: DailyEventObjectParticipantLeft) => {
+        videoContainerRef.current
+          ?.querySelectorAll(`[data-session-id="${event.participant.session_id}"]`)
+          .forEach((el) => el.remove());
+      });
 
-    // Self-view
-    call.on("track-started", (event) => {
-      if (event.participant?.local && event.track?.kind === "video" && selfViewRef.current) {
-        let video = selfViewRef.current.querySelector("video");
-        if (!video) {
-          video = document.createElement("video");
-          video.autoplay = true;
-          video.muted = true;
-          video.playsInline = true;
-          video.style.cssText = "width:100%;height:100%;object-fit:cover;";
-          selfViewRef.current.appendChild(video);
+      call.on("track-stopped", (event) => {
+        if (event.participant && !event.participant.local && event.track) {
+          videoContainerRef.current
+            ?.querySelector(`[data-session-id="${event.participant.session_id}"][data-kind="${event.track.kind}"]`)
+            ?.remove();
         }
-        video.srcObject = new MediaStream([event.track]);
-      }
-    });
+      });
 
-    // Network quality
-    call.on("network-quality-change", (event: DailyEventObjectNetworkQualityEvent) => {
-      const q = event.quality;
-      setNetworkQuality(q >= 80 ? "good" : q >= 40 ? "fair" : "poor");
-    });
+      // Self-view
+      call.on("track-started", (event) => {
+        if (event.participant && !event.participant.local && event.track) {
+          attachRemote(event.participant, event.track);
+          return;
+        }
+        if (event.participant?.local && event.track?.kind === "video" && selfViewRef.current) {
+          let video = selfViewRef.current.querySelector("video");
+          if (!video) {
+            video = document.createElement("video");
+            video.autoplay = true;
+            video.muted = true;
+            video.playsInline = true;
+            video.style.cssText = "width:100%;height:100%;object-fit:cover;";
+            selfViewRef.current.appendChild(video);
+          }
+          video.srcObject = new MediaStream([event.track]);
+        }
+      });
 
-    // Chat via app messages
-    call.on("app-message", (event) => {
-      const data = event.data as { type: string; text?: string; senderName?: string; sender?: Persona; ext?: TimeExtension };
-      if (data.type === "chat" && data.text) {
-        const msg: ChatMessage = {
-          id: `${Date.now()}-${Math.random()}`,
-          sender: data.sender ?? ("guest" as Persona),
-          senderName: data.senderName ?? "Participante",
-          text: data.text,
-          ts: Date.now(),
-        };
-        setMessages((prev) => [...prev, msg]);
-        if (!chatOpenRef.current) setUnreadCount((c) => c + 1);
-      }
-      if (data.type === "time-extension-request" && data.ext) {
-        setIncomingExt(data.ext);
-        setExtPending(true);
-      }
-      if (data.type === "time-extension-accepted" && data.ext) {
-        setExtraMs((ms) => ms + data.ext!.minutes_added * 60 * 1000);
-        setExtPending(false);
-        setIncomingExt(null);
-      }
-      if (data.type === "time-extension-declined") {
-        setExtPending(false);
-        setIncomingExt(null);
-      }
-    });
+      // Network quality
+      call.on("network-quality-change", (event: DailyEventObjectNetworkQualityEvent) => {
+        const q = event.quality;
+        setNetworkQuality(q >= 80 ? "good" : q >= 40 ? "fair" : "poor");
+      });
 
-    // Connection issues
-    call.on("error", (e) => { console.error("Daily error:", e); onConnectionLost(); });
+      // Chat via app messages
+      call.on("app-message", (event) => {
+        const data = event.data as { type: string; text?: string; senderName?: string; sender?: Persona; ext?: TimeExtension };
+        if (data.type === "chat" && data.text) {
+          const msg: ChatMessage = {
+            id: `${Date.now()}-${Math.random()}`,
+            sender: data.sender ?? ("guest" as Persona),
+            senderName: data.senderName ?? "Participante",
+            text: data.text,
+            ts: Date.now(),
+          };
+          setMessages((prev) => [...prev, msg]);
+          if (!chatOpenRef.current) setUnreadCount((c) => c + 1);
+        }
+        if (data.type === "time-extension-request" && data.ext) {
+          setIncomingExt(data.ext);
+          setExtPending(true);
+        }
+        if (data.type === "time-extension-accepted" && data.ext) {
+          setExtraMs((ms) => ms + data.ext!.minutes_added * 60 * 1000);
+          setExtPending(false);
+          setIncomingExt(null);
+        }
+        if (data.type === "time-extension-declined") {
+          setExtPending(false);
+          setIncomingExt(null);
+        }
+      });
+
+      // Connection issues
+      call.on("error", (e) => { console.error("Daily error:", e); onConnectionLost(); });
+      handle = call;
+    })();
 
     return () => {
-      call.leave().catch(() => {}).finally(() => call.destroy());
+      cancelled = true;
+      callRef.current = null;
+      const c = handle ?? DailyIframe.getCallInstance();
+      if (c) c.destroy().catch(() => {});
     };
   }, [session.daily_room_url, token, onConnectionLost]);
 

@@ -20,17 +20,21 @@ interface SalaClientProps {
   session: SessionData;
   persona: Persona;
   initialScreen: Screen;
+  earlyEntryMinutes?: number;
 }
 
 // ── Main client orchestrator ──────────────────────────────────────────────────
 
-export function SalaClient({ session, persona, initialScreen }: SalaClientProps) {
+export function SalaClient({ session, persona, initialScreen, earlyEntryMinutes = 10 }: SalaClientProps) {
   const [screen, setScreen] = useState<Screen>(initialScreen);
   const [token, setToken] = useState<string | null>(null);
   const [roomUrl, setRoomUrl] = useState<string | null>(session.daily_room_url);
   // A Daily room exists only when the token API gives us a usable roomUrl;
   // before that assume the room from the session row is there.
   const [roomReady, setRoomReady] = useState<boolean>(!!session.daily_room_url);
+  // Entrar stays disabled until the token request has settled, so VideoCall
+  // mounts once with a stable token instead of remounting when it arrives.
+  const [tokenSettled, setTokenSettled] = useState(false);
   const [otherJoined, setOtherJoined] = useState(false);
   const [sessionStartedAt, setSessionStartedAt] = useState<number>(
     session.session_started_at
@@ -42,7 +46,9 @@ export function SalaClient({ session, persona, initialScreen }: SalaClientProps)
 
   // ── Fetch meeting token (only for waiting/incall screens) ───────────────────
   useEffect(() => {
-    if (screen !== "waiting" && screen !== "incall") return;
+    // Only while waiting: every fetch mints a NEW token string, and a token
+    // change while in the call would remount VideoCall mid-session.
+    if (screen !== "waiting") return;
 
     let cancelled = false;
     const fetchToken = async () => {
@@ -52,6 +58,7 @@ export function SalaClient({ session, persona, initialScreen }: SalaClientProps)
         const data: { token: string | null; roomUrl: string | null } = await r.json();
         if (cancelled) return;
         setToken(data.token);
+        setTokenSettled(true);
         if (data.roomUrl) {
           setRoomUrl(data.roomUrl);
           setRoomReady(true);
@@ -202,7 +209,8 @@ export function SalaClient({ session, persona, initialScreen }: SalaClientProps)
           session={session}
           persona={persona}
           otherJoined={otherJoined}
-          roomReady={roomReady}
+          roomReady={roomReady && tokenSettled}
+          earlyEntryMinutes={earlyEntryMinutes}
           onEnter={handleEnterCall}
         />
       );
@@ -215,7 +223,8 @@ export function SalaClient({ session, persona, initialScreen }: SalaClientProps)
             session={session}
             persona={persona}
             otherJoined={otherJoined}
-            roomReady={roomReady}
+            roomReady={roomReady && tokenSettled}
+            earlyEntryMinutes={earlyEntryMinutes}
             onEnter={handleEnterCall}
           />
         );
@@ -242,7 +251,8 @@ export function SalaClient({ session, persona, initialScreen }: SalaClientProps)
             session={session}
             persona={persona}
             otherJoined={otherJoined}
-            roomReady={roomReady}
+            roomReady={roomReady && tokenSettled}
+            earlyEntryMinutes={earlyEntryMinutes}
             onEnter={handleEnterCall}
           />
         );

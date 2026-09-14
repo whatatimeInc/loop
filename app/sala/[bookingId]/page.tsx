@@ -79,6 +79,7 @@ export default async function SalaPage({ params }: Props) {
       session={session as never}
       persona={persona}
       initialScreen="waiting"
+      earlyEntryMinutes={EARLY_ENTRY_MINUTES}
     />
   );
 }

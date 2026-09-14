@@ -25,6 +25,11 @@ export async function createDailyRoom(sessionId: string, expiresAt: Date): Promi
       name: `looptalk-${sessionId}`,
       properties: {
         exp: Math.floor(expiresAt.getTime() / 1000),
+        // Private: the raw daily.co URL is useless without a token minted by
+        // /api/sessions/[id]/token, so a leaked URL cannot bypass the app's
+        // participant check (and nobody lands on Daily's default UI).
+        privacy: "private",
+        enable_prejoin_ui: false,
         enable_chat: true,
         enable_screenshare: true,
         start_video_off: false,

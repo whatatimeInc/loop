@@ -32,8 +32,11 @@ function fullName(p: SessionData["mentor"] | SessionData["guest"]) {
 }
 
 function useCountdown(targetMs: number) {
+  // Server and client clocks differ by the request latency; start from the
+  // server-safe value and correct after mount so hydration text matches.
   const [diff, setDiff] = useState(() => Math.max(0, targetMs - Date.now()));
   useEffect(() => {
+    setDiff(Math.max(0, targetMs - Date.now()));
     const t = setInterval(() => setDiff(Math.max(0, targetMs - Date.now())), 1000);
     return () => clearInterval(t);
   }, [targetMs]);
@@ -107,18 +110,21 @@ export function WaitingRoom({
   persona,
   otherJoined,
   roomReady,
+  earlyEntryMinutes = 10,
   onEnter,
 }: {
   session: SessionData;
   persona: Persona;
   otherJoined: boolean;
   roomReady: boolean;
+  /** Minutes before starts_at when Entrar unlocks (mirrors the page's window). */
+  earlyEntryMinutes?: number;
   onEnter: () => void;
 }) {
   const other = persona === "mentor" ? session.guest : session.mentor;
   const startsMs = new Date(session.starts_at).getTime();
   const diff = useCountdown(startsMs);
-  const canEnter = diff === 0 || otherJoined;
+  const canEnter = diff <= earlyEntryMinutes * 60_000 || otherJoined;
 
   // Private note — localStorage only, cleared after session ends
   const storageKey = `looptalk_note_${session.id}`;
