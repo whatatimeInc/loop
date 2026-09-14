@@ -6,6 +6,7 @@ import { useRouter, useSearchParams } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
 import { Logo } from "@/components/Logo";
 import { tokens } from "@/components/ui/tokens";
+import { safeRedirectPath } from "@/lib/safe-redirect";
 
 type Step = "email" | "password" | "link-sent";
 
@@ -134,7 +135,7 @@ const ghostBtn: React.CSSProperties = {
 export function LoginForm() {
   const router = useRouter();
   const searchParams = useSearchParams();
-  const redirect = searchParams.get("redirect") ?? "/conta";
+  const redirect = safeRedirectPath(searchParams.get("redirect"), "/conta");
 
   const [step, setStep] = useState<Step>("email");
   const [email, setEmail] = useState("");

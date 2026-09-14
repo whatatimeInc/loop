@@ -32,8 +32,11 @@ function fullName(p: SessionData["mentor"] | SessionData["guest"]) {
 }
 
 function useCountdown(targetMs: number) {
+  // Server and client clocks differ by the request latency; start from the
+  // server-safe value and correct after mount so hydration text matches.
   const [diff, setDiff] = useState(() => Math.max(0, targetMs - Date.now()));
   useEffect(() => {
+    setDiff(Math.max(0, targetMs - Date.now()));
     const t = setInterval(() => setDiff(Math.max(0, targetMs - Date.now())), 1000);
     return () => clearInterval(t);
   }, [targetMs]);
@@ -49,7 +52,9 @@ function formatMmSs(ms: number) {
 
 function formatScheduledTime(isoStr: string) {
   const d = new Date(isoStr);
-  const tz = Intl.DateTimeFormat().resolvedOptions().timeZone;
+  // Fixed zone: the server renders this too, and a browser-resolved zone would
+  // differ from the server's and break hydration. The product is Brazil-only.
+  const tz = "America/Sao_Paulo";
   const time = d.toLocaleTimeString("pt-BR", { hour: "2-digit", minute: "2-digit", timeZone: tz });
   const date = d.toLocaleDateString("pt-BR", { day: "2-digit", month: "long", timeZone: tz });
   const tzLabel = d.toLocaleTimeString("pt-BR", { timeZoneName: "short", timeZone: tz }).split(" ").pop() ?? "";
@@ -63,6 +68,9 @@ function DeviceStatus() {
   const [cam, setCam] = useState<"checking" | "ok" | "error">("checking");
 
   useEffect(() => {
+    // navigator.mediaDevices is undefined on insecure origins (plain http on a
+    // LAN address). Report the devices as unavailable instead of crashing.
+    if (!navigator.mediaDevices?.getUserMedia) { setMic("error"); setCam("error"); return; }
     navigator.mediaDevices.getUserMedia({ audio: true, video: true })
       .then((stream) => {
         stream.getTracks().forEach((t) => t.stop());
@@ -101,17 +109,22 @@ export function WaitingRoom({
   session,
   persona,
   otherJoined,
+  roomReady,
+  earlyEntryMinutes = 10,
   onEnter,
 }: {
   session: SessionData;
   persona: Persona;
   otherJoined: boolean;
+  roomReady: boolean;
+  /** Minutes before starts_at when Entrar unlocks (mirrors the page's window). */
+  earlyEntryMinutes?: number;
   onEnter: () => void;
 }) {
   const other = persona === "mentor" ? session.guest : session.mentor;
   const startsMs = new Date(session.starts_at).getTime();
   const diff = useCountdown(startsMs);
-  const canEnter = diff === 0 || otherJoined;
+  const canEnter = diff <= earlyEntryMinutes * 60_000 || otherJoined;
 
   // Private note — localStorage only, cleared after session ends
   const storageKey = `looptalk_note_${session.id}`;
@@ -201,20 +214,40 @@ export function WaitingRoom({
         </div>
 
         {/* Enter button */}
-        <button
-          onClick={onEnter}
-          disabled={!canEnter}
-          style={{
-            width: "100%", padding: "14px 24px",
-            background: canEnter ? tokens.lime : "color-mix(in srgb, var(--color-bg-white) 8%, transparent)",
-            border: "none", borderRadius: 8,
-            color: canEnter ? "var(--color-gray-900)" : "var(--color-gray-500)",
-            fontSize: 16, fontWeight: 700, cursor: canEnter ? "pointer" : "not-allowed",
-            transition: "all 0.2s",
-          }}
-        >
-          Entrar na sala
-        </button>
+        {roomReady ? (
+          <button
+            onClick={onEnter}
+            disabled={!canEnter}
+            style={{
+              width: "100%", padding: "14px 24px",
+              background: canEnter ? tokens.lime : "color-mix(in srgb, var(--color-bg-white) 8%, transparent)",
+              border: "none", borderRadius: 8,
+              color: canEnter ? "var(--color-gray-900)" : "var(--color-gray-500)",
+              fontSize: 16, fontWeight: 700, cursor: canEnter ? "pointer" : "not-allowed",
+              transition: "all 0.2s",
+            }}
+          >
+            Entrar na sala
+          </button>
+        ) : (
+          <div style={{ width: "100%", display: "flex", flexDirection: "column", gap: 8 }}>
+            <button
+              disabled
+              style={{
+                width: "100%", padding: "14px 24px",
+                background: "color-mix(in srgb, var(--color-bg-white) 8%, transparent)",
+                border: "none", borderRadius: 8,
+                color: "var(--color-gray-500)",
+                fontSize: 16, fontWeight: 700, cursor: "not-allowed",
+              }}
+            >
+              Entrar na sala
+            </button>
+            <p style={{ fontSize: 13, color: "var(--color-gray-500)", textAlign: "center", margin: 0 }}>
+              A sala de vídeo ainda não foi provisionada. Tente novamente em instantes.
+            </p>
+          </div>
+        )}
       </div>
     </div>
   );

@@ -51,12 +51,21 @@ function formatHHMM(ms: number) {
 
 // ── Screen: not yet ────────────────────────────────────────────────────────────
 
-export function NotYetScreen({ session, persona }: { session: SessionData; persona: Persona }) {
+export function NotYetScreen({
+  session,
+  persona,
+  earlyEntryMinutes = 10,
+}: {
+  session: SessionData;
+  persona: Persona;
+  /** Minutes before starts_at when the room opens (mirrors the page's window). */
+  earlyEntryMinutes?: number;
+}) {
   const other = persona === "mentor" ? session.guest : session.mentor;
   const startsMs = new Date(session.starts_at).getTime();
   const diff = useCountdown(startsMs);
-  const tenMinBefore = startsMs - 10 * 60 * 1000;
-  const diffToWindow = useCountdown(tenMinBefore);
+  const windowOpensAt = startsMs - earlyEntryMinutes * 60 * 1000;
+  const diffToWindow = useCountdown(windowOpensAt);
 
   return (
     <div style={{ minHeight: "100vh", background: "#F4F2EB", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", padding: "40px 24px", fontFamily: "Inter, sans-serif" }}>

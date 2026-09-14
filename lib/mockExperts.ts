@@ -1,10 +1,9 @@
-export type Categoria =
-  | "Carreira e Negócios"
-  | "Saúde e Bem Estar"
-  | "Criatividade"
-  | "Gastronomia"
-  | "Estilo de Vida"
-  | "Tecnologia";
+// NOTE (2026-09-14): this array is SEED DATA ONLY. Runtime pages read creators
+// from Supabase via lib/creators.ts. Keep the `Categoria` type and `categorias`
+// exports; nothing at runtime should import `experts` any more.
+import type { Categoria } from "@/lib/taxonomy";
+export type { Categoria };
+export { categorias } from "@/lib/taxonomy";
 
 export interface Expert {
   id: string;
@@ -26,14 +25,6 @@ export interface Expert {
   };
 }
 
-export const categorias: Categoria[] = [
-  "Carreira e Negócios",
-  "Saúde e Bem Estar",
-  "Criatividade",
-  "Gastronomia",
-  "Estilo de Vida",
-  "Tecnologia",
-];
 
 export const experts: Expert[] = [
   {

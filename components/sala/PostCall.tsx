@@ -62,7 +62,7 @@ function StarRating({ value, onChange }: { value: number; onChange: (v: number) 
 export function PostCallMentor({ session, actualMinutes }: { session: SessionData; actualMinutes: number }) {
   const [copied, setCopied] = useState(false);
   // Earnings from price field (stored in centavos)
-  const grossCents = (session as unknown as { price?: number }).price ?? 0;
+  const grossCents = session.price ?? 0;
   const feeCents = Math.round(grossCents * 0.2);
   const netCents = grossCents - feeCents;
 
@@ -121,7 +121,7 @@ export function PostCallMentor({ session, actualMinutes }: { session: SessionDat
                 <span style={{ fontSize: 16, fontWeight: 700, color: "#181D27" }}>Valor líquido</span>
                 <span style={{ fontSize: 16, fontWeight: 700, color: "#181D27" }}>{formatBRL(netCents)}</span>
               </div>
-              <p style={{ fontSize: 12, color: "#807F71", margin: "4px 0 0" }}>Repasse na próxima sexta · {nextFriday}</p>
+              <p style={{ fontSize: 12, color: "#807F71", margin: "4px 0 0" }}>Repasses ainda não ativos nesta fase (previsão: sexta, {nextFriday})</p>
             </div>
           </div>
         )}

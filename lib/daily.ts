@@ -23,8 +23,14 @@ export async function createDailyRoom(sessionId: string, expiresAt: Date): Promi
     headers: dailyHeaders(),
     body: JSON.stringify({
       name: `looptalk-${sessionId}`,
+      // Private: the raw daily.co URL is useless without a token minted by
+      // /api/sessions/[id]/token, so a leaked URL cannot bypass the app's
+      // participant check (and nobody lands on Daily's default UI).
+      // NB: `privacy` is a top-level field of the rooms API, not a property.
+      privacy: "private",
       properties: {
         exp: Math.floor(expiresAt.getTime() / 1000),
+        enable_prejoin_ui: false,
         enable_chat: true,
         enable_screenshare: true,
         start_video_off: false,
@@ -40,6 +46,8 @@ export async function createMeetingToken(opts: {
   roomName: string;
   userName: string;
   isOwner: boolean;
+  /** Token is rejected by Daily before this moment (nbf). */
+  notBefore?: Date;
   expiresAt: Date;
 }): Promise<string> {
   const res = await fetch(`${DAILY_API_URL}/meeting-tokens`, {
@@ -47,10 +55,15 @@ export async function createMeetingToken(opts: {
     headers: dailyHeaders(),
     body: JSON.stringify({
       properties: {
+        // room_name is what scopes the token: without it a token opens any room in the domain.
         room_name: opts.roomName,
         user_name: opts.userName,
         is_owner: opts.isOwner,
+        ...(opts.notBefore ? { nbf: Math.floor(opts.notBefore.getTime() / 1000) } : {}),
         exp: Math.floor(opts.expiresAt.getTime() / 1000),
+        // Daily ejects the participant when the token expires, so a call
+        // cannot outlive the window the app enforces.
+        eject_at_token_exp: true,
       },
     }),
   });

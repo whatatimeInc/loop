@@ -20,14 +20,21 @@ interface SalaClientProps {
   session: SessionData;
   persona: Persona;
   initialScreen: Screen;
+  earlyEntryMinutes?: number;
 }
 
 // ── Main client orchestrator ──────────────────────────────────────────────────
 
-export function SalaClient({ session, persona, initialScreen }: SalaClientProps) {
+export function SalaClient({ session, persona, initialScreen, earlyEntryMinutes = 10 }: SalaClientProps) {
   const [screen, setScreen] = useState<Screen>(initialScreen);
   const [token, setToken] = useState<string | null>(null);
   const [roomUrl, setRoomUrl] = useState<string | null>(session.daily_room_url);
+  // A Daily room exists only when the token API gives us a usable roomUrl;
+  // before that assume the room from the session row is there.
+  const [roomReady, setRoomReady] = useState<boolean>(!!session.daily_room_url);
+  // Entrar stays disabled until the token request has settled, so VideoCall
+  // mounts once with a stable token instead of remounting when it arrives.
+  const [tokenSettled, setTokenSettled] = useState(false);
   const [otherJoined, setOtherJoined] = useState(false);
   const [sessionStartedAt, setSessionStartedAt] = useState<number>(
     session.session_started_at
@@ -37,17 +44,48 @@ export function SalaClient({ session, persona, initialScreen }: SalaClientProps)
   const [actualMinutes, setActualMinutes] = useState(session.duration);
   const enteredAt = useRef<number | null>(null);
 
-  // ── Fetch meeting token on mount (only for waiting/incall screens) ──────────
+  // ── Fetch meeting token (only for waiting/incall screens) ───────────────────
   useEffect(() => {
-    if (screen !== "waiting" && screen !== "incall") return;
-    fetch(`/api/sessions/${session.id}/token`)
-      .then((r) => r.json())
-      .then((data: { token: string; roomUrl: string }) => {
+    // Only while waiting: every fetch mints a NEW token string, and a token
+    // change while in the call would remount VideoCall mid-session.
+    if (screen !== "waiting") return;
+
+    let cancelled = false;
+    const fetchToken = async () => {
+      try {
+        const r = await fetch(`/api/sessions/${session.id}/token`);
+        if (!r.ok || cancelled) return;
+        const data: { token: string | null; roomUrl: string | null } = await r.json();
+        if (cancelled) return;
         setToken(data.token);
-        if (data.roomUrl) setRoomUrl(data.roomUrl);
-      })
-      .catch((err) => console.error("Failed to fetch token:", err));
-  }, [session.id, screen]);
+        setTokenSettled(true);
+        if (data.roomUrl) {
+          setRoomUrl(data.roomUrl);
+          setRoomReady(true);
+        } else if (data.token === null) {
+          setRoomReady(false);
+        }
+      } catch (err) {
+        // Transport/parse error — keep the current roomReady/roomUrl untouched
+        console.error("Failed to fetch token:", err);
+      }
+    };
+
+    fetchToken();
+
+    // While waiting without a room or without a token (the token API refuses
+    // outside the entry window and fails on a Daily outage), retry every 15 s
+    // so Entrar unlocks without a reload once the window opens or Daily recovers.
+    let interval: ReturnType<typeof setInterval> | null = null;
+    if (screen === "waiting" && (!roomReady || !tokenSettled)) {
+      interval = setInterval(fetchToken, 15_000);
+    }
+
+    return () => {
+      cancelled = true;
+      if (interval) clearInterval(interval);
+    };
+  }, [session.id, screen, roomReady, tokenSettled]);
 
   // ── Supabase Realtime: detect other participant joining ────────────────────
   useEffect(() => {
@@ -161,7 +199,7 @@ export function SalaClient({ session, persona, initialScreen }: SalaClientProps)
 
   switch (screen) {
     case "not-yet":
-      return <NotYetScreen session={session} persona={persona} />;
+      return <NotYetScreen session={session} persona={persona} earlyEntryMinutes={earlyEntryMinutes} />;
 
     case "expired":
       return <ExpiredScreen session={session} persona={persona} />;
@@ -172,11 +210,26 @@ export function SalaClient({ session, persona, initialScreen }: SalaClientProps)
           session={session}
           persona={persona}
           otherJoined={otherJoined}
+          roomReady={roomReady && tokenSettled}
+          earlyEntryMinutes={earlyEntryMinutes}
           onEnter={handleEnterCall}
         />
       );
 
     case "incall":
+      if (!roomUrl) {
+        // No Daily room provisioned — never mount VideoCall without a room URL
+        return (
+          <WaitingRoom
+            session={session}
+            persona={persona}
+            otherJoined={otherJoined}
+            roomReady={roomReady && tokenSettled}
+            earlyEntryMinutes={earlyEntryMinutes}
+            onEnter={handleEnterCall}
+          />
+        );
+      }
       return (
         <>
           <VideoCall
@@ -193,6 +246,18 @@ export function SalaClient({ session, persona, initialScreen }: SalaClientProps)
       );
 
     case "connection-lost":
+      if (!roomUrl) {
+        return (
+          <WaitingRoom
+            session={session}
+            persona={persona}
+            otherJoined={otherJoined}
+            roomReady={roomReady && tokenSettled}
+            earlyEntryMinutes={earlyEntryMinutes}
+            onEnter={handleEnterCall}
+          />
+        );
+      }
       return (
         <>
           {/* Keep the video UI in background, overlay the reconnecting screen */}
