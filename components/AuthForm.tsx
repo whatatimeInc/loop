@@ -6,6 +6,7 @@ import { useRouter, useSearchParams } from "next/navigation";
 import { motion } from "framer-motion";
 import { Check } from "iconoir-react";
 import { createClient } from "@/lib/supabase/client";
+import { safeRedirectPath } from "@/lib/safe-redirect";
 
 // ─── ícone Google ─────────────────────────────────────────────────────────────
 
@@ -109,7 +110,7 @@ type Mode = "login" | "signup";
 export function AuthForm({ mode }: { mode: Mode }) {
   const router = useRouter();
   const searchParams = useSearchParams();
-  const redirect = searchParams.get("redirect") ?? "/explorar";
+  const redirect = safeRedirectPath(searchParams.get("redirect"), "/explorar");
 
   const [email, setEmail] = useState("");
   const [senha, setSenha] = useState("");

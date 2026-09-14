@@ -6,6 +6,7 @@ import { useRouter, useSearchParams } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
 import { Logo } from "@/components/Logo";
 import { tokens } from "@/components/ui/tokens";
+import { safeRedirectPath } from "@/lib/safe-redirect";
 
 // ── Inline floating-label input ───────────────────────────────────────────────
 function InlineInput({
@@ -102,7 +103,7 @@ type Step = "form" | "link-sent";
 
 export function CadastroForm() {
   const searchParams = useSearchParams();
-  const redirect = searchParams.get("redirect") ?? "/criar";
+  const redirect = safeRedirectPath(searchParams.get("redirect"), "/criar");
 
   const router = useRouter();
   const [step, setStep] = useState<Step>("form");
