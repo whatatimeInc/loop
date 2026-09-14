@@ -10,7 +10,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
 import { createServiceClient } from "@/lib/supabase/service";
-import { createMeetingToken } from "@/lib/daily";
+import { createMeetingToken, createDailyRoom } from "@/lib/daily";
 import { ENTERABLE_STATUSES, earlyEntryMinutes, entryState, entryWindow } from "@/lib/sala-window";
 
 export async function GET(
@@ -55,8 +55,25 @@ export async function GET(
   }
 
   if (!session.daily_room_name) {
-    // Room not provisioned yet (e.g. Daily key missing in dev)
-    return NextResponse.json({ token: null, roomUrl: session.daily_room_url, persona });
+    // Room not provisioned at booking time (key missing, or Daily was down).
+    // Provision it now, so the waiting room's periodic retry heals the session.
+    if (process.env.DAILY_CO_API_KEY) {
+      try {
+        const startsMs0 = new Date(session.starts_at).getTime();
+        const room = await createDailyRoom(session.id, new Date(startsMs0 + (session.duration + 90) * 60 * 1000));
+        await supabase
+          .from("sessions")
+          .update({ daily_room_url: room.url, daily_room_name: room.name })
+          .eq("id", id);
+        session.daily_room_url = room.url;
+        session.daily_room_name = room.name;
+      } catch (e) {
+        console.error("Lazy Daily room provisioning failed:", e);
+      }
+    }
+    if (!session.daily_room_name) {
+      return NextResponse.json({ token: null, roomUrl: session.daily_room_url, persona });
+    }
   }
 
   const mentor = session.mentor as unknown as { name: string | null; last_name: string | null } | null;

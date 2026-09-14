@@ -23,12 +23,13 @@ export async function createDailyRoom(sessionId: string, expiresAt: Date): Promi
     headers: dailyHeaders(),
     body: JSON.stringify({
       name: `looptalk-${sessionId}`,
+      // Private: the raw daily.co URL is useless without a token minted by
+      // /api/sessions/[id]/token, so a leaked URL cannot bypass the app's
+      // participant check (and nobody lands on Daily's default UI).
+      // NB: `privacy` is a top-level field of the rooms API, not a property.
+      privacy: "private",
       properties: {
         exp: Math.floor(expiresAt.getTime() / 1000),
-        // Private: the raw daily.co URL is useless without a token minted by
-        // /api/sessions/[id]/token, so a leaked URL cannot bypass the app's
-        // participant check (and nobody lands on Daily's default UI).
-        privacy: "private",
         enable_prejoin_ui: false,
         enable_chat: true,
         enable_screenshare: true,
