@@ -1,11 +1,17 @@
 // GET /api/sessions/[id]/token
-// Generates a Daily.co meeting token server-side.
+// Mints a Daily.co meeting token server-side for a participant of the session.
 // Returns { token, roomUrl, persona: 'mentor' | 'guest' }.
 // Daily.co API key is NEVER sent to the client.
+//
+// This is the only gate that matters for the private Daily room: the raw room
+// URL cannot be joined without a token, so every rule enforced here (logged-in
+// user, participant of this session, session still enterable, inside the entry
+// window) holds even for someone who bypasses the /sala page.
 import { NextRequest, NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
 import { createServiceClient } from "@/lib/supabase/service";
 import { createMeetingToken } from "@/lib/daily";
+import { ENTERABLE_STATUSES, earlyEntryMinutes, entryState, entryWindow } from "@/lib/sala-window";
 
 export async function GET(
   _req: NextRequest,
@@ -30,20 +36,28 @@ export async function GET(
     .eq("id", id)
     .single();
 
-  if (!session) return NextResponse.json({ error: "Session not found" }, { status: 404 });
-  if (session.status === "cancelada") return NextResponse.json({ error: "Session cancelled" }, { status: 410 });
+  // A session the caller is not part of is reported exactly like one that does
+  // not exist, so the endpoint cannot be used to probe which ids are real.
+  const isMentor = !!session && session.mentor_id === user.id;
+  const isGuest = !!session && session.guest_id === user.id;
+  if (!session || (!isMentor && !isGuest)) {
+    return NextResponse.json({ error: "Session not found" }, { status: 404 });
+  }
+  if (!ENTERABLE_STATUSES.has(session.status)) {
+    return NextResponse.json({ error: "Session not enterable" }, { status: 410 });
+  }
 
-  const isMentor = session.mentor_id === user.id;
-  const isGuest = session.guest_id === user.id;
-  if (!isMentor && !isGuest) return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+  const persona = isMentor ? "mentor" : "guest";
+  const window = entryWindow(session.starts_at, session.duration, earlyEntryMinutes());
+  const state = entryState(window, Date.now());
+  if (state !== "open") {
+    return NextResponse.json({ error: state === "too-early" ? "Too early" : "Session expired", state }, { status: 403 });
+  }
 
   if (!session.daily_room_name) {
     // Room not provisioned yet (e.g. Daily key missing in dev)
-    return NextResponse.json({ token: null, roomUrl: session.daily_room_url, persona: isMentor ? "mentor" : "guest" });
+    return NextResponse.json({ token: null, roomUrl: session.daily_room_url, persona });
   }
-
-  const startsMs = new Date(session.starts_at).getTime();
-  const tokenExpiry = new Date(startsMs + (session.duration + 90) * 60 * 1000);
 
   const mentor = session.mentor as unknown as { name: string | null; last_name: string | null } | null;
   const guest = session.guest as unknown as { name: string | null; last_name: string | null } | null;
@@ -58,15 +72,16 @@ export async function GET(
       roomName: session.daily_room_name,
       userName,
       isOwner: isMentor,
-      expiresAt: tokenExpiry,
+      // Minted only inside the entry window (checked above). The token itself
+      // stays valid a short grace past the window so a call that is still
+      // running is not cut off the moment new entries close; Daily then ejects.
+      notBefore: new Date(window.opensAt),
+      expiresAt: new Date(window.tokenExpiresAt),
     });
   } catch (e) {
     console.error("Token generation failed:", e);
+    return NextResponse.json({ error: "Could not issue a room token" }, { status: 502 });
   }
 
-  return NextResponse.json({
-    token,
-    roomUrl: session.daily_room_url,
-    persona: isMentor ? "mentor" : "guest",
-  });
+  return NextResponse.json({ token, roomUrl: session.daily_room_url, persona });
 }

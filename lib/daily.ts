@@ -45,6 +45,8 @@ export async function createMeetingToken(opts: {
   roomName: string;
   userName: string;
   isOwner: boolean;
+  /** Token is rejected by Daily before this moment (nbf). */
+  notBefore?: Date;
   expiresAt: Date;
 }): Promise<string> {
   const res = await fetch(`${DAILY_API_URL}/meeting-tokens`, {
@@ -52,10 +54,15 @@ export async function createMeetingToken(opts: {
     headers: dailyHeaders(),
     body: JSON.stringify({
       properties: {
+        // room_name is what scopes the token: without it a token opens any room in the domain.
         room_name: opts.roomName,
         user_name: opts.userName,
         is_owner: opts.isOwner,
+        ...(opts.notBefore ? { nbf: Math.floor(opts.notBefore.getTime() / 1000) } : {}),
         exp: Math.floor(opts.expiresAt.getTime() / 1000),
+        // Daily ejects the participant when the token expires, so a call
+        // cannot outlive the window the app enforces.
+        eject_at_token_exp: true,
       },
     }),
   });

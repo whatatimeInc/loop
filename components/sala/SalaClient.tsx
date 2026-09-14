@@ -73,10 +73,11 @@ export function SalaClient({ session, persona, initialScreen, earlyEntryMinutes 
 
     fetchToken();
 
-    // While waiting without a room, retry every 15 s so a room provisioned
-    // later enables Entrar without a reload.
+    // While waiting without a room or without a token (the token API refuses
+    // outside the entry window and fails on a Daily outage), retry every 15 s
+    // so Entrar unlocks without a reload once the window opens or Daily recovers.
     let interval: ReturnType<typeof setInterval> | null = null;
-    if (screen === "waiting" && !roomReady) {
+    if (screen === "waiting" && (!roomReady || !tokenSettled)) {
       interval = setInterval(fetchToken, 15_000);
     }
 
@@ -84,7 +85,7 @@ export function SalaClient({ session, persona, initialScreen, earlyEntryMinutes 
       cancelled = true;
       if (interval) clearInterval(interval);
     };
-  }, [session.id, screen, roomReady]);
+  }, [session.id, screen, roomReady, tokenSettled]);
 
   // ── Supabase Realtime: detect other participant joining ────────────────────
   useEffect(() => {
@@ -198,7 +199,7 @@ export function SalaClient({ session, persona, initialScreen, earlyEntryMinutes 
 
   switch (screen) {
     case "not-yet":
-      return <NotYetScreen session={session} persona={persona} />;
+      return <NotYetScreen session={session} persona={persona} earlyEntryMinutes={earlyEntryMinutes} />;
 
     case "expired":
       return <ExpiredScreen session={session} persona={persona} />;
