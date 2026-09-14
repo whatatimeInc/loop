@@ -57,11 +57,21 @@ The 48 catalogue creators are real users too (`<slug>@looptalk.demo`, same passw
 Vanessa's availability is 24 × 7 so any time today works; `SALA_EARLY_ENTRY_MINUTES=1440`
 in `.env.local` lets you open the room page for a session booked later today.
 
+## Video call
+
+The room runs on Daily.co (account domain `lptalk`, key in `.env.local`). The UI is ours:
+Daily only carries the audio/video tracks (call-object mode), so there is no Daily
+branding, prejoin screen or default layout. Controls: mute, camera, screen share, chat
+(button in the bottom bar; it fades after 3 s without mouse movement, move the mouse to
+bring it back), end call, time extension. Rooms are private: the raw daily.co URL does not
+open without a token minted by the app.
+
+To rehearse with two people: book with the guest, then open `/sala/<id>` as the guest in
+one browser and as the mentor in a private window. Verified 2026-09-14 with two headless
+browsers: both see and hear each other, chat messages arrive, nobody is dropped.
+
 ## What is NOT there
 
-- **Video call**: `DAILY_CO_API_KEY` is empty in `.env.local`. The session is created, the
-  room page loads, but the button says the room is not provisioned. Put a key from
-  https://dashboard.daily.co in `.env.local`, restart, and the next booking gets a room.
 - **Payment**: out of scope by decision. There is no payment step and no copy claiming one.
 - **E-mail**: nothing is sent. The confirmation page is the "receipt".
 
