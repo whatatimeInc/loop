@@ -1,4 +1,21 @@
-# Demo runbook — Loop.Talk happy path (local)
+# Demo runbook — Loop.Talk happy path
+
+## Production (Vercel + Supabase)
+
+| What | Where |
+|---|---|
+| App | https://loop-three-brown.vercel.app |
+| Vercel project | team `thiagofgf-4428s-projects`, project `loop` (Hobby plan: no Git integration for an org-private repo; deploy with `vercel deploy --prod` from `loop/`) |
+| Supabase | project `looptalk` (`qrogcumktoficaqsrxee`, sa-east-1) in thiagofgf@gmail.com's org |
+| GitHub | https://github.com/whatatimeInc/loop (PR #1 = this branch) |
+
+Same demo accounts as below. Env vars live on the Vercel project: `LAUNCH_PHASE`,
+`NEXT_PUBLIC_SUPABASE_URL`, `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY`, `SUPABASE_SECRET_KEY`
+(the service_role JWT: the new `sb_secret_…` format is rejected by this project's
+PostgREST/GoTrue), `DAILY_CO_API_KEY`, `NEXT_PUBLIC_SITE_URL`, `SALA_EARLY_ENTRY_MINUTES=10`.
+Seed prod again with `NEXT_PUBLIC_SUPABASE_URL=… SUPABASE_SECRET_KEY=… NEXT_PUBLIC_SITE_URL=… npx tsx scripts/seed-demo.ts`.
+
+## Local
 
 Branch `feat/demo-happy-path`. Everything below runs on this machine; nothing touches production.
 
