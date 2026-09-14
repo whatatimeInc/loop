@@ -23,7 +23,7 @@ fi
 
 cat <<TXT
 
-  App:        http://localhost:3100   (LAN: http://$(hostname -I | awk '{print $1}'):3100)
+  App:        http://localhost:3100  (from the Mac: open the SSH tunnel first, see DEMO.md)
   Studio:     http://127.0.0.1:55323
   Mail (OTP): http://127.0.0.1:55324
 

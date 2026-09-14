@@ -2,6 +2,19 @@
 
 Branch `feat/demo-happy-path`. Everything below runs on this machine; nothing touches production.
 
+## From the Mac: open the tunnel first
+
+The app and Supabase run on the nuc. Browsers only allow camera/microphone on
+`localhost` or HTTPS, so do NOT use the LAN IP: forward the two ports and browse
+`localhost` instead. In a Mac terminal, leave this running during the demo:
+
+```sh
+ssh -N -L 3100:localhost:3100 -L 55321:localhost:55321 devbox@192.168.68.105
+```
+
+Then open http://localhost:3100 on the Mac. Without the tunnel, signup and login
+fail with "Failed to fetch" (the browser tries to reach Supabase on the Mac itself).
+
 ## Start
 
 ```sh
@@ -15,7 +28,7 @@ migrations, seeds the catalogue and demo accounts (idempotent), and starts Next 
 
 | What | URL |
 |---|---|
-| App | http://localhost:3100 (LAN: http://192.168.68.105:3100) |
+| App | http://localhost:3100 (through the tunnel) |
 | Supabase Studio | http://127.0.0.1:55323 |
 | Mail catcher (magic links, if used) | http://127.0.0.1:55324 |
 
@@ -54,6 +67,7 @@ in `.env.local` lets you open the room page for a session booked later today.
 
 ## If something looks off
 
+- "Failed to fetch" on login/signup from the Mac → the tunnel is not running.
 - Auth returns 502 after a Supabase restart → `docker restart supabase_kong_loop`.
 - Reset everything: `supabase db reset && npx tsx scripts/seed-demo.ts`.
 - Browser check of the whole path: `../.claude/demo/run-e2e.sh` (needs the dev server up).

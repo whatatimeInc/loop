@@ -65,6 +65,9 @@ function DeviceStatus() {
   const [cam, setCam] = useState<"checking" | "ok" | "error">("checking");
 
   useEffect(() => {
+    // navigator.mediaDevices is undefined on insecure origins (plain http on a
+    // LAN address). Report the devices as unavailable instead of crashing.
+    if (!navigator.mediaDevices?.getUserMedia) { setMic("error"); setCam("error"); return; }
     navigator.mediaDevices.getUserMedia({ audio: true, video: true })
       .then((stream) => {
         stream.getTracks().forEach((t) => t.stop());
