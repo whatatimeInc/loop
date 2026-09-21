@@ -1,10 +1,11 @@
 "use client";
 
-import { useState } from "react";
+import { useRef, useState } from "react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
 import { utcToZoned } from "@/lib/slots";
-import { Calendar, VideoCamera, StarSolid } from "iconoir-react";
+import { Calendar, VideoCamera, StarSolid, Xmark } from "iconoir-react";
 
 // ─── props (loaded by page.tsx from public.sessions) ─────────────────────────
 
@@ -19,6 +20,7 @@ export type AgendaSessao = {
   mentorPhotoUrl: string | null;
   mentorCategory: string | null;
   myRating: number | null; // the guest's own review of this session
+  cancelavel: boolean;     // server-side verdict of the cancel window (lib/cancel-window.ts)
 };
 
 type StatusSessao = "proxima" | "acontecendo" | "concluida" | "cancelada";
@@ -55,6 +57,24 @@ function formatPreco(cents: number) {
 /** Whole days between two "YYYY-MM-DD" strings (both parsed as UTC midnight). */
 function diasEntre(de: string, para: string) {
   return Math.round((Date.parse(para) - Date.parse(de)) / 86_400_000);
+}
+
+/** "24 horas" / "1 hora" / "30 minutos" for the cancellation copy. */
+function formatPrazo(hours: number) {
+  if (hours < 1) {
+    const min = hours * 60;
+    if (min < 1) return "menos de 1 minuto";
+    // Exact, like the hours branch: 0.41h is "24,6 minutos", not "25 minutos".
+    return min === 1 ? "1 minuto" : `${min.toLocaleString("pt-BR")} minutos`;
+  }
+  // Print the configured value as-is (1.25 → "1,25 horas"); rounding it would
+  // promise a different window than the one the API enforces.
+  return hours === 1 ? "1 hora" : `${hours.toLocaleString("pt-BR")} horas`;
+}
+
+/** "até 24 horas antes da sessão", or "até o início da sessão" when there is no lead time. */
+function prazoClause(hours: number) {
+  return hours === 0 ? "até o início da sessão" : `até ${formatPrazo(hours)} antes da sessão`;
 }
 
 function diasAte(iso: string) {
@@ -97,8 +117,92 @@ function Avatar({ name, photoUrl }: { name: string; photoUrl: string | null }) {
 
 // ─── card de sessão ───────────────────────────────────────────────────────────
 
-function CardSessao({ sessao }: { sessao: Sessao }) {
+type CardProps = {
+  sessao: Sessao;
+  cancelDeadlineHours: number;
+  /** Bumps each time refreshed server props arrive; see `bloqueadoAqui`. */
+  geracao: number;
+  onCancelled: (id: string) => void;
+  /** The server said the row is no longer what we show; reload it. */
+  onStale: () => void;
+};
+
+function CardSessao({ sessao, cancelDeadlineHours, geracao, onCancelled, onStale }: CardProps) {
   const proxima = sessao.situacao === "proxima" || sessao.situacao === "acontecendo";
+  // `cancelavel` was decided by the server clock in page.tsx with the same rule
+  // as POST /api/sessions/[id]/cancel; this only decides whether to offer the
+  // button, the route is the authority.
+
+  const [confirmando, setConfirmando] = useState(false);
+  const [enviando, setEnviando] = useState(false);
+  const [erro, setErro] = useState<string | null>(null);
+  // Set when the API refuses (deadline passed, or the row is no longer
+  // scheduled) after this page was rendered, so the button disappears at once
+  // instead of waiting for the refresh to bring the current rows.
+  const [bloqueadoAqui, setBloqueadoAqui] = useState(false);
+  // The block only bridges the gap until router.refresh() lands: once new server
+  // props arrive they are the verdict again. Drop it, drop any message from
+  // before the refresh, and close a confirm bar the new props no longer back,
+  // so the card never offers "Sim, cancelar" on a session the server now
+  // reports as not cancellable.
+  const [geracaoVista, setGeracaoVista] = useState(geracao);
+  if (geracaoVista !== geracao) {
+    setGeracaoVista(geracao);
+    setBloqueadoAqui(false);
+    setErro(null);
+    if (!sessao.cancelavel) setConfirmando(false);
+  }
+  // Synchronous guard: state updates are async, a double click would fire twice.
+  const emVoo = useRef(false);
+
+  // Whether the deadline has passed is the server's verdict (`cancelavel`); the
+  // client never recomputes it. The `proxima` term only hides both the button
+  // and the notice once the session is live, where neither makes sense — it is
+  // the same situação the rest of the card already keys on (and situacaoDe
+  // yields it only for an 'agendada' row).
+  const aindaNaoComecou = sessao.situacao === "proxima";
+  const podeCancelar = aindaNaoComecou && sessao.cancelavel && !bloqueadoAqui;
+  const prazoEncerrado = aindaNaoComecou && !podeCancelar;
+
+  async function cancelar() {
+    if (emVoo.current) return;
+    emVoo.current = true;
+    setEnviando(true);
+    setErro(null);
+    try {
+      const r = await fetch(`/api/sessions/${sessao.id}/cancel`, { method: "POST" });
+      // Success is the route's `{ ok: true }` body, not a 2xx: fetch follows
+      // redirects, and an expired cookie or the launch gate turns this POST
+      // into a 200 HTML page that must not be mistaken for a cancellation.
+      const body = (await r.json().catch(() => ({}))) as { ok?: boolean; state?: string };
+      if (r.ok && body.ok === true) {
+        setConfirmando(false);
+        onCancelled(sessao.id);
+        return;
+      }
+      // Close the confirm bar so the error copy below is what the guest sees.
+      setConfirmando(false);
+      if (body.state === "past-deadline") {
+        setErro(`O prazo para cancelar terminou: só é possível ${prazoClause(cancelDeadlineHours)}.`);
+        setBloqueadoAqui(true);
+        onStale();
+      } else if (body.state === "not-scheduled") {
+        // The row changed under us (the mentor cancelled, or it concluded):
+        // show why and pull the current rows so the card stops offering actions.
+        setErro("Esta sessão já não está agendada.");
+        setBloqueadoAqui(true);
+        onStale();
+      } else {
+        setErro("Não foi possível cancelar agora. Tente novamente.");
+      }
+    } catch {
+      setConfirmando(false);
+      setErro("Não foi possível cancelar agora. Tente novamente.");
+    } finally {
+      emVoo.current = false;
+      setEnviando(false);
+    }
+  }
 
   return (
     <div className={`bg-white rounded-xl border overflow-hidden transition-shadow hover:shadow-sm ${
@@ -133,6 +237,16 @@ function CardSessao({ sessao }: { sessao: Sessao }) {
           {proxima && (
             <>
               <span className="text-xs text-lime font-semibold">{diasAte(sessao.startsAt)}</span>
+              {podeCancelar && !confirmando && (
+                <button
+                  type="button"
+                  onClick={() => { setErro(null); setConfirmando(true); }}
+                  className="flex items-center gap-1 px-3 py-1.5 rounded-md border border-gray-200 text-gray-500 text-xs font-medium hover:bg-gray-50 hover:text-red-500 transition-colors"
+                >
+                  <Xmark className="w-3.5 h-3.5" />
+                  Cancelar
+                </button>
+              )}
               <Link
                 href={`/sala/${sessao.id}`}
                 className="flex items-center gap-1.5 px-3 py-1.5 rounded-md bg-gray-900 text-white text-xs font-semibold hover:bg-gray-800 transition-colors"
@@ -168,6 +282,44 @@ function CardSessao({ sessao }: { sessao: Sessao }) {
           )}
         </div>
       </div>
+
+      {/* Cancelamento — only while the session has not started; once it is
+          live the confirm bar, an old error and the notice all stop making sense. */}
+      {aindaNaoComecou && (confirmando || erro || prazoEncerrado) && (
+        <div className="px-5 pb-4 -mt-1">
+          {confirmando ? (
+            <div className="flex flex-wrap items-center justify-between gap-2 bg-gray-50 rounded-lg px-4 py-3">
+              <p className="text-xs text-gray-600">
+                Cancelar esta sessão? O horário fica livre para outra pessoa.
+              </p>
+              <div className="flex items-center gap-2">
+                <button
+                  type="button"
+                  onClick={() => setConfirmando(false)}
+                  disabled={enviando}
+                  className="px-3 py-1.5 rounded-md text-xs font-medium text-gray-500 hover:bg-white transition-colors disabled:opacity-50"
+                >
+                  Voltar
+                </button>
+                <button
+                  type="button"
+                  onClick={cancelar}
+                  disabled={enviando}
+                  className="px-3 py-1.5 rounded-md bg-red-500 text-white text-xs font-semibold hover:bg-red-600 transition-colors disabled:opacity-50"
+                >
+                  {enviando ? "Cancelando…" : "Sim, cancelar"}
+                </button>
+              </div>
+            </div>
+          ) : erro ? (
+            <p className="text-xs text-red-500">{erro}</p>
+          ) : (
+            <p className="text-xs text-gray-400">
+              Cancelamento só {prazoClause(cancelDeadlineHours)}. Este prazo já passou.
+            </p>
+          )}
+        </div>
+      )}
     </div>
   );
 }
@@ -221,8 +373,36 @@ function Empty({ tab }: { tab: "proximas" | "historico" }) {
 
 type Tab = "proximas" | "historico";
 
-export function AgendaClient({ sessoes }: { sessoes: AgendaSessao[] }) {
+export function AgendaClient({
+  sessoes: sessoesIniciais,
+  cancelDeadlineHours,
+}: {
+  sessoes: AgendaSessao[];
+  cancelDeadlineHours: number;
+}) {
+  const router = useRouter();
   const [tab, setTab] = useState<Tab>("proximas");
+  // Server props stay the source of truth (router.refresh() re-fetches them);
+  // ids cancelled from this screen are overlaid so the card moves to
+  // "Histórico" at once, before the refreshed rows arrive.
+  const [canceladasAqui, setCanceladasAqui] = useState<ReadonlySet<string>>(() => new Set());
+  // A refresh hands this component a new `sessoes` array; count those arrivals
+  // so each card can tell "the server answered again" from a mere re-render.
+  const [propsVistas, setPropsVistas] = useState(sessoesIniciais);
+  const [geracao, setGeracao] = useState(0);
+  if (propsVistas !== sessoesIniciais) {
+    setPropsVistas(sessoesIniciais);
+    setGeracao((g) => g + 1);
+  }
+
+  function aoCancelar(id: string) {
+    setCanceladasAqui((prev) => new Set(prev).add(id));
+    router.refresh();
+  }
+
+  const sessoes = sessoesIniciais.map((s) =>
+    canceladasAqui.has(s.id) && s.status === "agendada" ? { ...s, status: "cancelada" } : s,
+  );
 
   const now = Date.now();
   const comSituacao: Sessao[] = sessoes.map((s) => ({ ...s, situacao: situacaoDe(s, now) }));
@@ -305,7 +485,14 @@ export function AgendaClient({ sessoes }: { sessoes: AgendaSessao[] }) {
             ) : (
               <div className="flex flex-col gap-3">
                 {lista.map((s) => (
-                  <CardSessao key={s.id} sessao={s} />
+                  <CardSessao
+                    key={s.id}
+                    sessao={s}
+                    cancelDeadlineHours={cancelDeadlineHours}
+                    geracao={geracao}
+                    onCancelled={aoCancelar}
+                    onStale={() => router.refresh()}
+                  />
                 ))}
               </div>
             )}

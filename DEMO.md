@@ -13,6 +13,8 @@ Same demo accounts as below. Env vars live on the Vercel project: `LAUNCH_PHASE`
 `NEXT_PUBLIC_SUPABASE_URL`, `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY`, `SUPABASE_SECRET_KEY`
 (the service_role JWT: the new `sb_secret_…` format is rejected by this project's
 PostgREST/GoTrue), `DAILY_CO_API_KEY`, `NEXT_PUBLIC_SITE_URL`, `SALA_EARLY_ENTRY_MINUTES=10`.
+Optional: `CANCEL_DEADLINE_HOURS` (default 24) — how many hours before the start a guest
+can still cancel a session; the mentor can cancel at any time.
 Seed prod again with `NEXT_PUBLIC_SUPABASE_URL=… SUPABASE_SECRET_KEY=… NEXT_PUBLIC_SITE_URL=… npx tsx scripts/seed-demo.ts`.
 
 ## Local

@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import { createClient } from "@/lib/supabase/client";
 import { useDashboard } from "../DashboardShell";
@@ -121,11 +121,19 @@ function SessionRow({ session, onCancel }: { session: Session; onCancel: (id: st
 
 export default function SessoesPage() {
   const { profile } = useDashboard();
-  const [upcoming, setUpcoming] = useState<Session[]>([]);
-  const [history, setHistory] = useState<Session[]>([]);
+  // One list; "Próximas" and "Histórico" are views of it, so a local status
+  // flip moves a row between them without two states drifting apart.
+  const [rows, setRows] = useState<Session[]>([]);
   const [loading, setLoading] = useState(true);
+  const upcoming = rows.filter(s => s.status === "agendada" && endOf(s) > Date.now());
+  const history = rows.filter(s => s.status !== "agendada" || endOf(s) <= Date.now());
+
+  // Ticket of the newest load(); an older fetch that resolves later must not
+  // overwrite what a newer one already showed (e.g. resurrect a cancelled row).
+  const loadTicket = useRef(0);
 
   async function load() {
+    const ticket = ++loadTicket.current;
     const sb = createClient();
     const { data } = await sb
       .from("sessions")
@@ -134,20 +142,50 @@ export default function SessoesPage() {
       .order("starts_at", { ascending: false });
 
     const mentors = await fetchParticipants(sb, ((data ?? []) as Session[]).map(s => s.mentor_id));
-    const rows = ((data ?? []) as Session[]).map(s => ({ ...s, mentor: mentors.get(s.mentor_id) ?? null }));
-    setUpcoming(rows.filter(s => s.status === "agendada" && endOf(s) > Date.now()));
-    setHistory(rows.filter(s => s.status !== "agendada" || endOf(s) <= Date.now()));
+    const fresh = ((data ?? []) as Session[]).map(s => ({ ...s, mentor: mentors.get(s.mentor_id) ?? null }));
+    if (ticket !== loadTicket.current) return;
+    setRows(fresh);
     setLoading(false);
   }
 
   useEffect(() => { load(); }, [profile.id]);
 
+  // Ids with a cancel request in flight, so a second click cannot double-post.
+  const cancelling = useRef(new Set<string>());
+
   async function handleCancel(id: string) {
+    if (cancelling.current.has(id)) return;
     const confirmed = window.confirm("Cancelar esta sessão?");
     if (!confirmed) return;
-    const sb = createClient();
-    await sb.from("sessions").update({ status: "cancelada" }).eq("id", id);
-    load();
+    cancelling.current.add(id);
+    try {
+      const r = await fetch(`/api/sessions/${id}/cancel`, { method: "POST" });
+      // Success is the route's `{ ok: true }` body, not a 2xx: fetch follows
+      // redirects, and an expired cookie turns this POST into a 200 HTML page.
+      const body = (await r.json().catch(() => ({}))) as { ok?: boolean; state?: string };
+      if (r.ok && body.ok === true) {
+        // Reflect the cancel at once so the list is right even if the reload
+        // below fails. Retire any reload already in flight: it was read before
+        // the cancel and would put the row back as 'agendada'.
+        loadTicket.current++;
+        setRows(prev => prev.map(s => (s.id === id ? { ...s, status: "cancelada" } : s)));
+      } else {
+        window.alert(
+          body.state === "past-deadline"
+            ? "O prazo para cancelar esta sessão já passou."
+            : "Não foi possível cancelar a sessão. Tente novamente.",
+        );
+      }
+    } catch {
+      window.alert("Não foi possível cancelar a sessão. Tente novamente.");
+    }
+    try {
+      await load();
+    } catch {
+      // The local state above already shows the result; the next visit reloads.
+    } finally {
+      cancelling.current.delete(id);
+    }
   }
 
   if (loading) return <p style={{ color: FAINT, fontSize: 14 }}>Carregando...</p>;
