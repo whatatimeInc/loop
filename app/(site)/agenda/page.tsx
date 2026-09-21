@@ -1,6 +1,7 @@
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { AREA_LABEL, getParticipants } from "@/lib/creators";
+import { cancelDeadlineHours, cancelState } from "@/lib/cancel-window";
 import { AgendaClient, type AgendaSessao } from "./AgendaClient";
 
 export const dynamic = "force-dynamic";
@@ -45,9 +46,20 @@ export default async function AgendaPage() {
     ratingBySession.set(r.session_id, r.rating);
   }
 
+  // Decided here with the server clock, so a skewed browser clock can neither
+  // hide the button nor offer it; the cancel route re-checks anyway.
+  const deadlineHours = cancelDeadlineHours();
+  const now = Date.now();
+
   const sessoes: AgendaSessao[] = ((rows ?? []) as unknown as SessionRow[]).map((row) => {
     const mentor = mentors.get(row.mentor_id);
     return {
+      // Same verdict the route gives: the deadline binds the guest only, and a
+      // self-booked row (the viewer is also the mentor) keeps the mentor's freedom.
+      cancelavel:
+        row.status === "agendada" &&
+        (row.mentor_id === user.id ||
+          cancelState({ status: row.status, startsAt: row.starts_at }, now, deadlineHours) === "cancellable"),
       id: row.id,
       startsAt: row.starts_at,
       durationMinutes: row.duration,
@@ -61,5 +73,5 @@ export default async function AgendaPage() {
     };
   });
 
-  return <AgendaClient sessoes={sessoes} />;
+  return <AgendaClient sessoes={sessoes} cancelDeadlineHours={deadlineHours} />;
 }
