@@ -160,14 +160,16 @@ export default function SessoesPage() {
     cancelling.current.add(id);
     try {
       const r = await fetch(`/api/sessions/${id}/cancel`, { method: "POST" });
-      if (r.ok) {
+      // Success is the route's `{ ok: true }` body, not a 2xx: fetch follows
+      // redirects, and an expired cookie turns this POST into a 200 HTML page.
+      const body = (await r.json().catch(() => ({}))) as { ok?: boolean; state?: string };
+      if (r.ok && body.ok === true) {
         // Reflect the cancel at once so the list is right even if the reload
         // below fails. Retire any reload already in flight: it was read before
         // the cancel and would put the row back as 'agendada'.
         loadTicket.current++;
         setRows(prev => prev.map(s => (s.id === id ? { ...s, status: "cancelada" } : s)));
       } else {
-        const body = (await r.json().catch(() => ({}))) as { state?: string };
         window.alert(
           body.state === "past-deadline"
             ? "O prazo para cancelar esta sessão já passou."

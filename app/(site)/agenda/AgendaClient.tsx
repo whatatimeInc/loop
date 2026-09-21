@@ -62,9 +62,10 @@ function diasEntre(de: string, para: string) {
 /** "24 horas" / "1 hora" / "30 minutos" for the cancellation copy. */
 function formatPrazo(hours: number) {
   if (hours < 1) {
-    const min = Math.round(hours * 60);
+    const min = hours * 60;
     if (min < 1) return "menos de 1 minuto";
-    return min === 1 ? "1 minuto" : `${min} minutos`;
+    // Exact, like the hours branch: 0.41h is "24,6 minutos", not "25 minutos".
+    return min === 1 ? "1 minuto" : `${min.toLocaleString("pt-BR")} minutos`;
   }
   // Print the configured value as-is (1.25 → "1,25 horas"); rounding it would
   // promise a different window than the one the API enforces.
@@ -140,15 +141,16 @@ function CardSessao({ sessao, cancelDeadlineHours, geracao, onCancelled, onStale
   // instead of waiting for the refresh to bring the current rows.
   const [bloqueadoAqui, setBloqueadoAqui] = useState(false);
   // The block only bridges the gap until router.refresh() lands: once new server
-  // props arrive they are the verdict again, so drop it (and the message that
-  // came with it) instead of hiding a button the server may now offer.
+  // props arrive they are the verdict again. Drop it, drop any message from
+  // before the refresh, and close a confirm bar the new props no longer back,
+  // so the card never offers "Sim, cancelar" on a session the server now
+  // reports as not cancellable.
   const [geracaoVista, setGeracaoVista] = useState(geracao);
   if (geracaoVista !== geracao) {
     setGeracaoVista(geracao);
-    if (bloqueadoAqui) {
-      setBloqueadoAqui(false);
-      setErro(null);
-    }
+    setBloqueadoAqui(false);
+    setErro(null);
+    if (!sessao.cancelavel) setConfirmando(false);
   }
   // Synchronous guard: state updates are async, a double click would fire twice.
   const emVoo = useRef(false);
@@ -169,12 +171,15 @@ function CardSessao({ sessao, cancelDeadlineHours, geracao, onCancelled, onStale
     setErro(null);
     try {
       const r = await fetch(`/api/sessions/${sessao.id}/cancel`, { method: "POST" });
-      if (r.ok) {
+      // Success is the route's `{ ok: true }` body, not a 2xx: fetch follows
+      // redirects, and an expired cookie or the launch gate turns this POST
+      // into a 200 HTML page that must not be mistaken for a cancellation.
+      const body = (await r.json().catch(() => ({}))) as { ok?: boolean; state?: string };
+      if (r.ok && body.ok === true) {
         setConfirmando(false);
         onCancelled(sessao.id);
         return;
       }
-      const body = (await r.json().catch(() => ({}))) as { state?: string };
       // Close the confirm bar so the error copy below is what the guest sees.
       setConfirmando(false);
       if (body.state === "past-deadline") {
