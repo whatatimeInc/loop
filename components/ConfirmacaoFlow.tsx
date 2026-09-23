@@ -133,7 +133,14 @@ function CalendarButtons({ sessao }: { sessao: ConfirmacaoSessao }) {
 
 // ─── componente principal ──────────────────────────────────────────────────────
 
-export function ConfirmacaoFlow({ session }: { session: ConfirmacaoSessao }) {
+export function ConfirmacaoFlow({
+  session,
+  confirmationEmail = null,
+}: {
+  session: ConfirmacaoSessao;
+  /** Address the confirmation e-mail went to; null when no e-mail was sent. */
+  confirmationEmail?: string | null;
+}) {
   const { ano, mes, dia, hora, minuto } = relogio(session.startsAt);
   const dataFormatada = `${dia} de ${MESES[mes - 1]} de ${ano}`;
   const horaFormatada = `${pad(hora)}:${pad(minuto)}`;
@@ -161,6 +168,12 @@ export function ConfirmacaoFlow({ session }: { session: ConfirmacaoSessao }) {
             Sua sessão está reservada na agenda de {session.mentor.firstName}. Guarde este link:
             é por aqui que você entra na sala.
           </p>
+          {confirmationEmail && (
+            <p className="text-gray-500 text-sm max-w-sm mt-3">
+              Enviamos esta confirmação e o convite de calendário para{" "}
+              <span className="font-semibold text-gray-700">{confirmationEmail}</span>.
+            </p>
+          )}
         </div>
 
         {/* Card de detalhes */}

@@ -15,6 +15,10 @@ Same demo accounts as below. Env vars live on the Vercel project: `LAUNCH_PHASE`
 PostgREST/GoTrue), `DAILY_CO_API_KEY`, `NEXT_PUBLIC_SITE_URL`, `SALA_EARLY_ENTRY_MINUTES=10`.
 Optional: `CANCEL_DEADLINE_HOURS` (default 24) — how many hours before the start a guest
 can still cancel a session; the mentor can cancel at any time.
+Optional: `RESEND_API_KEY` + `RESEND_FROM` (a sender on a domain verified in Resend, e.g.
+`Loop.Talk <sessoes@looptalk.com.br>`) — with both set, `POST /api/sessions` e-mails the
+guest a confirmation with the `/sala/<id>` link and an `.ics` invite right after booking,
+and the confirmation page says so. Without them nothing is sent and no e-mail line appears.
 Seed prod again with `NEXT_PUBLIC_SUPABASE_URL=… SUPABASE_SECRET_KEY=… NEXT_PUBLIC_SITE_URL=… npx tsx scripts/seed-demo.ts`.
 
 ## Local
