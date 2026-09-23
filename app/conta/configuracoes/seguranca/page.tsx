@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { createClient } from "@/lib/supabase/server";
 import { SegurancaClient } from "./SegurancaClient";
 
@@ -16,12 +17,12 @@ export default async function SegurancaPage() {
   return (
     <div>
       <div style={{ display: "flex", alignItems: "center", gap: 12, marginBottom: 32 }}>
-        <a
+        <Link
           href="/conta/configuracoes"
           style={{ color: "var(--color-gray-400)", fontSize: 14, textDecoration: "none" }}
         >
           Configurações
-        </a>
+        </Link>
         <span style={{ color: "var(--color-gray-400)" }}>›</span>
         <span style={{ fontSize: 14, color: "var(--color-gray-900)" }}>Segurança</span>
       </div>

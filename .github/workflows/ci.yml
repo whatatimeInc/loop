@@ -1,0 +1,40 @@
+# Merge gate: lint + typecheck + unit tests + build.
+# Runs for every pull request and every push to main. The "ci" job name is the
+# required status check in the main branch ruleset, so renaming it breaks the gate.
+name: CI
+on:
+  pull_request:
+  push:
+    branches: [main]
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+permissions:
+  contents: read
+jobs:
+  ci:
+    name: ci
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    env:
+      NEXT_TELEMETRY_DISABLED: "1"
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          # Same major as the Vercel project (Node.js 24.x).
+          node-version: 24
+          cache: npm
+      - run: npm ci
+      - name: Lint
+        run: npm run lint:ci
+      - name: Typecheck
+        run: npm run typecheck
+      - name: Unit tests
+        run: npm test
+      # No secrets on purpose: the build must succeed on a clean runner, so a
+      # missing env var can never be the reason a pull request goes red.
+      - name: Build
+        run: npm run build
