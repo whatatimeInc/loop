@@ -17,7 +17,7 @@
     "@supabase/ssr": "^0.10.3",
     "@supabase/supabase-js": "^2.105.4",
     "date-fns": "^4.1.0",
-    "framer-motion": "^12.38.0",
+    "framer-motion": "^13.4.0",
     "gsap": "^3.15.0",
     "iconoir-react": "^7.11.1",
     "next": "16.2.6",
