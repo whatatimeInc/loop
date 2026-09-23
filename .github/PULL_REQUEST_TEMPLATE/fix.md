@@ -16,4 +16,5 @@
 - [ ] Conventional Commits, at least one `fix:` (bumps semver **patch**), everything in English
 - [ ] Regression test that fails without the fix
 - [ ] Local gates green: `npm run lint && npm run typecheck && npm test && npm run build`
+- [ ] Checked in both launch phases (`LAUNCH_PHASE=pre` and `post`) if the change touches CTAs or the waitlist path
 - [ ] Scope limited to the bug; if a migration was touched, timestamped without collision and applied locally
