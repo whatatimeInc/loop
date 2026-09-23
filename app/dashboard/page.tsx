@@ -75,7 +75,7 @@ function SessionCard({ session, role }: { session: Session; role: "mentor" | "gu
 
   return (
     <div style={{ display: "flex", alignItems: "center", gap: 12, padding: "14px 16px", background: CARD, borderRadius: 10, border: `1px solid ${BORDER}` }}>
-      <Avatar name={otherName} photoUrl={(other as any)?.photo_url} size={40} />
+      <Avatar name={otherName} photoUrl={other?.photo_url} size={40} />
       <div style={{ flex: 1, minWidth: 0 }}>
         <p style={{ fontSize: 14, fontWeight: 600, color: DARK, margin: "0 0 2px", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{otherName}</p>
         <p style={{ fontSize: 12, color: MUTED, margin: 0 }}>{fmtDate(session.starts_at)} · {session.duration} min · {fmtBRL(session.price)}</p>

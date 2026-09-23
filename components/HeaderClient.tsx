@@ -42,9 +42,9 @@ export function HeaderClient({ isLoggedIn, phase }: { isLoggedIn: boolean; phase
         }}
       >
         {/* Esquerda: Logo */}
-        <a href="/" aria-label="Ir para a Home" style={{ display: "inline-flex" }}>
+        <Link href="/" aria-label="Ir para a Home" style={{ display: "inline-flex" }}>
           <Logo size="header" />
-        </a>
+        </Link>
 
         {/* Centro: tagline */}
         <span
@@ -103,9 +103,9 @@ export function HeaderClient({ isLoggedIn, phase }: { isLoggedIn: boolean; phase
           padding: "14px 24px",
         }}
       >
-        <a href="/" aria-label="Ir para a Home" style={{ display: "inline-flex" }}>
+        <Link href="/" aria-label="Ir para a Home" style={{ display: "inline-flex" }}>
           <Logo size="header" />
-        </a>
+        </Link>
         {isPre ? (
           <button
             onClick={openWaitlistModal}

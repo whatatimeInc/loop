@@ -1,0 +1,25 @@
+# Weekly dependency update pull requests, grouped so a normal week is one PR
+# for npm and one for the actions used in the workflows. Every PR still has to
+# pass the `ci` job like any other.
+version: 2
+updates:
+  - package-ecosystem: "npm"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+      day: "saturday"
+      time: "06:00"
+      timezone: "America/Sao_Paulo"
+    open-pull-requests-limit: 5
+    rebase-strategy: "disabled"
+    groups:
+      npm-minor-patch:
+        update-types: ["minor", "patch"]
+  - package-ecosystem: "github-actions"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+      day: "saturday"
+      time: "06:00"
+      timezone: "America/Sao_Paulo"
+    rebase-strategy: "disabled"
