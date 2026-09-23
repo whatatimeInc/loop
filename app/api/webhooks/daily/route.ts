@@ -4,6 +4,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createServiceClient } from "@/lib/supabase/service";
 import { deleteDailyRoom, verifyDailyWebhookSignature } from "@/lib/daily";
+import { env } from "@/lib/env";
 
 export const runtime = "nodejs";
 
@@ -29,14 +30,11 @@ function sessionIdFromRoomName(roomName: string): string | null {
 export async function POST(req: NextRequest) {
   const rawBody = await req.text();
   const signature = req.headers.get("x-daily-signature") ?? "";
-  const secret = process.env.DAILY_WEBHOOK_SECRET;
 
-  // Verify signature if secret is configured
-  if (secret) {
-    const valid = await verifyDailyWebhookSignature(rawBody, signature, secret);
-    if (!valid) {
-      return NextResponse.json({ error: "Invalid signature" }, { status: 401 });
-    }
+  // The secret is required at startup, so verification is never skipped.
+  const valid = await verifyDailyWebhookSignature(rawBody, signature, env().DAILY_WEBHOOK_SECRET);
+  if (!valid) {
+    return NextResponse.json({ error: "Invalid signature" }, { status: 401 });
   }
 
   let payload: DailyWebhookPayload;

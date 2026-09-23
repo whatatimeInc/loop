@@ -191,19 +191,14 @@ export async function POST(request: NextRequest) {
   let daily_room_url: string | null = null;
   let daily_room_name: string | null = null;
   let daily_error: string | null = null;
-  if (process.env.DAILY_CO_API_KEY) {
-    try {
-      const room = await createDailyRoom(session.id, roomExpiry);
-      daily_room_url = room.url;
-      daily_room_name = room.name;
-      await supabase.from("sessions").update({ daily_room_url, daily_room_name }).eq("id", session.id);
-    } catch (e) {
-      daily_error = e instanceof Error ? e.message : String(e);
-      console.error("Daily.co room creation failed:", e);
-    }
-  } else {
-    daily_error = "DAILY_CO_API_KEY is not configured";
-    console.warn("POST /api/sessions: DAILY_CO_API_KEY missing; session created without a room");
+  try {
+    const room = await createDailyRoom(session.id, roomExpiry);
+    daily_room_url = room.url;
+    daily_room_name = room.name;
+    await supabase.from("sessions").update({ daily_room_url, daily_room_name }).eq("id", session.id);
+  } catch (e) {
+    daily_error = e instanceof Error ? e.message : String(e);
+    console.error("Daily.co room creation failed:", e);
   }
 
   return NextResponse.json(

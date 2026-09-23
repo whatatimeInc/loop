@@ -1,12 +1,12 @@
 import { type NextRequest, NextResponse } from "next/server";
 import { LAUNCH_PHASE } from "@/lib/launch";
+import { env } from "@/lib/env";
 
 // ── Basic Auth (staging gate) ──────────────────────────────────────────────
-const BA_USER = process.env.BASIC_AUTH_USER ?? "";
-const BA_PASS = process.env.BASIC_AUTH_PASS ?? "";
-
 function requireBasicAuth(request: NextRequest): NextResponse | null {
-  if (!BA_USER || !BA_PASS) return null; // disabled if env vars not set
+  // Both unset = gate disabled (production). A half-set pair is refused at startup.
+  const { BASIC_AUTH_USER: BA_USER, BASIC_AUTH_PASS: BA_PASS } = env();
+  if (!BA_USER || !BA_PASS) return null;
   const auth = request.headers.get("authorization") ?? "";
   if (auth.startsWith("Basic ")) {
     const decoded = atob(auth.slice(6));
