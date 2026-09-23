@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { createServerClient } from "@supabase/ssr";
+import { createServiceClient } from "@/lib/supabase/service";
 
 export async function POST(request: NextRequest) {
   const body = await request.json().catch(() => null);
@@ -8,11 +8,7 @@ export async function POST(request: NextRequest) {
   }
 
   // Service role client to bypass RLS — server-side only, never exposed
-  const supabase = createServerClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.SUPABASE_SECRET_KEY!,
-    { cookies: { getAll: () => [], setAll: () => {} } }
-  );
+  const supabase = createServiceClient();
 
   const { data } = await supabase
     .from("profiles")

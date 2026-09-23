@@ -1,13 +1,16 @@
 // Server-side only — never import from client components.
 // Daily.co REST API helpers.
 
-const DAILY_API_URL = "https://api.daily.co/v1";
-const DAILY_API_KEY = process.env.DAILY_CO_API_KEY!;
+import { env } from "@/lib/env";
 
+const DAILY_API_URL = "https://api.daily.co/v1";
+
+// Read per call, not at module load: importing this module must never throw,
+// and env() is validated once at startup anyway.
 function dailyHeaders() {
   return {
     "Content-Type": "application/json",
-    Authorization: `Bearer ${DAILY_API_KEY}`,
+    Authorization: `Bearer ${env().DAILY_CO_API_KEY}`,
   };
 }
 

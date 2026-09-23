@@ -94,7 +94,7 @@ export async function POST(
   // after the response: the cancellation is already recorded, so a slow or
   // down Daily API must neither fail nor stall the answer the guest sees.
   const roomName = session.daily_room_name;
-  if (roomName && process.env.DAILY_CO_API_KEY) {
+  if (roomName) {
     after(() => deleteDailyRoom(roomName).catch((err) => console.error("[cancel] deleteDailyRoom failed", err)));
   }
 
