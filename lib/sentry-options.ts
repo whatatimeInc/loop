@@ -22,3 +22,14 @@ export const SENTRY_BASE_OPTIONS = {
   tracesSampleRate: 0,
   dataCollection: SENTRY_DATA_COLLECTION,
 };
+
+/**
+ * The DSN as the SDK must see it. `validateEnv` accepts a padded value (it
+ * trims before parsing), but the SDK's DSN regex is anchored and does not
+ * trim, so a pasted DSN with a stray newline would silently disable
+ * reporting while `enabled` stayed true. Blank means unset.
+ */
+export function sentryDsn(raw: string | undefined): string | undefined {
+  const trimmed = raw?.trim();
+  return trimmed ? trimmed : undefined;
+}

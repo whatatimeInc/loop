@@ -99,3 +99,24 @@ test("a ping that throws synchronously is a query failure, not a crash", async (
   assert.equal(result.status, 503);
   assert.equal(result.body.supabase.reason, "query_failed");
 });
+
+test("a ping that fails after the timeout is swallowed, not left as an unhandled rejection", async () => {
+  const unhandled: unknown[] = [];
+  const onUnhandled = (reason: unknown) => { unhandled.push(reason); };
+  process.on("unhandledRejection", onUnhandled);
+  try {
+    let fail: ((e: Error) => void) | undefined;
+    const result = await checkHealth({
+      ping: () => new Promise<void>((_, reject) => { fail = reject; }),
+      timeoutMs: 10,
+      report: () => {},
+      now: fixedNow,
+    });
+    assert.equal(result.body.supabase.reason, "timeout");
+    fail?.(new Error("connection reset after the deadline"));
+    await new Promise((r) => setTimeout(r, 10));
+    assert.deepEqual(unhandled, []);
+  } finally {
+    process.off("unhandledRejection", onUnhandled);
+  }
+});

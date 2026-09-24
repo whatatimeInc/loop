@@ -40,7 +40,20 @@ export function toError(where: string, value: unknown): { error: Error; raw?: un
   return { error: new Error(`${where}: ${messageOf(value)}`), raw: value };
 }
 
-export function createErrorReporter({ capture, log }: { capture: CaptureFn; log: LogFn }): ErrorReporter {
+export type ReporterDeps = {
+  capture: CaptureFn;
+  log: LogFn;
+  /**
+   * Pushes queued events to the transport. `capture` only enqueues; on a
+   * serverless host the invocation can be frozen before the envelope leaves,
+   * which is exactly the case for reports made inside `after()`.
+   */
+  flush?: () => Promise<unknown>;
+  /** Extends the invocation's lifetime until the task settles (Vercel's waitUntil). */
+  keepAlive?: (task: Promise<unknown>) => void;
+};
+
+export function createErrorReporter({ capture, log, flush, keepAlive }: ReporterDeps): ErrorReporter {
   return (where, value, extra) => {
     log(`[${where}]`, value);
     try {
@@ -48,6 +61,15 @@ export function createErrorReporter({ capture, log }: { capture: CaptureFn; log:
       const merged: Record<string, unknown> | undefined =
         raw === undefined ? extra : { ...(extra ?? {}), raw };
       capture(error, { tags: { where }, ...(merged ? { extra: merged } : {}) });
+      if (flush) {
+        // The kept promise never rejects: a failing flush must not become an
+        // unhandled rejection in the runtime that is keeping us alive.
+        const settled = flush().then(
+          () => undefined,
+          (flushFailure) => { log("[report-error] flush failed", flushFailure); },
+        );
+        keepAlive?.(settled);
+      }
     } catch (captureFailure) {
       log("[report-error] capture failed", captureFailure);
     }

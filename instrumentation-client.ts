@@ -1,9 +1,9 @@
 // Browser-side Sentry. Runs before the app hydrates. NEXT_PUBLIC_SENTRY_DSN is
 // inlined at build time, so an unset DSN means a disabled SDK in the bundle.
 import * as Sentry from "@sentry/nextjs";
-import { SENTRY_BASE_OPTIONS } from "./lib/sentry-options";
+import { SENTRY_BASE_OPTIONS, sentryDsn } from "./lib/sentry-options";
 
-const dsn = process.env.NEXT_PUBLIC_SENTRY_DSN;
+const dsn = sentryDsn(process.env.NEXT_PUBLIC_SENTRY_DSN);
 
 Sentry.init({
   dsn,

@@ -54,3 +54,30 @@ test("never throws, even when capture itself throws", () => {
   // the original error was still logged before capture ran
   assert.equal(logged[0][0], "[x]");
 });
+
+test("after a capture, the flush is scheduled through keepAlive so a freezing runtime waits for it", async () => {
+  const kept: Promise<unknown>[] = [];
+  let flushed = 0;
+  const report = createErrorReporter({
+    capture: () => "evt",
+    log: () => {},
+    flush: async () => { flushed += 1; },
+    keepAlive: (task) => { kept.push(task); },
+  });
+  report("sessions/cancel", new Error("Daily delete failed"));
+  assert.equal(flushed, 1);
+  assert.equal(kept.length, 1);
+  await kept[0];
+});
+
+test("a rejecting flush never surfaces: the kept promise resolves and the reporter does not throw", async () => {
+  const kept: Promise<unknown>[] = [];
+  const report = createErrorReporter({
+    capture: () => "evt",
+    log: () => {},
+    flush: () => Promise.reject(new Error("transport gone")),
+    keepAlive: (task) => { kept.push(task); },
+  });
+  assert.doesNotThrow(() => report("x", new Error("original")));
+  await assert.doesNotReject(kept[0]);
+});
