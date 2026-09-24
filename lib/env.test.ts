@@ -8,7 +8,8 @@ const VALID: Record<string, string | undefined> = {
   NEXT_PUBLIC_SITE_URL: "https://loop.example.com",
   SUPABASE_SECRET_KEY: "sb_secret_xxx",
   DAILY_CO_API_KEY: "daily-key",
-  DAILY_WEBHOOK_SECRET: "hook-secret",
+  // What Daily gets at webhook registration: base64 of ≥16 random bytes.
+  DAILY_WEBHOOK_SECRET: "c2VjcmV0LXNlY3JldC1zZWNyZXQtc2VjcmV0LTMyYg==",
   LAUNCH_PHASE: "post",
 };
 
@@ -99,6 +100,18 @@ test("LAUNCH_PHASE accepts only pre or post", () => {
   const pre = validateEnv({ ...VALID, LAUNCH_PHASE: "pre" });
   assert.equal(pre.ok, true);
   if (pre.ok) assert.equal(pre.env.LAUNCH_PHASE, "pre");
+});
+
+test("DAILY_WEBHOOK_SECRET must be base64 decoding to at least 16 bytes", () => {
+  for (const bad of ["hook-secret", "not base64!", Buffer.from("too-short").toString("base64")]) {
+    const result = validateEnv({ ...VALID, DAILY_WEBHOOK_SECRET: bad });
+    assert.equal(result.ok, false, `DAILY_WEBHOOK_SECRET=${bad} should fail`);
+    if (result.ok) continue;
+    assert.deepEqual(result.problems.map((p) => p.key), ["DAILY_WEBHOOK_SECRET"]);
+    assert.equal(result.problems[0].reason, "invalid");
+    assert.match(result.problems[0].message, /base64/);
+    assert.doesNotMatch(result.problems[0].message, new RegExp(bad.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")));
+  }
 });
 
 test("basic auth pair: both set is accepted and exposed", () => {
