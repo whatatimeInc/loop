@@ -1,6 +1,7 @@
 import { type NextRequest, NextResponse } from "next/server";
 import { LAUNCH_PHASE } from "@/lib/launch";
 import { env } from "@/lib/env";
+import { isPreLaunchPublicPath, WAITLIST_PREFIX } from "@/lib/pre-launch";
 
 // ── Basic Auth (staging gate) ──────────────────────────────────────────────
 function requireBasicAuth(request: NextRequest): NextResponse | null {
@@ -22,8 +23,6 @@ function requireBasicAuth(request: NextRequest): NextResponse | null {
 }
 
 // ── Route constants ────────────────────────────────────────────────────────
-const WAITLIST_PREFIX = "/waitlist";
-
 // Routes that require auth in post-launch
 const PROTEGIDAS = [
   "/conta",
@@ -42,9 +41,10 @@ export function proxy(request: NextRequest) {
   const { pathname } = request.nextUrl;
 
   // ── PRE-LAUNCH: home nova (com CTAs de waitlist) + landing antiga em
-  // /waitlist, ambas públicas. Tudo mais volta pra / ────────────────────────
+  // /waitlist, ambas públicas, mais o health check para monitores externos.
+  // Tudo mais volta pra / ─────────────────────────────────────────────────
   if (LAUNCH_PHASE === "pre") {
-    if (pathname === "/" || pathname.startsWith(WAITLIST_PREFIX)) {
+    if (isPreLaunchPublicPath(pathname)) {
       return NextResponse.next();
     }
 

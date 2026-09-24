@@ -26,7 +26,7 @@ export const REQUIRED_ENV_KEYS = [
  * absent in production; a half-set pair is an error because proxy.ts would
  * silently disable the gate.
  */
-export const OPTIONAL_ENV_KEYS = ["BASIC_AUTH_USER", "BASIC_AUTH_PASS"] as const;
+export const OPTIONAL_ENV_KEYS = ["BASIC_AUTH_USER", "BASIC_AUTH_PASS", "NEXT_PUBLIC_SENTRY_DSN"] as const;
 
 export type EnvSource = Record<string, string | undefined>;
 
@@ -60,6 +60,9 @@ const schema = z
     LAUNCH_PHASE: z.preprocess(blankToUndefined, z.enum(["pre", "post"])),
     BASIC_AUTH_USER: optional(),
     BASIC_AUTH_PASS: optional(),
+    // Error reporting is opt-in: without a DSN the Sentry SDK initialises
+    // disabled and every capture is a no-op.
+    NEXT_PUBLIC_SENTRY_DSN: z.preprocess(blankToUndefined, z.url().optional()),
   })
   .superRefine((value, ctx) => {
     if (value.BASIC_AUTH_USER !== undefined && value.BASIC_AUTH_PASS === undefined) {
@@ -152,6 +155,7 @@ export function env(): Env {
     LAUNCH_PHASE: process.env.LAUNCH_PHASE,
     BASIC_AUTH_USER: process.env.BASIC_AUTH_USER,
     BASIC_AUTH_PASS: process.env.BASIC_AUTH_PASS,
+    NEXT_PUBLIC_SENTRY_DSN: process.env.NEXT_PUBLIC_SENTRY_DSN,
   });
   if (!result.ok) throw new Error(formatEnvProblems(result.problems));
   cached = result.env;

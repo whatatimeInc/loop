@@ -21,6 +21,7 @@ import {
   resendConfig,
   siteUrlFrom,
 } from "@/lib/confirmation-email";
+import { reportError } from "@/lib/report";
 
 const Body = z.object({
   mentor_id: z.string().uuid(),
@@ -165,7 +166,7 @@ export async function POST(request: NextRequest) {
         idempotencyKey: confirmationIdempotencyKey(sessionId),
       });
       if (error) {
-        console.error(`Confirmation e-mail for session ${sessionId} failed:`, error);
+        reportError("sessions/create/confirmation-email", error, { sessionId });
         return;
       }
       console.log(`Confirmation e-mail for session ${sessionId} sent: ${data?.id}`);
@@ -179,10 +180,10 @@ export async function POST(request: NextRequest) {
         .eq("id", sessionId)
         .select("id");
       if (markErr || !marked?.length) {
-        console.error(`Could not record confirmation e-mail for session ${sessionId}:`, markErr ?? "0 rows updated");
+        reportError("sessions/create/record-confirmation", markErr ?? "0 rows updated", { sessionId });
       }
     } catch (e) {
-      console.error(`Confirmation e-mail for session ${sessionId} threw:`, e);
+      reportError("sessions/create/confirmation-email", e, { sessionId });
     }
   });
 
@@ -198,7 +199,7 @@ export async function POST(request: NextRequest) {
     await supabase.from("sessions").update({ daily_room_url, daily_room_name }).eq("id", session.id);
   } catch (e) {
     daily_error = e instanceof Error ? e.message : String(e);
-    console.error("Daily.co room creation failed:", e);
+    reportError("sessions/create/daily-room", e, { sessionId: session.id });
   }
 
   return NextResponse.json(

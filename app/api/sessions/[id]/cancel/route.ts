@@ -14,6 +14,7 @@ import { createClient } from "@/lib/supabase/server";
 import { createServiceClient } from "@/lib/supabase/service";
 import { deleteDailyRoom } from "@/lib/daily";
 import { cancelDeadlineHours, cancelState } from "@/lib/cancel-window";
+import { reportError } from "@/lib/report";
 
 export async function POST(
   _req: NextRequest,
@@ -95,7 +96,7 @@ export async function POST(
   // down Daily API must neither fail nor stall the answer the guest sees.
   const roomName = session.daily_room_name;
   if (roomName) {
-    after(() => deleteDailyRoom(roomName).catch((err) => console.error("[cancel] deleteDailyRoom failed", err)));
+    after(() => deleteDailyRoom(roomName).catch((err) => reportError("sessions/cancel/delete-room", err, { roomName })));
   }
 
   return NextResponse.json({ ok: true });
