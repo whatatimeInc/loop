@@ -81,3 +81,14 @@ test("a rejecting flush never surfaces: the kept promise resolves and the report
   assert.doesNotThrow(() => report("x", new Error("original")));
   await assert.doesNotReject(kept[0]);
 });
+
+test("a log function that throws never makes the reporter throw", () => {
+  const captured: unknown[] = [];
+  const reportError = createErrorReporter({
+    capture: (error) => { captured.push(error); },
+    log: () => { throw new Error("stdout is closed"); },
+  });
+
+  assert.doesNotThrow(() => reportError("api/health", new Error("boom")));
+  assert.equal(captured.length, 1, "the capture still happens when logging fails");
+});

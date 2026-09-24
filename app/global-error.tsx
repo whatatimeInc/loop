@@ -44,7 +44,7 @@ export default function GlobalError({
             O Loop.Talk não conseguiu carregar
           </h1>
           <p style={{ marginTop: "1rem", maxWidth: "28rem", color: "var(--color-gray-600)" }}>
-            Nossa equipe já foi avisada. Tente recarregar a página em instantes.
+            Tente recarregar a página em instantes.{error.digest ? " Se continuar acontecendo, informe o código abaixo." : null}
           </p>
           <button
             type="button"

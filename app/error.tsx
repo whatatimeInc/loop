@@ -32,7 +32,7 @@ export default function ErrorPage({
         Não conseguimos carregar esta página
       </h1>
       <p className="mt-4 max-w-md" style={{ color: "var(--color-gray-600)" }}>
-        Nossa equipe já foi avisada. Você pode tentar de novo ou voltar para o início.
+        Você pode tentar de novo ou voltar para o início.{error.digest ? " Se continuar acontecendo, informe o código abaixo." : null}
       </p>
       <div className="mt-8 flex flex-wrap gap-3 justify-center">
         <button

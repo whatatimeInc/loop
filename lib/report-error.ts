@@ -53,7 +53,16 @@ export type ReporterDeps = {
   keepAlive?: (task: Promise<unknown>) => void;
 };
 
-export function createErrorReporter({ capture, log, flush, keepAlive }: ReporterDeps): ErrorReporter {
+export function createErrorReporter({ capture, log: rawLog, flush, keepAlive }: ReporterDeps): ErrorReporter {
+  // Logging is the last resort, so a log function that itself throws (a closed
+  // stream, a wrapped console) is swallowed here rather than escaping.
+  const log: LogFn = (...args) => {
+    try {
+      rawLog(...args);
+    } catch {
+      // Nothing left to report to.
+    }
+  };
   return (where, value, extra) => {
     log(`[${where}]`, value);
     try {
