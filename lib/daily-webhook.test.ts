@@ -242,6 +242,30 @@ test("answers 400 to a correctly signed body that is not a Daily event, without 
   assert.deepEqual(calls, []);
 });
 
+test("answers 200 to Daily's signed registration probe without recording it", async () => {
+  // Daily POSTs {"test":"test"} before it will create a webhook and never
+  // retries; the endpoint has to answer 200 to it or the registration fails.
+  const { store, calls } = fakeStore(SCHEDULED);
+  const res = await handleDailyWebhook(signed('{"test":"test"}'), SECRET, store);
+  assert.equal(res.status, 200);
+  assert.deepEqual(res.body, { ok: true, probe: true });
+  assert.deepEqual(calls, []);
+});
+
+test("an unsigned registration probe is still refused", async () => {
+  const { store, calls } = fakeStore(SCHEDULED);
+  const res = await handleDailyWebhook({ rawBody: '{"test":"test"}', signature: null, timestamp: null }, SECRET, store);
+  assert.equal(res.status, 401);
+  assert.deepEqual(calls, []);
+});
+
+test("a signed body that merely contains a test key is not the probe", async () => {
+  const { store, calls } = fakeStore(SCHEDULED);
+  const res = await handleDailyWebhook(signed('{"test":"test","id":"x"}'), SECRET, store);
+  assert.equal(res.status, 400);
+  assert.deepEqual(calls, []);
+});
+
 test("meeting.started sets session_started_at from start_ts when still null", async () => {
   const { store, calls } = fakeStore(SCHEDULED);
   const res = await handleDailyWebhook(signed(event()), SECRET, store);

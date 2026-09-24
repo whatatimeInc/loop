@@ -266,6 +266,20 @@ const DEFAULT_DELETE_ROOM_TIMEOUT_MS = 5_000;
  * keeps Daily retrying. That costs one of Daily's retries, which is why the
  * route's stale window is barely longer than Daily's own delivery timeout.
  */
+// Exactly the documented probe body and nothing else, so a real event that
+// happens to carry a "test" key is still validated as an event.
+export function isRegistrationProbe(rawBody: string): boolean {
+  let json: unknown;
+  try {
+    json = JSON.parse(rawBody);
+  } catch {
+    return false;
+  }
+  if (typeof json !== "object" || json === null || Array.isArray(json)) return false;
+  const keys = Object.keys(json);
+  return keys.length === 1 && keys[0] === "test" && (json as { test: unknown }).test === "test";
+}
+
 export async function handleDailyWebhook(
   input: WebhookInput,
   secret: Buffer | null,
@@ -281,6 +295,11 @@ export async function handleDailyWebhook(
   if (!verifyDailyWebhookSignature({ ...input, secret })) {
     return { status: 401, body: { error: "Invalid signature" } };
   }
+
+  // Daily verifies an endpoint before creating a webhook: it POSTs
+  // {"test":"test"}, signed like an event, expects a 200 within 8 s and never
+  // retries. It is not an event and has nothing to record.
+  if (isRegistrationProbe(input.rawBody)) return { status: 200, body: { ok: true, probe: true } };
 
   const parsed = parseDailyWebhookEvent(input.rawBody);
   if (!parsed.ok) return { status: 400, body: { error: "Invalid event" } };
