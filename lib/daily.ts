@@ -1,7 +1,9 @@
 // Server-side only — never import from client components.
 // Daily.co REST API helpers.
 
-import { env } from "@/lib/env";
+// Relative with the extension, like lib/env.ts: keeps this module loadable
+// under `node --test`, which does not resolve the "@/" alias.
+import { env } from "./env.ts";
 
 const DAILY_API_URL = "https://api.daily.co/v1";
 
@@ -75,29 +77,16 @@ export async function createMeetingToken(opts: {
   return data.token as string;
 }
 
-export async function deleteDailyRoom(roomName: string): Promise<void> {
+export async function deleteDailyRoom(roomName: string, signal?: AbortSignal): Promise<void> {
   const res = await fetch(`${DAILY_API_URL}/rooms/${roomName}`, {
     method: "DELETE",
     headers: dailyHeaders(),
+    signal,
   });
   if (!res.ok && res.status !== 404) {
     throw new Error(`Daily.co deleteRoom failed: ${await res.text()}`);
   }
-}
-
-export async function verifyDailyWebhookSignature(
-  body: string,
-  signature: string,
-  secret: string
-): Promise<boolean> {
-  const encoder = new TextEncoder();
-  const key = await crypto.subtle.importKey(
-    "raw",
-    encoder.encode(secret),
-    { name: "HMAC", hash: "SHA-256" },
-    false,
-    ["verify"]
-  );
-  const sigBytes = Buffer.from(signature, "hex");
-  return crypto.subtle.verify("HMAC", key, sigBytes, encoder.encode(body));
+  // Nothing in the success body is needed, but an unread body keeps the
+  // socket checked out of the pool until it is collected; release it now.
+  await res.body?.cancel();
 }

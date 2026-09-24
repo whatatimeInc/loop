@@ -8,6 +8,7 @@
 // process.env.X directly, so a typo in a key name is a startup failure, not a
 // silent `undefined` at 3 a.m.
 import { z } from "zod";
+import { decodeWebhookSecret } from "./webhook-secret.ts";
 
 /** Keys that must be present and non-blank for the server to start. */
 export const REQUIRED_ENV_KEYS = [
@@ -38,6 +39,15 @@ function blankToUndefined(value: unknown): unknown {
 
 const required = () => z.preprocess(blankToUndefined, z.string());
 const optional = () => z.preprocess(blankToUndefined, z.string().optional());
+// The value handed to Daily at webhook registration; Daily keys its HMAC with
+// the decoded bytes, so a non-base64 string would verify nothing.
+const webhookSecret = () =>
+  z.preprocess(
+    blankToUndefined,
+    z.string().refine((value) => decodeWebhookSecret(value) !== null, {
+      message: "must be base64 of at least 16 bytes, e.g. `openssl rand -base64 32`",
+    })
+  );
 
 const schema = z
   .object({
@@ -46,7 +56,7 @@ const schema = z
     NEXT_PUBLIC_SITE_URL: z.preprocess(blankToUndefined, z.url()),
     SUPABASE_SECRET_KEY: required(),
     DAILY_CO_API_KEY: required(),
-    DAILY_WEBHOOK_SECRET: required(),
+    DAILY_WEBHOOK_SECRET: webhookSecret(),
     LAUNCH_PHASE: z.preprocess(blankToUndefined, z.enum(["pre", "post"])),
     BASIC_AUTH_USER: optional(),
     BASIC_AUTH_PASS: optional(),
