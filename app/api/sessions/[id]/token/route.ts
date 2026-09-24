@@ -11,7 +11,8 @@ import { NextRequest, NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
 import { createServiceClient } from "@/lib/supabase/service";
 import { createMeetingToken, createDailyRoom } from "@/lib/daily";
-import { ENTERABLE_STATUSES, earlyEntryMinutes, entryState, entryWindow } from "@/lib/sala-window";
+import { ENTERABLE_STATUSES, earlyEntryMinutes, entryState } from "@/lib/sala-window";
+import { extendedWindow } from "@/lib/extensions";
 
 export async function GET(
   _req: NextRequest,
@@ -48,7 +49,16 @@ export async function GET(
   }
 
   const persona = isMentor ? "mentor" : "guest";
-  const window = entryWindow(session.starts_at, session.duration, earlyEntryMinutes());
+  // Accepted time extensions move the session's end, so a token minted for a
+  // reconnect after one must outlive the extended call, not the booked one.
+  // `supabase` is the service-role client created above: RLS does not apply,
+  // so an empty result really means no rows.
+  const { data: extRows, error: extErr } = await supabase
+    .from("time_extensions")
+    .select("minutes_added, status")
+    .eq("session_id", id);
+  if (extErr) return NextResponse.json({ error: "Could not read the session's time extensions" }, { status: 500 });
+  const window = extendedWindow(session.starts_at, session.duration, extRows ?? [], earlyEntryMinutes());
   const state = entryState(window, Date.now());
   if (state !== "open") {
     return NextResponse.json({ error: state === "too-early" ? "Too early" : "Session expired", state }, { status: 403 });

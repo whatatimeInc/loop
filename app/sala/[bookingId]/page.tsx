@@ -2,7 +2,8 @@ import { redirect, notFound } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { createServiceClient } from "@/lib/supabase/service";
 import { SalaClient } from "@/components/sala/SalaClient";
-import { ENTERABLE_STATUSES, earlyEntryMinutes, entryState, entryWindow } from "@/lib/sala-window";
+import { ENTERABLE_STATUSES, earlyEntryMinutes, entryState } from "@/lib/sala-window";
+import { acceptedMinutes, extendedWindow } from "@/lib/extensions";
 
 type Props = { params: Promise<{ bookingId: string }> };
 
@@ -42,29 +43,46 @@ export default async function SalaPage({ params }: Props) {
   if (session.status === "cancelada") redirect(`/explorar`);
   if (!ENTERABLE_STATUSES.has(session.status as string)) {
     // mentor_no_show / guest_no_show: the session was resolved without a call
-    return <SalaClient session={session as never} persona={persona} initialScreen="expired" />;
+    return <SalaClient key={session.id as string} session={session as never} persona={persona} initialScreen="expired" />;
   }
 
   // ── Time window: the same rule the token API applies ─────────────────────────
+  // Accepted extensions count: the page must not show "expired" during the
+  // extra minutes, and the countdown must survive a reload.
+  // `supabase` is the service-role client created above: RLS does not apply,
+  // so an empty result really means no rows.
+  const { data: extRows, error: extErr } = await supabase
+    .from("time_extensions")
+    .select("minutes_added, status")
+    .eq("session_id", bookingId);
+  // A failed read must not be mistaken for "no extensions": that would show
+  // an extended session as expired. Fail loudly instead.
+  if (extErr) throw new Error(`Could not read time extensions for session ${bookingId}: ${extErr.message}`);
+  const extraMinutes = acceptedMinutes(extRows ?? []);
   const early = earlyEntryMinutes();
-  const state = entryState(entryWindow(session.starts_at as string, session.duration as number, early), Date.now());
+  const state = entryState(
+    extendedWindow(session.starts_at as string, session.duration as number, extRows ?? [], early),
+    Date.now(),
+  );
 
   if (state === "expired") {
     // A finished session shows its wrap-up screen instead of a dead waiting room.
     const screen = session.status === "concluída" ? "post-call" : "expired";
-    return <SalaClient session={session as never} persona={persona} initialScreen={screen} />;
+    return <SalaClient key={session.id as string} session={session as never} persona={persona} initialScreen={screen} />;
   }
   if (state === "too-early") {
-    return <SalaClient session={session as never} persona={persona} initialScreen="not-yet" earlyEntryMinutes={early} />;
+    return <SalaClient key={session.id as string} session={session as never} persona={persona} initialScreen="not-yet" earlyEntryMinutes={early} />;
   }
 
   // ── Normal: within window ────────────────────────────────────────────────────
   return (
     <SalaClient
+      key={session.id as string}
       session={session as never}
       persona={persona}
       initialScreen="waiting"
       earlyEntryMinutes={early}
+      extraMinutes={extraMinutes}
     />
   );
 }

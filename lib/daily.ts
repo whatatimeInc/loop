@@ -90,3 +90,19 @@ export async function deleteDailyRoom(roomName: string, signal?: AbortSignal): P
   // socket checked out of the pool until it is collected; release it now.
   await res.body?.cancel();
 }
+
+/**
+ * Pushes a room's expiry later, so an accepted time extension is not cut off
+ * by the lifetime fixed when the room was created. Callers pass the later of
+ * the two instants; Daily refuses new joins after `exp` and, since rooms are
+ * created without `eject_at_room_exp`, does not eject people already inside.
+ */
+export async function updateDailyRoomExpiry(roomName: string, expiresAt: Date): Promise<void> {
+  const res = await fetch(`${DAILY_API_URL}/rooms/${roomName}`, {
+    method: "POST",
+    headers: dailyHeaders(),
+    body: JSON.stringify({ properties: { exp: Math.floor(expiresAt.getTime() / 1000) } }),
+  });
+  if (!res.ok) throw new Error(`Daily.co updateRoom failed: ${await res.text()}`);
+  await res.body?.cancel();
+}
