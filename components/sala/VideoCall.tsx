@@ -563,10 +563,11 @@ export function VideoCall({
           if (!chatOpenRef.current) setUnreadCount((c) => c + 1);
         }
         if (data.type === "time-extension-request" && data.ext) {
-          // Only the other side's request is something to answer.
+          // Only the other side's request matters, and even then the database
+          // decides what to show: a re-sent message for a settled row shows nothing.
           if (data.ext.requested_by === persona) return;
-          setIncoming(data.ext);
-          setExtPending(true);
+          writeGenRef.current += 1;
+          void syncFromServerRef.current(true);
         }
         // Answers count only for the request this side is still waiting for:
         // a late message after the reconcile already settled it adds nothing.
@@ -793,6 +794,8 @@ export function VideoCall({
     // The row is created first: the message to the other side carries the
     // real id, so their answer updates the row instead of a browser-made id.
     try {
+    // The write starts now: a read in flight must not clear "pending" under it.
+    noteWrite();
     const { ok, data } = await postJson(`/api/sessions/${session.id}/extensions`, { minutes_added: mins });
     const ext = data?.ext as TimeExtension | undefined;
     // A pending row already exists (a lost 201, or the other side asked
@@ -814,6 +817,7 @@ export function VideoCall({
       setIncoming(ext);
       return;
     }
+    setExtPending(true);
     awaitAnswer(ext);
     sendAppMessage({ type: "time-extension-request", ext });
     } finally {
@@ -838,6 +842,11 @@ export function VideoCall({
       await syncFromServer(true);
       return;
     }
+    // The server has accepted: note the write first, so a read in flight
+    // cannot revive the modal, then clear the UI. Until a read applies the
+    // minutes the grant is outstanding and the countdown may not end the call.
+    grantOutstandingRef.current = true;
+    noteWrite();
     setExtPending(false);
     setIncoming(null);
     // The row the server accepted is what the peer is told about; the
@@ -846,10 +855,6 @@ export function VideoCall({
     const recorded = (data?.ext as TimeExtension | undefined) ?? ext;
     const accepted = { ...recorded, status: "accepted" as const };
     sendAppMessage({ type: "time-extension-accepted", ext: accepted });
-    // The server has accepted: until a read applies the minutes, the grant is
-    // outstanding and the countdown may not end the call.
-    grantOutstandingRef.current = true;
-    noteWrite();
     // A read discarded because something else moved meanwhile is retried at
     // once while the grant is outstanding; the periodic sync is the backstop.
     for (let attempt = 0; attempt < 3 && grantOutstandingRef.current; attempt++) {
