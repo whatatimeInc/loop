@@ -1,17 +1,22 @@
 // Next.js instrumentation hook: `register` runs once when a server instance
 // starts (not during `next build`), before the first request is served.
 //
-// This is where the app refuses to come up on a bad configuration. It must be
-// `process.exit`, not `throw`: a throw here makes Next log "Failed to prepare
-// server" and then keep the process alive answering HTTP 500 on every route,
-// which is the opposite of a visible failure. The Node runtime check keeps the
-// edge bundle free of zod and of server secret names.
+// Next compiles this file for both the Node and the Edge runtime, so each
+// branch only loads its own module: the Node half (env gate + server Sentry)
+// stays out of the edge bundle, and the edge half stays tiny.
+import * as Sentry from "@sentry/nextjs";
+
 export async function register() {
+  if (process.env.NEXT_RUNTIME === "edge") {
+    await import("./sentry.edge.config");
+    return;
+  }
   if (process.env.NEXT_RUNTIME !== "nodejs") return;
-  const { validateEnv, formatEnvProblems } = await import("./lib/env");
-  const result = validateEnv(process.env);
-  if (result.ok) return;
-  console.error(formatEnvProblems(result.problems));
-  console.error("Refusing to start. See .env.example for every key and its scope.");
-  process.exit(1);
+  const { registerNode } = await import("./instrumentation-node");
+  await registerNode();
 }
+
+// Every error Next catches on the server — Server Components, route handlers,
+// proxy — lands here with the route it came from. This is the path the card's
+// acceptance test exercises: a throw in a server page must reach Sentry.
+export const onRequestError = Sentry.captureRequestError;

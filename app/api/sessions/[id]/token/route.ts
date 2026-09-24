@@ -12,6 +12,7 @@ import { createClient } from "@/lib/supabase/server";
 import { createServiceClient } from "@/lib/supabase/service";
 import { createMeetingToken, createDailyRoom } from "@/lib/daily";
 import { ENTERABLE_STATUSES, earlyEntryMinutes, entryState, entryWindow } from "@/lib/sala-window";
+import { reportError } from "@/lib/report";
 
 export async function GET(
   _req: NextRequest,
@@ -67,7 +68,7 @@ export async function GET(
       session.daily_room_url = room.url;
       session.daily_room_name = room.name;
     } catch (e) {
-      console.error("Lazy Daily room provisioning failed:", e);
+      reportError("sessions/token/provision-room", e, { sessionId: id });
     }
     if (!session.daily_room_name) {
       return NextResponse.json({ token: null, roomUrl: session.daily_room_url, persona });
@@ -94,7 +95,7 @@ export async function GET(
       expiresAt: new Date(window.tokenExpiresAt),
     });
   } catch (e) {
-    console.error("Token generation failed:", e);
+    reportError("sessions/token/mint", e, { sessionId: id });
     return NextResponse.json({ error: "Could not issue a room token" }, { status: 502 });
   }
 

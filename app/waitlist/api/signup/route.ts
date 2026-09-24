@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
+import { reportError } from "@/lib/report";
 
 export async function POST(request: NextRequest) {
   const body = await request.json().catch(() => null);
@@ -45,7 +46,7 @@ export async function POST(request: NextRequest) {
   });
 
   if (authError) {
-    console.error("[waitlist/signup]", authError.message);
+    reportError("waitlist/signup", authError);
     return NextResponse.json({ error: "Não foi possível processar o cadastro." }, { status: 500 });
   }
 

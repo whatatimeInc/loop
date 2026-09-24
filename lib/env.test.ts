@@ -164,3 +164,26 @@ test("formatEnvProblems never echoes a value", () => {
   if (result.ok) return;
   assert.doesNotMatch(formatEnvProblems(result.problems), /hunter2/);
 });
+
+test("the Sentry DSN is optional: unset and blank both pass and read as undefined", () => {
+  for (const value of [undefined, "", "   "]) {
+    const result = validateEnv({ ...VALID, NEXT_PUBLIC_SENTRY_DSN: value });
+    assert.equal(result.ok, true, String(value));
+    if (!result.ok) return;
+    assert.equal(result.env.NEXT_PUBLIC_SENTRY_DSN, undefined);
+  }
+});
+
+test("a Sentry DSN that is not an absolute URL is reported by name", () => {
+  const result = validateEnv({ ...VALID, NEXT_PUBLIC_SENTRY_DSN: "not-a-dsn" });
+  assert.equal(result.ok, false);
+  if (result.ok) return;
+  assert.deepEqual(result.problems.map((p) => p.key), ["NEXT_PUBLIC_SENTRY_DSN"]);
+});
+
+test("a valid Sentry DSN comes back trimmed", () => {
+  const result = validateEnv({ ...VALID, NEXT_PUBLIC_SENTRY_DSN: " https://abc123@o1.ingest.sentry.io/42 \n" });
+  assert.equal(result.ok, true);
+  if (!result.ok) return;
+  assert.equal(result.env.NEXT_PUBLIC_SENTRY_DSN, "https://abc123@o1.ingest.sentry.io/42");
+});
