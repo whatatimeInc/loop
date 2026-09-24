@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
+import { reportError } from "@/lib/report";
 
 export async function POST(request: NextRequest) {
   const body = await request.json().catch(() => null);
@@ -24,7 +25,7 @@ export async function POST(request: NextRequest) {
   const { error } = await supabase.auth.updateUser({ password });
 
   if (error) {
-    console.error("[set-password]", error.message);
+    reportError("conta/set-password", error);
     return NextResponse.json({ error: "Não foi possível atualizar a senha." }, { status: 500 });
   }
 

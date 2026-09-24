@@ -9,6 +9,7 @@ import { deleteDailyRoom } from "@/lib/daily";
 import { env } from "@/lib/env";
 import { BodyTooLargeError, decodeWebhookSecret, handleDailyWebhook, readBodyBounded } from "@/lib/daily-webhook";
 import { createSupabaseWebhookStore, RELEASE_GRACE_MS, REQUEST_DEADLINE_MS } from "@/lib/daily-webhook-store";
+import { reportError } from "@/lib/report";
 
 export const runtime = "nodejs";
 
@@ -50,14 +51,19 @@ export async function POST(req: NextRequest) {
       deadline,
       wrapUp,
     });
-    const result = await handleDailyWebhook(input, secret, store, { deadline });
+    const result = await handleDailyWebhook(input, secret, store, {
+      deadline,
+      // The handler swallows a failed room deletion by design (Daily must not
+      // retry a processed event); routing its log here is what makes it an alert.
+      log: (message, ...detail) => reportError("webhooks/daily", detail[detail.length - 1] ?? message, { message, detail }),
+    });
     return NextResponse.json(result.body, { status: result.status });
   } catch (error) {
     if (error instanceof BodyTooLargeError) {
       return NextResponse.json({ error: "Body too large" }, { status: 413 });
     }
     // Any claim was released; a 5xx makes Daily retry the same event id.
-    console.error("daily webhook: processing failed", error);
+    reportError("webhooks/daily", error);
     return NextResponse.json({ error: "Processing failed" }, { status: 500 });
   }
 }

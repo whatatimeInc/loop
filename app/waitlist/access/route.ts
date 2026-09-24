@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
+import { reportError } from "@/lib/report";
 
 // Magic link entry point.
 // Supabase appends ?code=... to this URL after email confirmation.
@@ -16,7 +17,7 @@ export async function GET(request: NextRequest) {
   const { error } = await supabase.auth.exchangeCodeForSession(code);
 
   if (error) {
-    console.error("[waitlist/access]", error.message);
+    reportError("waitlist/access", error);
     // Invalid or expired token — redirect to landing with error hint
     return NextResponse.redirect(`${origin}/?error=link_invalid`);
   }
