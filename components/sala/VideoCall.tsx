@@ -9,6 +9,16 @@ import DailyIframe, {
   DailyEventObjectNetworkQualityEvent,
 } from "@daily-co/daily-js";
 import type { SessionData, Persona, ChatMessage, TimeExtension } from "./types";
+import { acceptedMinutes, requestOutcome } from "@/lib/extensions";
+
+/** How long a requester waits for an answer over the call before asking the database. */
+const ANSWER_RECONCILE_MS = 45_000;
+/** In-call sync cadence: catches a request or answer whose call message was lost. */
+const SYNC_INTERVAL_MS = 30_000;
+/** Failed pre-end reads (one per tick) tolerated before the call ends anyway. */
+const PRE_END_MAX_ATTEMPTS = 10;
+/** A sync read that takes longer than this counts as failed. */
+const SYNC_TIMEOUT_MS = 8_000;
 import { tokens } from "@/components/ui/tokens";
 
 // ── icons ─────────────────────────────────────────────────────────────────────
@@ -278,6 +288,9 @@ export function VideoCall({
   persona,
   token,
   sessionStartedAt,
+  extraMinutes = 0,
+  onTokenRefreshed,
+  onExtensionAccepted,
   onEnd,
   onConnectionLost,
 }: {
@@ -285,6 +298,12 @@ export function VideoCall({
   persona: Persona;
   token: string | null;
   sessionStartedAt: number;
+  /** Minutes already granted by accepted extensions before this mount. */
+  extraMinutes?: number;
+  /** A longer token re-issued when this side accepts an extension. */
+  onTokenRefreshed?: (token: string) => void;
+  /** Minutes granted by an extension accepted during this mount (either side). */
+  onExtensionAccepted?: (minutes: number) => void;
   onEnd: () => void;
   onConnectionLost: () => void;
 }) {
@@ -303,11 +322,58 @@ export function VideoCall({
   const [networkQuality, setNetworkQuality] = useState<"good" | "fair" | "poor">("good");
   const [controlsVisible, setControlsVisible] = useState(true);
   const controlsTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
-  const [remainingMs, setRemainingMs] = useState<number>(() => {
-    const endMs = sessionStartedAt + session.duration * 60 * 1000;
-    return Math.max(0, endMs - Date.now());
-  });
-  const [extraMs, setExtraMs] = useState(0);
+  // Granted extension time lives in extraMsRef (below): the countdown is
+  // always derived from it (see remainingFor), never added to it, so seeding
+  // it and the initial countdown from the same prop counts the minutes once.
+  const remainingFor = useCallback(
+    (extra: number) => Math.max(0, sessionStartedAt + session.duration * 60 * 1000 + extra - Date.now()),
+    [sessionStartedAt, session.duration],
+  );
+  const [remainingMs, setRemainingMs] = useState<number>(() => remainingFor(extraMinutes * 60 * 1000));
+  const [extNotice, setExtNotice] = useState<string | null>(null);
+  // Synchronous guards: a double click must not send two requests or two answers.
+  const extBusyRef = useRef(false);
+  // The request this side is waiting an answer for, and the reconcile timer
+  // that runs when no answer arrives over the call channel.
+  const myRequestRef = useRef<TimeExtension | null>(null);
+  const answerTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  // Accepted minutes this mount already holds (seeded from the prop), so the
+  // mount-time rehydrate reports to the parent only what it did not know yet.
+  const knownMinutesRef = useRef(extraMinutes);
+  // False once unmounted: a sync that resolves afterwards applies nothing.
+  const mountedRef = useRef(false);
+  // Latest sync function and incoming request, for the timer and the join effect.
+  const syncFromServerRef = useRef<(fresh?: boolean) => Promise<boolean>>(async () => false);
+  const incomingRef = useRef<TimeExtension | null>(null);
+  // Bumped on every local write or answer received. A read that started
+  // before the bump is discarded when it lands: it predates what it would
+  // settle, and the fresh read chained behind it carries the truth.
+  const writeGenRef = useRef(0);
+  // True while a pre-end sync is in flight; endedRef sticks once onEnd ran,
+  // so a tick queued meanwhile cannot end the call twice.
+  const endingRef = useRef(false);
+  const endedRef = useRef(false);
+  // Until the first sync settles, the countdown treats the session as if a
+  // request might be pending: a reload seconds before the end must not end
+  // the call before the database has been asked.
+  const initialSyncDoneRef = useRef(false);
+  // Failed pre-end reads are retried a bounded number of times before ending.
+  const preEndAttemptsRef = useRef(0);
+  // True when the server confirmed an accept whose minutes this side has not
+  // applied yet (the follow-up read failed): the countdown must not end the
+  // call while such a grant is outstanding; the next successful sync clears it.
+  const grantOutstandingRef = useRef(false);
+  const noteWrite = () => { writeGenRef.current += 1; };
+  // Granted extension time in ms; a ref so the timer tick and long-lived
+  // handlers always read the latest value (renders come from remainingMs).
+  const extraMsRef = useRef(extraMinutes * 60 * 1000);
+  const noticeTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  // Timers live until unmount only: the join effect re-runs on a token change
+  // (reconnect) and must not drop a reconcile that is still waiting.
+  useEffect(() => () => {
+    if (answerTimerRef.current) clearTimeout(answerTimerRef.current);
+    if (noticeTimerRef.current) clearTimeout(noticeTimerRef.current);
+  }, []);
   const [showExtBanner, setShowExtBanner] = useState(false);
   const [extPending, setExtPending] = useState(false);
   const [showExtRequestModal, setShowExtRequestModal] = useState(false);
@@ -316,21 +382,64 @@ export function VideoCall({
   // Latest chatOpen for handlers that must not re-run the call effect
   const chatOpenRef = useRef(false);
   useEffect(() => { chatOpenRef.current = chatOpen; }, [chatOpen]);
+  // Set together with the state, synchronously: the timer tick reads the ref
+  // and must not see a request one render late.
+  const setIncoming = useCallback((ext: TimeExtension | null) => {
+    // Adopting a NEW request (from a message, a 409, or a read) is a local
+    // write: a read already in flight must not undo it when it lands. Re-setting
+    // the same row (periodic reads) changes nothing and bumps nothing.
+    if (ext && ext.id !== incomingRef.current?.id) writeGenRef.current += 1;
+    incomingRef.current = ext;
+    setIncomingExt(ext);
+  }, []);
+  // Same for the parent's accept callback: the join effect must never depend on it.
+  const onExtensionAcceptedRef = useRef(onExtensionAccepted);
+  useEffect(() => { onExtensionAcceptedRef.current = onExtensionAccepted; }, [onExtensionAccepted]);
 
-  // Timer — decrements every second
+  // Timer — recomputes the countdown every second from the booked end plus
+  // the granted extension time, so a grant moves the end at the next tick.
   useEffect(() => {
     const interval = setInterval(() => {
-      const endMs = sessionStartedAt + (session.duration * 60 + extraMs / 1000) * 1000;
-      const left = Math.max(0, endMs - Date.now());
+      // The ref, not the closed-over state: a tick already queued when a
+      // grant lands must see the new end, or it could end the call.
+      const left = remainingFor(extraMsRef.current);
       setRemainingMs(left);
+      if (left === 0 && (endingRef.current || endedRef.current)) return; // sync in flight, or already ended
+      const mustAskFirst = () =>
+        !!myRequestRef.current || !!incomingRef.current || !initialSyncDoneRef.current || grantOutstandingRef.current;
+      if (left === 0 && mustAskFirst()) {
+        // An answer may be recorded without its message having reached us:
+        // ask the database once before ending the call. The interval keeps
+        // running, so a grant found there simply moves the countdown on.
+        endingRef.current = true;
+        void syncFromServerRef.current(true).then((ok) => {
+          endingRef.current = false;
+          if (remainingFor(extraMsRef.current) > 0) {
+            // Time was granted: the next deadline starts with a fresh budget.
+            preEndAttemptsRef.current = 0;
+            return;
+          }
+          if (endedRef.current) return;
+          // A failed read is not "no extension": while an answer is awaited
+          // or shown, try again on the next ticks before giving up.
+          if (!ok && mustAskFirst() && preEndAttemptsRef.current < PRE_END_MAX_ATTEMPTS) {
+            preEndAttemptsRef.current += 1;
+            return;
+          }
+          endedRef.current = true;
+          clearInterval(interval);
+          onEnd();
+        });
+        return;
+      }
       // Show 5-min banner
       if (left > 0 && left <= 5 * 60 * 1000 + 500 && left > 5 * 60 * 1000 - 500) {
         setShowExtBanner(true);
       }
-      if (left === 0) { clearInterval(interval); onEnd(); }
+      if (left === 0) { endedRef.current = true; clearInterval(interval); onEnd(); }
     }, 1000);
     return () => clearInterval(interval);
-  }, [sessionStartedAt, session.duration, extraMs, onEnd]);
+  }, [remainingFor, onEnd]);
 
   // Controls auto-hide
   const resetControlsTimer = useCallback(() => {
@@ -454,17 +563,23 @@ export function VideoCall({
           if (!chatOpenRef.current) setUnreadCount((c) => c + 1);
         }
         if (data.type === "time-extension-request" && data.ext) {
-          setIncomingExt(data.ext);
-          setExtPending(true);
+          // Only the other side's request matters, and even then the database
+          // decides what to show: a re-sent message for a settled row shows nothing.
+          if (data.ext.requested_by === persona) return;
+          writeGenRef.current += 1;
+          void syncFromServerRef.current(true);
         }
-        if (data.type === "time-extension-accepted" && data.ext) {
-          setExtraMs((ms) => ms + data.ext!.minutes_added * 60 * 1000);
-          setExtPending(false);
-          setIncomingExt(null);
-        }
-        if (data.type === "time-extension-declined") {
-          setExtPending(false);
-          setIncomingExt(null);
+        // Answers count only for the request this side is still waiting for:
+        // a late message after the reconcile already settled it adds nothing.
+        // Answers over the call only say "go and look": the sync settles the
+        // awaited request from the database and applies any grant, so a
+        // forged, stale or premature message changes nothing by itself, and
+        // the request stays awaited (pre-end sync included) until then.
+        if (data.type === "time-extension-accepted" || data.type === "time-extension-declined") {
+          const mine = myRequestRef.current;
+          if (!mine || (data.ext && mine.id !== data.ext.id)) return;
+          writeGenRef.current += 1;
+          void syncFromServerRef.current(true);
         }
       });
 
@@ -479,7 +594,8 @@ export function VideoCall({
       const c = handle ?? DailyIframe.getCallInstance();
       if (c) c.destroy().catch(() => {});
     };
-  }, [session.daily_room_url, token, onConnectionLost]);
+    // persona is fixed for a mount and setIncoming is stable: neither re-runs the join.
+  }, [session.daily_room_url, token, onConnectionLost, persona, setIncoming]);
 
   // Controls
   function toggleMic() {
@@ -515,45 +631,266 @@ export function VideoCall({
       ts: Date.now(),
     };
     setMessages((prev) => [...prev, msg]);
-    callRef.current?.sendAppMessage({ type: "chat", text, sender: persona, senderName: msg.senderName }, "*");
+    sendAppMessage({ type: "chat", text, sender: persona, senderName: msg.senderName });
   }
 
-  function requestExtension(mins: 5 | 10 | 15) {
-    const ext: TimeExtension = {
-      id: `${Date.now()}`,
-      requested_by: persona,
-      minutes_added: mins,
-      status: "pending",
+  function showExtNotice(text: string) {
+    setExtNotice(text);
+    if (noticeTimerRef.current) clearTimeout(noticeTimerRef.current);
+    noticeTimerRef.current = setTimeout(() => setExtNotice(null), 5000);
+  }
+
+  /** Applies granted minutes once: countdown, parent state and the known total move together. */
+  const applyGrant = useCallback((minutes: number) => {
+    if (minutes <= 0) return;
+    knownMinutesRef.current += minutes;
+    const extra = extraMsRef.current + minutes * 60 * 1000;
+    extraMsRef.current = extra;
+    // The timer would catch up at its next tick; move the countdown now so
+    // the new end is visible (and end-of-call cannot fire) in the meantime.
+    setRemainingMs(remainingFor(extra));
+    onExtensionAcceptedRef.current?.(minutes);
+  }, [remainingFor]);
+  // The join effect reads it through a ref: it must not re-run for a grant.
+  const applyGrantRef = useRef(applyGrant);
+  useEffect(() => { applyGrantRef.current = applyGrant; }, [applyGrant]);
+
+  function settleMyRequest() {
+    myRequestRef.current = null;
+    if (answerTimerRef.current) { clearTimeout(answerTimerRef.current); answerTimerRef.current = null; }
+  }
+
+  /** App messages throw when the call is not joined; the database is the source of truth anyway. */
+  function sendAppMessage(message: unknown) {
+    try { callRef.current?.sendAppMessage(message, "*"); } catch (err) { console.error("App message failed:", err); }
+  }
+
+  /**
+   * No answer arrived over the call channel (the other side's message may
+   * have been lost): read the row and settle from the database.
+   */
+  async function reconcileMyRequest() {
+    const mine = myRequestRef.current;
+    if (!mine || !mountedRef.current) return;
+    // The sync settles the request from the database; while it is still
+    // pending (or the read failed), ask again later. Fresh: a periodic read
+    // already in flight may predate the answer.
+    await syncFromServerRef.current(true);
+    if (mountedRef.current && myRequestRef.current?.id === mine.id) {
+      answerTimerRef.current = setTimeout(reconcileMyRequest, ANSWER_RECONCILE_MS);
+    }
+  }
+
+  /**
+   * The database says where the extension flow stands: accepted minutes this
+   * mount does not know yet are applied, a pending request of ours is waited
+   * for again, the other side's pending request is shown. Used on (re)mount
+   * and whenever an answer's outcome is uncertain (a lost response).
+   */
+  const syncInFlightRef = useRef<Promise<boolean> | null>(null);
+  /**
+   * `fresh` is for callers that know a write or an answer just happened: a
+   * read already in flight may predate it, so they wait for it and then read
+   * again. Routine callers (mount, periodic) share the in-flight read.
+   */
+  const syncFromServer = useCallback((fresh = false): Promise<boolean> => {
+    // One sync at a time: two overlapping reads would both see the same
+    // known total and apply the same grant twice.
+    if (syncInFlightRef.current) {
+      const current = syncInFlightRef.current;
+      return fresh ? current.then(() => syncFromServer(true)) : current;
+    }
+    const run = (async (): Promise<boolean> => {
+    try {
+      const gen = writeGenRef.current;
+      // Bounded: a hung read must settle as a failure, or the pre-end path
+      // would wait on it forever and the call could never end.
+      const r = await fetch(`/api/sessions/${session.id}/extensions`, { cache: "no-store", signal: AbortSignal.timeout(SYNC_TIMEOUT_MS) });
+      const data = (await r.json().catch(() => null)) as { ok?: boolean; extensions?: (TimeExtension & { id: string })[] } | null;
+      if (!(r.status >= 200 && r.status < 300 && data?.ok === true && data.extensions)) return false;
+      if (!mountedRef.current) return false;
+      // Stale: something was written or answered while this read was in
+      // flight. Settling from it could drop a request or a grant it never saw.
+      if (gen !== writeGenRef.current) return false;
+      const rows = data.extensions;
+      initialSyncDoneRef.current = true;
+      grantOutstandingRef.current = false;
+      // Grants come only from this delta, never from a local row again.
+      applyGrantRef.current(acceptedMinutes(rows) - knownMinutesRef.current);
+      // The request this side awaits is settled by the database's word.
+      const mine = myRequestRef.current;
+      if (mine) {
+        const outcome = requestOutcome(rows, mine.id);
+        if (outcome !== "pending") {
+          settleMyRequest();
+          setExtPending(false);
+          if (outcome !== "accepted") showExtNotice("Seu pedido de mais tempo não foi aceito.");
+        }
+      }
+      const pending = rows.find((x) => x.status === "pending");
+      if (pending && pending.requested_by === persona) {
+        // Our own request: nothing to answer on this side.
+        setIncoming(null);
+        setExtPending(true);
+        if (!myRequestRef.current) awaitAnswer(pending);
+      } else if (pending) {
+        // Same state the live handler sets for the other side's request.
+        setExtPending(true);
+        setIncoming(pending);
+      } else {
+        setIncoming(null);
+        if (!myRequestRef.current) setExtPending(false);
+      }
+      return true;
+    } catch (err) {
+      console.error("Extension sync failed:", err);
+      return false;
+    } finally {
+      syncInFlightRef.current = null;
+    }
+    })();
+    syncInFlightRef.current = run;
+    return run;
+    // awaitAnswer is a plain function of this render; refs carry the rest.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [session.id, persona]);
+
+  useEffect(() => {
+    mountedRef.current = true;
+    syncFromServerRef.current = syncFromServer;
+    void syncFromServer();
+    // A request or answer whose call message was lost still shows up here.
+    const periodic = setInterval(() => { void syncFromServer(); }, SYNC_INTERVAL_MS);
+    return () => {
+      mountedRef.current = false;
+      clearInterval(periodic);
+      myRequestRef.current = null;
     };
+  }, [syncFromServer]);
+
+  function awaitAnswer(ext: TimeExtension) {
+    noteWrite();
+    myRequestRef.current = ext;
+    if (answerTimerRef.current) clearTimeout(answerTimerRef.current);
+    answerTimerRef.current = setTimeout(reconcileMyRequest, ANSWER_RECONCILE_MS);
+  }
+
+  /** 2xx with `{ ok: true }` is the only success; a login redirect answers 200 HTML. */
+  async function postJson(url: string, body: unknown): Promise<{ ok: boolean; data: Record<string, unknown> | null }> {
+    try {
+      const r = await fetch(url, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(body) });
+      const data = (await r.json().catch(() => null)) as Record<string, unknown> | null;
+      return { ok: r.status >= 200 && r.status < 300 && data?.ok === true, data };
+    } catch {
+      return { ok: false, data: null };
+    }
+  }
+
+  async function requestExtension(mins: 5 | 10 | 15) {
+    if (extBusyRef.current) return;
+    extBusyRef.current = true;
     setExtPending(true);
     setShowExtRequestModal(false);
-    callRef.current?.sendAppMessage({ type: "time-extension-request", ext }, "*");
-    // Persist to DB
-    fetch(`/api/sessions/${session.id}/extensions`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ requested_by: persona, minutes_added: mins }),
-    }).catch(console.error);
+    // The row is created first: the message to the other side carries the
+    // real id, so their answer updates the row instead of a browser-made id.
+    try {
+    // The write starts now: a read in flight must not clear "pending" under it.
+    noteWrite();
+    const { ok, data } = await postJson(`/api/sessions/${session.id}/extensions`, { minutes_added: mins });
+    const ext = data?.ext as TimeExtension | undefined;
+    // A pending row already exists (a lost 201, or the other side asked
+    // first): announce that one instead of leaving it orphaned.
+    const pendingExists = data?.state === "pending-exists" && !!ext;
+    if (!(ok || pendingExists) || !ext) {
+      setExtPending(false);
+      showExtNotice(
+        data?.state === "limit-reached"
+          ? "Esta sessão já recebeu o máximo de tempo extra."
+          : "Não foi possível pedir mais tempo. Tente de novo.",
+      );
+      return;
+    }
+    if (ext.requested_by !== persona) {
+      // The other side's request is the pending one: answer it, do not send.
+      // Same state the live request handler sets.
+      setExtPending(true);
+      setIncoming(ext);
+      return;
+    }
+    setExtPending(true);
+    awaitAnswer(ext);
+    sendAppMessage({ type: "time-extension-request", ext });
+    } finally {
+      extBusyRef.current = false;
+    }
   }
 
-  function acceptExtension() {
-    if (!incomingExt) return;
-    const accepted = { ...incomingExt, status: "accepted" as const };
-    setExtraMs((ms) => ms + incomingExt.minutes_added * 60 * 1000);
+  async function acceptExtension() {
+    if (!incomingExt || extBusyRef.current) return;
+    extBusyRef.current = true;
+    const ext = incomingExt;
+    try {
+    const { ok, data } = await postJson(`/api/sessions/${session.id}/extensions/${ext.id}/respond`, { status: "accepted" });
+    if (!ok) {
+      // The row may have been accepted although the answer was lost, or it
+      // may still be pending: the database decides. A sync applies any grant
+      // this side does not know yet and re-shows the request if it is still
+      // open, so the acceptor can retry.
+      // The request stays shown (and keeps the pre-end guard) until the sync
+      // says what really happened; a failed sync leaves it for a retry.
+      showExtNotice("Não foi possível confirmar a prorrogação.");
+      await syncFromServer(true);
+      return;
+    }
+    // The server has accepted: note the write first, so a read in flight
+    // cannot revive the modal, then clear the UI. Until a read applies the
+    // minutes the grant is outstanding and the countdown may not end the call.
+    grantOutstandingRef.current = true;
+    noteWrite();
     setExtPending(false);
-    setIncomingExt(null);
-    callRef.current?.sendAppMessage({ type: "time-extension-accepted", ext: accepted }, "*");
-    fetch(`/api/sessions/${session.id}/extensions/${incomingExt.id}/respond`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ status: "accepted" }),
-    }).catch(console.error);
+    setIncoming(null);
+    // The row the server accepted is what the peer is told about; the
+    // minutes themselves are applied by the (locked) sync, so an overlapping
+    // periodic sync that already saw the row cannot make this side add them twice.
+    const recorded = (data?.ext as TimeExtension | undefined) ?? ext;
+    const accepted = { ...recorded, status: "accepted" as const };
+    sendAppMessage({ type: "time-extension-accepted", ext: accepted });
+    // A read discarded because something else moved meanwhile is retried at
+    // once while the grant is outstanding; the periodic sync is the backstop.
+    for (let attempt = 0; attempt < 3 && grantOutstandingRef.current; attempt++) {
+      await syncFromServer(true);
+    }
+    if (typeof data?.token === "string") onTokenRefreshed?.(data.token);
+    } finally {
+      extBusyRef.current = false;
+    }
   }
 
-  function declineExtension() {
+  async function declineExtension() {
+    if (!incomingExt || extBusyRef.current) return;
+    extBusyRef.current = true;
+    const ext = incomingExt;
+    try {
+    const { ok, data } = await postJson(`/api/sessions/${session.id}/extensions/${ext.id}/respond`, { status: "declined" });
+    // The database is the truth the requester reconciles against, so the
+    // "declined" message goes out only once the row really is declined; a
+    // request that is no longer pending (already answered) is simply dropped.
+    if (!ok) {
+      // Already answered elsewhere (another tab accepted it, or the answer
+      // was lost) or a plain failure: the database decides what this side
+      // shows next, including a grant it does not know yet.
+      const already = typeof data?.state === "string" && data.state.startsWith("already-");
+      if (!already) showExtNotice("Não foi possível recusar. Tente de novo.");
+      await syncFromServer(true);
+      return;
+    }
+    noteWrite();
     setExtPending(false);
-    setIncomingExt(null);
-    callRef.current?.sendAppMessage({ type: "time-extension-declined" }, "*");
+    setIncoming(null);
+    sendAppMessage({ type: "time-extension-declined", ext });
+    } finally {
+      extBusyRef.current = false;
+    }
   }
 
   const sessionLabel = `Conversa de ${session.duration} min`;
@@ -604,6 +941,20 @@ export function VideoCall({
         {/* 5-min banner */}
         {showExtBanner && (
           <ExtensionBanner onRequest={() => setShowExtRequestModal(true)} pending={extPending} />
+        )}
+
+        {/* Extension outcome notice (request or answer that could not be recorded) */}
+        {extNotice && (
+          <div
+            role="status"
+            style={{
+              position: "absolute", top: 60, left: "50%", transform: "translateX(-50%)", zIndex: 30,
+              padding: "10px 16px", borderRadius: 8, fontSize: 13, fontWeight: 600,
+              background: "#F5A623", color: "#1A1A1A", boxShadow: "0 4px 16px rgba(0,0,0,0.4)",
+            }}
+          >
+            {extNotice}
+          </div>
         )}
       </div>
 

@@ -21,12 +21,25 @@ interface SalaClientProps {
   persona: Persona;
   initialScreen: Screen;
   earlyEntryMinutes?: number;
+  /** Minutes already granted by accepted time extensions (server-side sum). */
+  extraMinutes?: number;
 }
 
 // ── Main client orchestrator ──────────────────────────────────────────────────
 
-export function SalaClient({ session, persona, initialScreen, earlyEntryMinutes = 10 }: SalaClientProps) {
+export function SalaClient({ session, persona, initialScreen, earlyEntryMinutes = 10, extraMinutes: initialExtraMinutes = 0 }: SalaClientProps) {
   const [screen, setScreen] = useState<Screen>(initialScreen);
+  // Accepted extensions are kept here, above VideoCall, so a remount after a
+  // dropped connection restarts the countdown from the extended end.
+  const [extraMinutes, setExtraMinutes] = useState(initialExtraMinutes);
+  const handleExtensionAccepted = useCallback((minutes: number) => {
+    setExtraMinutes((m) => m + minutes);
+  }, []);
+  // A token re-issued on accept is NOT applied to the live call: changing the
+  // `token` prop re-runs VideoCall's join effect and would drop the call. It
+  // is kept aside and used only when the user reconnects.
+  const refreshedToken = useRef<string | null>(null);
+  const handleTokenRefreshed = useCallback((t: string) => { refreshedToken.current = t; }, []);
   const [token, setToken] = useState<string | null>(null);
   const [roomUrl, setRoomUrl] = useState<string | null>(session.daily_room_url);
   // A Daily room exists only when the token API gives us a usable roomUrl;
@@ -179,6 +192,11 @@ export function SalaClient({ session, persona, initialScreen, earlyEntryMinutes 
   }, []);
 
   const handleRetryConnection = useCallback(() => {
+    if (refreshedToken.current) {
+      // A new token remounts the call: the reconnect the user just asked for.
+      setToken(refreshedToken.current);
+      refreshedToken.current = null;
+    }
     setScreen("incall");
   }, []);
 
@@ -237,6 +255,9 @@ export function SalaClient({ session, persona, initialScreen, earlyEntryMinutes 
             persona={persona}
             token={token}
             sessionStartedAt={sessionStartedAt}
+            extraMinutes={extraMinutes}
+            onTokenRefreshed={handleTokenRefreshed}
+            onExtensionAccepted={handleExtensionAccepted}
             onEnd={handleCallEnd}
             onConnectionLost={handleConnectionLost}
           />
@@ -266,6 +287,9 @@ export function SalaClient({ session, persona, initialScreen, earlyEntryMinutes 
             persona={persona}
             token={token}
             sessionStartedAt={sessionStartedAt}
+            extraMinutes={extraMinutes}
+            onTokenRefreshed={handleTokenRefreshed}
+            onExtensionAccepted={handleExtensionAccepted}
             onEnd={handleCallEnd}
             onConnectionLost={() => {}}
           />
