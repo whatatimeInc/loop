@@ -187,3 +187,22 @@ test("a valid Sentry DSN comes back trimmed", () => {
   if (!result.ok) return;
   assert.equal(result.env.NEXT_PUBLIC_SENTRY_DSN, "https://abc123@o1.ingest.sentry.io/42");
 });
+
+test("ADMIN_EMAILS is optional and, when set, kept as written", () => {
+  const unset = validateEnv(VALID);
+  assert.equal(unset.ok, true);
+  if (unset.ok) assert.equal(unset.env.ADMIN_EMAILS, undefined);
+  const set = validateEnv({ ...VALID, ADMIN_EMAILS: "ops@loop.io, dev@loop.io" });
+  assert.equal(set.ok, true);
+  if (set.ok) assert.equal(set.env.ADMIN_EMAILS, "ops@loop.io, dev@loop.io");
+});
+
+test("ADMIN_EMAILS with an entry that is not an e-mail is refused without echoing it", () => {
+  const result = validateEnv({ ...VALID, ADMIN_EMAILS: "ops@loop.io, not-an-email" });
+  assert.equal(result.ok, false);
+  if (result.ok) return;
+  assert.deepEqual(result.problems.map((p) => p.key), ["ADMIN_EMAILS"]);
+  assert.equal(result.problems[0].reason, "invalid");
+  assert.match(result.problems[0].message, /comma-separated list of e-mails/);
+  assert.doesNotMatch(result.problems[0].message, /not-an-email/);
+});
