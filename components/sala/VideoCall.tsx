@@ -9,7 +9,7 @@ import DailyIframe, {
   DailyEventObjectNetworkQualityEvent,
 } from "@daily-co/daily-js";
 import type { SessionData, Persona, ChatMessage, TimeExtension } from "./types";
-import { acceptedMinutes, requestOutcome } from "@/lib/extensions";
+import { acceptedMinutes, requestOutcome, shouldOfferExtension } from "@/lib/extensions";
 
 /** How long a requester waits for an answer over the call before asking the database. */
 const ANSWER_RECONCILE_MS = 45_000;
@@ -374,7 +374,6 @@ export function VideoCall({
     if (answerTimerRef.current) clearTimeout(answerTimerRef.current);
     if (noticeTimerRef.current) clearTimeout(noticeTimerRef.current);
   }, []);
-  const [showExtBanner, setShowExtBanner] = useState(false);
   const [extPending, setExtPending] = useState(false);
   const [showExtRequestModal, setShowExtRequestModal] = useState(false);
   const [incomingExt, setIncomingExt] = useState<TimeExtension | null>(null);
@@ -431,10 +430,6 @@ export function VideoCall({
           onEnd();
         });
         return;
-      }
-      // Show 5-min banner
-      if (left > 0 && left <= 5 * 60 * 1000 + 500 && left > 5 * 60 * 1000 - 500) {
-        setShowExtBanner(true);
       }
       if (left === 0) { endedRef.current = true; clearInterval(interval); onEnd(); }
     }, 1000);
@@ -938,9 +933,16 @@ export function VideoCall({
           <IcoSignal quality={networkQuality} />
         </div>
 
-        {/* 5-min banner */}
-        {showExtBanner && (
-          <ExtensionBanner onRequest={() => setShowExtRequestModal(true)} pending={extPending} />
+        {/* Last-minutes banner: derived from the time left (see
+            shouldOfferExtension), so a late join or a reload inside the last
+            minutes still offers it. Keyed by the granted time, so "Fechar"
+            hides it only until the session gains more time. */}
+        {shouldOfferExtension({ remainingMs, requestPending: extPending }) && (
+          <ExtensionBanner
+            key={extraMsRef.current}
+            onRequest={() => setShowExtRequestModal(true)}
+            pending={extPending}
+          />
         )}
 
         {/* Extension outcome notice (request or answer that could not be recorded) */}

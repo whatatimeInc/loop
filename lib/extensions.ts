@@ -56,3 +56,20 @@ export const MAX_EXTENSION_MINUTES = 60;
 export function extensionAllowance(rows: ExtensionRow[], minutes: number): "ok" | "limit-reached" {
   return acceptedMinutes(rows) + minutes > MAX_EXTENSION_MINUTES ? "limit-reached" : "ok";
 }
+
+/** How close to the end the "ask for more time" banner is offered. */
+export const EXTENSION_OFFER_WINDOW_MS = 5 * 60_000;
+
+/**
+ * Whether the banner that opens the request modal should be on screen.
+ *
+ * Derived from the time left, never latched at the moment the countdown
+ * crosses the threshold: a participant who joins late, or reloads inside the
+ * last minutes, must still be able to ask for more time. It also stays up
+ * while this side waits for an answer, because the "waiting" indicator lives
+ * in the banner.
+ */
+export function shouldOfferExtension(input: { remainingMs: number; requestPending: boolean }): boolean {
+  if (input.requestPending) return true;
+  return input.remainingMs > 0 && input.remainingMs <= EXTENSION_OFFER_WINDOW_MS;
+}
