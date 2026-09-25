@@ -9,34 +9,21 @@ import type { Categoria } from "@/lib/mockExperts";
 import { useRevealOnView, revealStyle } from "@/components/home/useReveal";
 import type { LaunchPhase } from "@/lib/launch";
 
-// Placeholder roster — swap for real featured creators when they are picked.
-// TODO: no per-mentor videos exist yet (public/mentors/* only has photos), so
-// every card points at the same sample clip. Drop per-creator mp4s in and set
-// `video` accordingly; leave it undefined to render a still photo only.
+// Featured creators on the home page. Empty until the team's own profiles
+// exist (Broome BOOK-8): the previous placeholders were real public figures
+// who never authorised the use of their name or photo. While empty, the
+// section renders nothing.
+// TODO: no per-mentor videos exist yet, so set `video` per creator when added;
+// leave it undefined to render a still photo only.
 const CREATORS: {
   slug: string; name: string; description: string; categoria: Categoria; video?: string;
-}[] = [
-  {
-    slug:        "andre-do-amaral",
-    name:        "André Do Amaral",
-    description: "Designer e diretor criativo. Identidade visual e branding.",
-    categoria:   "Criatividade",
-    video:       "/homepage-hero-423-2.mp4",
-  },
-  {
-    slug:        "mauricio-arruda",
-    name:        "Mauricio Arruda",
-    description: "Arquitetura e Design. Sócio e diretor criativo da MAU.",
-    categoria:   "Criatividade",
-    video:       "/homepage-hero-423-2.mp4",
-  },
-];
+}[] = [];
 
 // Portrait proportion from the 1440px reference: 343 wide by 500 tall.
 const CARD_W     = 343;
 const CARD_RATIO = "343 / 500";
 
-export function CreatorsSection({ phase }: { phase: LaunchPhase }) {
+function CreatorsSectionContent({ phase }: { phase: LaunchPhase }) {
   const [isMobile, setIsMobile] = useState(false);
   const isPre = phase === "pre";
   const sectionRef = useRef<HTMLElement>(null);
@@ -159,4 +146,10 @@ export function CreatorsSection({ phase }: { phase: LaunchPhase }) {
       )}
     </section>
   );
+}
+
+/** Renders nothing while there are no featured creators to show. */
+export function CreatorsSection(props: { phase: LaunchPhase }) {
+  if (CREATORS.length === 0) return null;
+  return <CreatorsSectionContent {...props} />;
 }
