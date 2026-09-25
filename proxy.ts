@@ -32,6 +32,7 @@ const PROTEGIDAS = [
   "/sala",
   "/avaliar",
   "/confirmacao",
+  "/admin",
 ];
 
 export function proxy(request: NextRequest) {

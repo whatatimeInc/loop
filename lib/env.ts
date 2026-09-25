@@ -26,7 +26,7 @@ export const REQUIRED_ENV_KEYS = [
  * absent in production; a half-set pair is an error because proxy.ts would
  * silently disable the gate.
  */
-export const OPTIONAL_ENV_KEYS = ["BASIC_AUTH_USER", "BASIC_AUTH_PASS", "NEXT_PUBLIC_SENTRY_DSN"] as const;
+export const OPTIONAL_ENV_KEYS = ["BASIC_AUTH_USER", "BASIC_AUTH_PASS", "NEXT_PUBLIC_SENTRY_DSN", "ADMIN_EMAILS"] as const;
 
 export type EnvSource = Record<string, string | undefined>;
 
@@ -63,6 +63,17 @@ const schema = z
     // Error reporting is opt-in: without a DSN the Sentry SDK initialises
     // disabled and every capture is a no-op.
     NEXT_PUBLIC_SENTRY_DSN: z.preprocess(blankToUndefined, z.url().optional()),
+    // Who may open /admin (lib/admin.ts). Unset: nobody, the area is a 404.
+    ADMIN_EMAILS: z.preprocess(
+      blankToUndefined,
+      z
+        .string()
+        .refine(
+          (value) => value.split(",").every((e) => e.trim() === "" || z.email().safeParse(e.trim()).success),
+          { message: "must be a comma-separated list of e-mails" },
+        )
+        .optional(),
+    ),
   })
   .superRefine((value, ctx) => {
     if (value.BASIC_AUTH_USER !== undefined && value.BASIC_AUTH_PASS === undefined) {
