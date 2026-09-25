@@ -12,7 +12,17 @@ import {
   NoShowMentorScreen,
   NoShowGuestScreen,
   ConnectionLostScreen,
+  type MarkNoShowResult,
 } from "./SpecialStates";
+import { noShowOpensAt, otherParty } from "@/lib/no-show";
+import { APP_TZ } from "@/lib/slots";
+
+// What the waiting side reads when the server refuses a no-show.
+const NO_SHOW_MESSAGES: Record<string, string> = {
+  "too-early": "Ainda está dentro da tolerância. Aguarde o fim da contagem.",
+  "not-scheduled": "Esta sessão já foi encerrada ou cancelada. Recarregue a página.",
+  "not-counterpart": "Só é possível registrar a ausência da outra pessoa desta sessão.",
+};
 
 // ── Props ─────────────────────────────────────────────────────────────────────
 
@@ -28,7 +38,7 @@ interface SalaClientProps {
 // ── Main client orchestrator ──────────────────────────────────────────────────
 
 export function SalaClient({ session, persona, initialScreen, earlyEntryMinutes = 10, extraMinutes: initialExtraMinutes = 0 }: SalaClientProps) {
-  const [screen, setScreen] = useState<Screen>(initialScreen);
+  const [rawScreen, setScreen] = useState<Screen>(initialScreen);
   // Accepted extensions are kept here, above VideoCall, so a remount after a
   // dropped connection restarts the countdown from the extended end.
   const [extraMinutes, setExtraMinutes] = useState(initialExtraMinutes);
@@ -49,6 +59,17 @@ export function SalaClient({ session, persona, initialScreen, earlyEntryMinutes 
   // mounts once with a stable token instead of remounting when it arrives.
   const [tokenSettled, setTokenSettled] = useState(false);
   const [otherJoined, setOtherJoined] = useState(false);
+  // A no-show in flight or already recorded is final for this screen: the
+  // server write cannot be taken back, so a late arrival must not reopen the
+  // waiting room over it.
+  const [markState, setMarkState] = useState<"idle" | "pending" | "recorded">("idle");
+  // The other side arrived after the grace: show the waiting room, where Entrar
+  // joins the call, instead of offering to record them as absent. Derived, so
+  // a failed attempt (markState back to idle) re-evaluates on its own.
+  const screen: Screen =
+    otherJoined && markState === "idle" && (rawScreen === "no-show-mentor" || rawScreen === "no-show-guest")
+      ? "waiting"
+      : rawScreen;
   const [sessionStartedAt, setSessionStartedAt] = useState<number>(
     session.session_started_at
       ? new Date(session.session_started_at).getTime()
@@ -102,7 +123,9 @@ export function SalaClient({ session, persona, initialScreen, earlyEntryMinutes 
 
   // ── Supabase Realtime: detect other participant joining ────────────────────
   useEffect(() => {
-    if (screen !== "waiting") return;
+    // Also while a no-show screen is up: if the other side arrives late, the
+    // waiting side must see it before recording an absence.
+    if (screen !== "waiting" && screen !== "no-show-mentor" && screen !== "no-show-guest") return;
     const supabase = createClient();
     const channel = supabase
       .channel(`session:${session.id}`)
@@ -150,13 +173,11 @@ export function SalaClient({ session, persona, initialScreen, earlyEntryMinutes 
   // ── No-show detection (waiting room) ─────────────────────────────────────
   useEffect(() => {
     if (screen !== "waiting") return;
-    const GRACE_MS = 15 * 60 * 1000;
-    const startsMs = new Date(session.starts_at).getTime();
+    const opensAt = noShowOpensAt(session.starts_at);
 
     // Check immediately and also set a timer
     const checkNoShow = () => {
-      const elapsed = Date.now() - startsMs;
-      if (elapsed >= GRACE_MS && !otherJoined) {
+      if (Date.now() >= opensAt && !otherJoined) {
         // After grace period, show no-show screen for whichever side is waiting
         if (persona === "guest") setScreen("no-show-mentor");
         else setScreen("no-show-guest");
@@ -200,14 +221,41 @@ export function SalaClient({ session, persona, initialScreen, earlyEntryMinutes 
     setScreen("incall");
   }, []);
 
-  const handleMarkNoShow = useCallback(() => {
-    fetch(`/api/sessions/${session.id}/no-show`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ no_show_by: persona === "mentor" ? "guest" : "mentor" }),
-    }).catch(() => {});
-    setScreen("post-call");
+  // The screen shows the outcome: a refused or failed request must not look
+  // like a recorded no-show.
+  const postNoShow = useCallback(async (): Promise<MarkNoShowResult> => {
+    try {
+      const r = await fetch(`/api/sessions/${session.id}/no-show`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ no_show_by: otherParty(persona) }),
+      });
+      if (r.ok) return { ok: true };
+      const data: { state?: string; status?: string | null; opens_at?: string | null } = await r.json().catch(() => ({}));
+      // The session left "agendada" another way: retrying cannot help.
+      if (data.state === "not-scheduled") {
+        // Both sides reported at once and the other one was recorded first.
+        const already = data.status === "mentor_no_show" || data.status === "guest_no_show";
+        return { ok: false, message: already ? "A ausência nesta sessão já foi registrada." : NO_SHOW_MESSAGES["not-scheduled"], final: true };
+      }
+      if (data.state === "too-early" && data.opens_at) {
+        // The server's clock decides; show its time, in the app's time zone.
+        const at = new Date(data.opens_at).toLocaleTimeString("pt-BR", { hour: "2-digit", minute: "2-digit", timeZone: APP_TZ });
+        return { ok: false, message: `Ainda está dentro da tolerância. Tente de novo a partir de ${at}.` };
+      }
+      return { ok: false, message: NO_SHOW_MESSAGES[data.state ?? ""] ?? "Não foi possível registrar agora. Tente de novo." };
+    } catch {
+      return { ok: false, message: "Sem conexão. Tente de novo." };
+    }
   }, [session.id, persona]);
+
+  const handleMarkNoShow = useCallback(async (): Promise<MarkNoShowResult> => {
+    setMarkState("pending");
+    const result = await postNoShow();
+    // Already closed another way counts as final too: nothing left to retry.
+    setMarkState(result.ok || result.final ? "recorded" : "idle");
+    return result;
+  }, [postNoShow]);
 
   const handleReviewSubmitted = useCallback(() => {
     // nothing to do; PostCallGuest manages its own state
@@ -313,6 +361,7 @@ export function SalaClient({ session, persona, initialScreen, earlyEntryMinutes 
         <NoShowMentorScreen
           session={session}
           onLeave={() => { window.location.href = "/explorar"; }}
+          onMarkNoShow={handleMarkNoShow}
         />
       );
 
@@ -321,6 +370,7 @@ export function SalaClient({ session, persona, initialScreen, earlyEntryMinutes 
         <NoShowGuestScreen
           session={session}
           onMarkNoShow={handleMarkNoShow}
+          onLeave={() => { window.location.href = "/dashboard"; }}
         />
       );
 

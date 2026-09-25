@@ -45,6 +45,12 @@ export default async function SalaPage({ params }: Props) {
     // mentor_no_show / guest_no_show: the session was resolved without a call
     return <SalaClient key={session.id as string} session={session as never} persona={persona} initialScreen="expired" />;
   }
+  // A finished session shows its wrap-up screen, inside the window or after
+  // it: it must never fall back into the waiting room. (The token route still
+  // accepts "concluída", so whoever is still in the call can reconnect.)
+  if (session.status === "concluída") {
+    return <SalaClient key={session.id as string} session={session as never} persona={persona} initialScreen="post-call" />;
+  }
 
   // ── Time window: the same rule the token API applies ─────────────────────────
   // Accepted extensions count: the page must not show "expired" during the
@@ -66,9 +72,7 @@ export default async function SalaPage({ params }: Props) {
   );
 
   if (state === "expired") {
-    // A finished session shows its wrap-up screen instead of a dead waiting room.
-    const screen = session.status === "concluída" ? "post-call" : "expired";
-    return <SalaClient key={session.id as string} session={session as never} persona={persona} initialScreen={screen} />;
+    return <SalaClient key={session.id as string} session={session as never} persona={persona} initialScreen="expired" />;
   }
   if (state === "too-early") {
     return <SalaClient key={session.id as string} session={session as never} persona={persona} initialScreen="not-yet" earlyEntryMinutes={early} />;

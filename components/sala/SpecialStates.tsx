@@ -1,10 +1,11 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import type { SessionData, Persona } from "./types";
 import { tokens } from "@/components/ui/tokens";
+import { noShowOpensAt } from "@/lib/no-show";
 
 // ── shared helpers ─────────────────────────────────────────────────────────────
 
@@ -118,18 +119,125 @@ export function ExpiredScreen({ session, persona }: { session: SessionData; pers
   );
 }
 
-// ── Screen: no-show (mentor didn't join) ───────────────────────────────────────
+// ── No-show confirmation (shared by both no-show screens) ──────────────────────
+
+/** `final`: the session was already closed another way; retrying cannot help. */
+export type MarkNoShowResult = { ok: true } | { ok: false; message: string; final?: boolean };
+
+function NoShowConfirm({
+  label,
+  question,
+  onMarkNoShow,
+  onLeave,
+}: {
+  label: string;
+  question: string;
+  onMarkNoShow: () => Promise<MarkNoShowResult>;
+  /** Shown once the absence is recorded, so the screen is never a dead end. */
+  onLeave?: () => void;
+}) {
+  const inFlight = useRef(false);
+  const [confirming, setConfirming] = useState(false);
+  const [submitting, setSubmitting] = useState(false);
+  const [recorded, setRecorded] = useState(false);
+  const [closed, setClosed] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
+  async function confirm() {
+    // One request at a time: the ref is set synchronously, so a second click
+    // landing before the re-render cannot post again.
+    if (inFlight.current) return;
+    inFlight.current = true;
+    setSubmitting(true);
+    setError(null);
+    try {
+      const result = await onMarkNoShow();
+      if (result.ok) setRecorded(true);
+      else {
+        setError(result.message);
+        if (result.final) setClosed(true);
+      }
+    } finally {
+      inFlight.current = false;
+      setSubmitting(false);
+    }
+  }
+
+  if (recorded || closed) {
+    return (
+      <div style={{ display: "flex", flexDirection: "column", gap: 12, width: "100%" }}>
+        <div style={{ background: "rgba(255,255,255,0.06)", borderRadius: 12, padding: "20px 24px", width: "100%" }}>
+          <p style={{ fontSize: 14, margin: 0 }}>{recorded ? "Não comparecimento registrado." : error}</p>
+        </div>
+        {onLeave && (
+          <button
+            onClick={onLeave}
+            style={{
+              padding: "12px 24px", background: "transparent", border: "1px solid rgba(255,255,255,0.2)",
+              borderRadius: 8, color: "#F0EFEB", fontSize: 15, fontWeight: 600, cursor: "pointer",
+            }}
+          >
+            Sair
+          </button>
+        )}
+      </div>
+    );
+  }
+
+  return (
+    <div style={{ display: "flex", flexDirection: "column", gap: 12, width: "100%" }}>
+      {!confirming ? (
+        <button
+          onClick={() => setConfirming(true)}
+          style={{
+            padding: "12px 24px", background: "rgba(192,57,43,0.85)", border: "none",
+            borderRadius: 8, color: "#fff", fontSize: 15, fontWeight: 600, cursor: "pointer", width: "100%",
+          }}
+        >
+          {label}
+        </button>
+      ) : (
+        <div style={{ background: "rgba(255,255,255,0.06)", borderRadius: 12, padding: "20px 24px", width: "100%", display: "flex", flexDirection: "column", gap: 12 }}>
+          <p style={{ fontSize: 14, margin: 0 }}>{question}</p>
+          <div style={{ display: "flex", gap: 8 }}>
+            <button disabled={submitting} onClick={() => { setConfirming(false); setError(null); }} style={{ flex: 1, padding: "10px", background: "transparent", border: "1px solid rgba(255,255,255,0.2)", borderRadius: 8, color: "#F0EFEB", cursor: submitting ? "default" : "pointer" }}>Cancelar</button>
+            <button disabled={submitting} onClick={confirm} style={{ flex: 1, padding: "10px", background: "#C0392B", border: "none", borderRadius: 8, color: "#fff", fontWeight: 600, cursor: submitting ? "default" : "pointer", opacity: submitting ? 0.6 : 1 }}>
+              {submitting ? "Registrando…" : "Confirmar"}
+            </button>
+          </div>
+        </div>
+      )}
+      {error && <p role="alert" style={{ fontSize: 13, color: "#F28B82", margin: 0 }}>{error}</p>}
+      {/* Disabled while the request is in flight: leaving the page could cancel it. */}
+      {onLeave && (
+        <button
+          disabled={submitting}
+          onClick={onLeave}
+          style={{
+            padding: "12px 24px", background: "transparent", border: "1px solid rgba(255,255,255,0.2)",
+            borderRadius: 8, color: "#F0EFEB", fontSize: 15, fontWeight: 600,
+            cursor: submitting ? "default" : "pointer", opacity: submitting ? 0.6 : 1,
+          }}
+        >
+          Sair
+        </button>
+      )}
+    </div>
+  );
+}
+
+// ── Screen: no-show (mentor didn't join) — shown to the GUEST ─────────────────
 
 export function NoShowMentorScreen({
   session,
   onLeave,
+  onMarkNoShow,
 }: {
   session: SessionData;
   onLeave: () => void;
+  onMarkNoShow: () => Promise<MarkNoShowResult>;
 }) {
-  const GRACE_MS = 15 * 60 * 1000;
-  const graceEnd = new Date(session.starts_at).getTime() + GRACE_MS;
-  const diff = useCountdown(graceEnd);
+  const diff = useCountdown(noShowOpensAt(session.starts_at));
   const graceOver = diff === 0;
 
   return (
@@ -149,44 +257,35 @@ export function NoShowMentorScreen({
               {formatHHMM(diff)}
             </p>
             <p style={{ fontSize: 13, color: "#807F71", margin: 0 }}>
-              você receberá o reembolso total.
+              você poderá registrar que ele não compareceu.
             </p>
           </div>
         ) : (
-          <div style={{ display: "flex", flexDirection: "column", gap: 12, width: "100%" }}>
-            <p style={{ fontSize: 14, color: "#807F71", margin: 0 }}>
-              Você receberá o reembolso total em até 5 dias úteis.
-            </p>
-            <button
-              onClick={onLeave}
-              style={{
-                padding: "12px 24px", background: "rgba(192,57,43,0.85)", border: "none",
-                borderRadius: 8, color: "#fff", fontSize: 15, fontWeight: 600, cursor: "pointer",
-              }}
-            >
-              Sair
-            </button>
-          </div>
+          <NoShowConfirm
+            label="Registrar que o host não compareceu"
+            question="Confirmar que o host não compareceu?"
+            onMarkNoShow={onMarkNoShow}
+            onLeave={onLeave}
+          />
         )}
       </div>
     </div>
   );
 }
 
-// ── Screen: no-show (guest didn't join) ───────────────────────────────────────
+// ── Screen: no-show (guest didn't join) — shown to the MENTOR ─────────────────
 
 export function NoShowGuestScreen({
   session,
   onMarkNoShow,
+  onLeave,
 }: {
   session: SessionData;
-  onMarkNoShow: () => void;
+  onMarkNoShow: () => Promise<MarkNoShowResult>;
+  onLeave: () => void;
 }) {
-  const GRACE_MS = 15 * 60 * 1000;
-  const graceEnd = new Date(session.starts_at).getTime() + GRACE_MS;
-  const diff = useCountdown(graceEnd);
+  const diff = useCountdown(noShowOpensAt(session.starts_at));
   const graceOver = diff === 0;
-  const [confirming, setConfirming] = useState(false);
 
   return (
     <div style={{ minHeight: "100vh", background: "#1A1A1A", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", padding: "40px 24px", fontFamily: "Inter, sans-serif", color: "#F0EFEB" }}>
@@ -203,27 +302,12 @@ export function NoShowGuestScreen({
             </p>
           </div>
         ) : (
-          <>
-            {!confirming ? (
-              <button
-                onClick={() => setConfirming(true)}
-                style={{
-                  padding: "12px 24px", background: "rgba(192,57,43,0.85)", border: "none",
-                  borderRadius: 8, color: "#fff", fontSize: 15, fontWeight: 600, cursor: "pointer", width: "100%",
-                }}
-              >
-                Encerrar como no-show
-              </button>
-            ) : (
-              <div style={{ background: "rgba(255,255,255,0.06)", borderRadius: 12, padding: "20px 24px", width: "100%", display: "flex", flexDirection: "column", gap: 12 }}>
-                <p style={{ fontSize: 14, margin: 0 }}>Confirmar que o convidado não compareceu?</p>
-                <div style={{ display: "flex", gap: 8 }}>
-                  <button onClick={() => setConfirming(false)} style={{ flex: 1, padding: "10px", background: "transparent", border: "1px solid rgba(255,255,255,0.2)", borderRadius: 8, color: "#F0EFEB", cursor: "pointer" }}>Cancelar</button>
-                  <button onClick={onMarkNoShow} style={{ flex: 1, padding: "10px", background: "#C0392B", border: "none", borderRadius: 8, color: "#fff", fontWeight: 600, cursor: "pointer" }}>Confirmar</button>
-                </div>
-              </div>
-            )}
-          </>
+          <NoShowConfirm
+            label="Encerrar como no-show"
+            question="Confirmar que o convidado não compareceu?"
+            onMarkNoShow={onMarkNoShow}
+            onLeave={onLeave}
+          />
         )}
       </div>
     </div>
