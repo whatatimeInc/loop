@@ -12,22 +12,22 @@
     "test": "node --test \"lib/**/*.test.ts\""
   },
   "dependencies": {
-    "@daily-co/daily-react": "^0.25.3",
-    "@prisma/client": "^7.8.0",
+    "@daily-co/daily-react": "^0.26.0",
+    "@prisma/client": "^7.10.0",
     "@sentry/nextjs": "^11.0.0",
-    "@supabase/ssr": "^0.10.3",
+    "@supabase/ssr": "^0.12.7",
     "@supabase/supabase-js": "^2.105.4",
-    "date-fns": "^4.1.0",
+    "date-fns": "^4.4.0",
     "framer-motion": "^12.38.0",
     "gsap": "^3.15.0",
-    "iconoir-react": "^7.11.1",
-    "next": "16.2.6",
-    "next-intl": "^4.11.1",
-    "prisma": "^7.8.0",
-    "react": "19.2.4",
-    "react-dom": "19.2.4",
-    "resend": "^6.12.3",
-    "zod": "^4.4.3"
+    "iconoir-react": "^7.12.1",
+    "next": "16.3.6",
+    "next-intl": "^4.14.6",
+    "prisma": "^7.10.0",
+    "react": "19.3.0",
+    "react-dom": "19.3.0",
+    "resend": "^6.28.1",
+    "zod": "^4.6.5"
   },
   "devDependencies": {
     "@tailwindcss/postcss": "^4",
@@ -35,9 +35,9 @@
     "@types/react": "^19",
     "@types/react-dom": "^19",
     "eslint": "^9.39.5",
-    "eslint-config-next": "^16.2.6",
+    "eslint-config-next": "^16.3.6",
     "tailwindcss": "^4",
-    "tsx": "^4.21.0",
+    "tsx": "^4.23.15",
     "typescript": "^5"
   }
 }
